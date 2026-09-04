@@ -88,6 +88,8 @@ struct RootView: View {
                     engine.nudgeVolume(-0.04)
                 case .toggleMute:
                     engine.toggleMute()
+                case .togglePlayPause:
+                    engine.togglePlayPause()
                 case .nextScene:
                     stepScene(by: 1)
                 case .previousScene:

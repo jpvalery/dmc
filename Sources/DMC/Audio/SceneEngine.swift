@@ -51,6 +51,27 @@ final class SceneEngine: ObservableObject {
     private var configChangePending = false
 
     var isPlaying: Bool { activeSceneID != nil }
+
+    /// Paused rather than stopped: the graph stays attached and every player keeps its position,
+    /// so resuming picks up mid-loop instead of restarting the scene.
+    @Published private(set) var isPaused = false
+
+    /// Transport toggle for the whole mix. Does nothing when no scene is loaded — "play" here
+    /// resumes what was paused rather than guessing which scene to start.
+    func togglePlayPause() {
+        guard activeSceneID != nil else { return }
+        if isPaused {
+            do {
+                try ensureRunning()
+                isPaused = false
+            } catch {
+                problems.append("Could not resume audio: \(error.localizedDescription)")
+            }
+        } else {
+            engine.pause()
+            isPaused = true
+        }
+    }
     var currentScene: SoundScene? { activeScene }
 
     func isLive(layer id: UUID) -> Bool { active.contains { $0.layer.id == id } }
@@ -147,6 +168,7 @@ final class SceneEngine: ObservableObject {
     // MARK: - Engine lifecycle
 
     private func ensureRunning() throws {
+        isPaused = false
         guard !engine.isRunning else { return }
         engine.prepare()
         try engine.start()
@@ -183,6 +205,7 @@ final class SceneEngine: ObservableObject {
     private func stopEngineIfIdle() {
         guard active.isEmpty, retiring.isEmpty, engine.isRunning else { return }
         engine.stop()
+        isPaused = false
     }
 
     /// Tear everything down immediately, no fades. Used when the graph is already invalid.

@@ -235,6 +235,13 @@ struct SceneRail: View {
                         .padding(12)
                     }
 
+                    Button { engine.togglePlayPause() } label: {
+                        Image(systemName: engine.isPaused ? "play.fill" : "pause.fill")
+                    }
+                    .buttonStyle(.borderless)
+                    .disabled(!engine.isPlaying)
+                    .help(engine.isPaused ? "Resume" : "Pause")
+
                     Button { engine.stopAll() } label: { Image(systemName: "stop.fill") }
                         .buttonStyle(.borderless)
                         .disabled(!engine.isPlaying)
@@ -251,14 +258,26 @@ struct SceneRail: View {
                             .frame(width: 14)
                         Slider(value: $engine.masterVolume, in: 0...1)
                     }
-                    Button {
-                        engine.stopAll()
-                    } label: {
-                        Label("Stop all", systemImage: "stop.fill")
-                            .font(.caption)
-                            .frame(maxWidth: .infinity)
+                    HStack(spacing: 6) {
+                        Button {
+                            engine.togglePlayPause()
+                        } label: {
+                            Label(engine.isPaused ? "Resume" : "Pause",
+                                  systemImage: engine.isPaused ? "play.fill" : "pause.fill")
+                                .font(.caption)
+                                .frame(maxWidth: .infinity)
+                        }
+                        .disabled(!engine.isPlaying)
+
+                        Button {
+                            engine.stopAll()
+                        } label: {
+                            Label("Stop all", systemImage: "stop.fill")
+                                .font(.caption)
+                                .frame(maxWidth: .infinity)
+                        }
+                        .disabled(!engine.isPlaying)
                     }
-                    .disabled(!engine.isPlaying)
                 }
                 .padding(8)
             }

@@ -16,7 +16,7 @@ RGB effects, and let VIA remap encoder rotation. Both needed a rebuild.
 
 | Encoder | Rotate | Press |
 |---------|--------|-------|
-| left    | DMC master volume | stop all audio |
+| left    | DMC master volume | pause / resume |
 | centre  | mousewheel | middle click |
 | right   | RGB brightness | RGB mode next |
 
@@ -27,10 +27,14 @@ steps. Over the laptop speakers the identical keycodes behave perfectly, which m
 look intermittent and sends you chasing the encoder, the tap timing and `ENCODER_MAP` in turn.
 None of those are the cause.
 
-Instead it sends `LALT(KC_F13)` / `LALT(KC_F14)` / `LALT(KC_F15)`, which DMC reads as hotkey
-slots 24-26 and maps to master volume up, down and stop-all. That bypasses macOS and Bluetooth
-entirely, and only rides the ambience — a Discord ping stays where you set it. The trade-off is
-that it does nothing while DMC is closed.
+It sends bare `KC_F17` / `KC_F18` / `KC_F19` instead, which DMC reads as hotkey slots 4-6 and
+maps to master volume up, down and pause/resume. That bypasses macOS and Bluetooth entirely, and
+only rides the ambience — a Discord ping stays where you set it. The trade-off is that it does
+nothing while DMC is closed.
+
+`F17`-`F20` specifically, and without a modifier. `F14`/`F15` are brightness on Apple keyboards
+and macOS claims them whatever modifier you add: `LALT(KC_F14)` opened Displays settings *as well
+as* reaching DMC. `F17`-`F20` carry no default binding at all.
 
 DMC reads these as hotkey slots: bare `F13`–`F16` are slots 0–3, shifted 8–11, control 16–19.
 See `HotkeyManager.padLayout`.

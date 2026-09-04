@@ -21,6 +21,8 @@ enum HotkeyAction: Codable, Hashable {
     case newScene
     /// Silence the ambience without stopping it.
     case toggleMute
+    /// Pause the mix in place and resume it mid-loop.
+    case togglePlayPause
 }
 
 /// A macropad key DMC listens for.
@@ -107,10 +109,14 @@ final class HotkeyManager: ObservableObject {
         2: .sceneIndex(7),  10: .sceneIndex(8),  18: .sceneIndex(9),   // column 3  (M6,M7,M8)
         3: .previousScene,  11: .newScene,       19: .nextScene,       // column 4  (M9,M10,M11)
 
-        // The left knob, on the otherwise-unused Option bank. It drives DMC's own master
-        // volume rather than the system's: macOS routes system volume to AirPods over AVRCP
-        // absolute volume, which coalesces rapid encoder taps into jumps instead of steps.
-        24: .volumeUp, 25: .volumeDown, 26: .stopAll,
+        // The left knob drives DMC's own master volume rather than the system's: macOS routes
+        // system volume to AirPods over AVRCP absolute volume, which coalesces rapid encoder
+        // taps into jumps instead of steps.
+        //
+        // Bare F17-F19 specifically. F14/F15 are brightness on Apple keyboards and macOS claims
+        // them whatever modifier is added — LALT(F14) opened Displays settings *as well as*
+        // firing here. F17-F20 carry no default binding, so no modifier is needed at all.
+        4: .volumeUp, 5: .volumeDown, 6: .togglePlayPause,
     ]
 
     private static let starterLayout: [Int: HotkeyAction] = padLayout

@@ -78,6 +78,9 @@ struct DMCApp: App {
 
                 Divider()
 
+                Button(engine.isPaused ? "Resume Audio" : "Pause Audio") { engine.togglePlayPause() }
+                    .keyboardShortcut(.space, modifiers: [.command, .shift])
+                    .disabled(!engine.isPlaying)
                 Button("Stop All Audio") { engine.stopAll() }
                     .disabled(!engine.isPlaying)
                 Button("Macropad & Hotkeys…") { router.showHotkeys = true }

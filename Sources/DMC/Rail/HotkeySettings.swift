@@ -79,6 +79,7 @@ struct HotkeySettings: View {
                 Text("Previous scene").tag(HotkeyAction.previousScene)
                 Text("New scene…").tag(HotkeyAction.newScene)
                 Text("Mute / unmute").tag(HotkeyAction.toggleMute)
+                Text("Pause / resume").tag(HotkeyAction.togglePlayPause)
 
                 Divider()
                 Section("By position in the rail") {
@@ -137,6 +138,7 @@ struct HotkeySettings: View {
         case .previousScene: "Previous scene"
         case .newScene: "New scene"
         case .toggleMute: "Mute / unmute"
+        case .togglePlayPause: "Pause / resume"
         case .scene(let id): store.scenes.first { $0.id == id }.map { "Scene: \($0.name)" } ?? "Scene: (deleted)"
         case .sceneIndex(let position): "Position \(position)"
         }
