@@ -40,8 +40,8 @@ struct HotkeySettings: View {
             Divider()
 
             HStack(spacing: 8) {
-                Button("Suggested layout") { applySuggestedLayout() }
-                    .help("15 keys to your first 15 scenes, three encoders on the Control bank")
+                Button("Match macropad") { applySuggestedLayout() }
+                    .help("M0-M8 to rail positions 1-9 down each column, M9-M11 to prev / new / next")
                 Button("Clear all") {
                     for slot in HotkeySlot.all { hotkeys.setBinding(.none, for: slot) }
                 }
@@ -77,10 +77,23 @@ struct HotkeySettings: View {
                 Text("Volume down").tag(HotkeyAction.volumeDown)
                 Text("Next scene").tag(HotkeyAction.nextScene)
                 Text("Previous scene").tag(HotkeyAction.previousScene)
+                Text("New scene…").tag(HotkeyAction.newScene)
+
+                Divider()
+                Section("By position in the rail") {
+                    ForEach(1...16, id: \.self) { position in
+                        let name = store.scenes.indices.contains(position - 1)
+                            ? store.scenes[position - 1].name
+                            : "empty"
+                        Text("Position \(position) — \(name)").tag(HotkeyAction.sceneIndex(position))
+                    }
+                }
+
                 if !store.scenes.isEmpty {
-                    Divider()
-                    ForEach(store.scenes) { scene in
-                        Text("Scene: \(scene.name)").tag(HotkeyAction.scene(scene.id))
+                    Section("Pinned to one scene") {
+                        ForEach(store.scenes) { scene in
+                            Text(scene.name).tag(HotkeyAction.scene(scene.id))
+                        }
                     }
                 }
             }
@@ -88,20 +101,11 @@ struct HotkeySettings: View {
         }
     }
 
-    /// Fifteen pad keys onto the bare and Shift banks, then the three encoders onto Control.
+    /// The 4x3 Winry315 pad: F13-F16 bare and shifted are the first eight rail positions,
+    /// and the Control row is transport. Slots the pad cannot send are left clear.
     private func applySuggestedLayout() {
         for slot in HotkeySlot.all { hotkeys.setBinding(.none, for: slot) }
-
-        for (index, scene) in store.scenes.prefix(15).enumerated() {
-            hotkeys.setBinding(.scene(scene.id), for: HotkeySlot.all[index])
-        }
-        // Encoder 1 on ⌃F13–⌃F15, encoder 2 on ⌃F16–⌃F18. Encoder 3 (⌃F19, ⌃F20, ⌥F13) is
-        // left free — there is no third action worth inventing yet.
-        let encoders: [(Int, HotkeyAction)] = [
-            (16, .volumeUp), (17, .volumeDown), (18, .stopAll),
-            (19, .nextScene), (20, .previousScene),
-        ]
-        for (index, action) in encoders {
+        for (index, action) in HotkeyManager.padLayout {
             hotkeys.setBinding(action, for: HotkeySlot.all[index])
         }
     }
@@ -130,7 +134,9 @@ struct HotkeySettings: View {
         case .volumeDown: "Volume down"
         case .nextScene: "Next scene"
         case .previousScene: "Previous scene"
+        case .newScene: "New scene"
         case .scene(let id): store.scenes.first { $0.id == id }.map { "Scene: \($0.name)" } ?? "Scene: (deleted)"
+        case .sceneIndex(let position): "Position \(position)"
         }
     }
 }

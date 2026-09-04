@@ -6,6 +6,7 @@ struct DMCApp: App {
     @StateObject private var engine = SceneEngine()
     @StateObject private var store = SceneStore()
     @StateObject private var router = UIRouter()
+    @StateObject private var campaigns = CampaignStore()
 
     @AppStorage("pane.railCollapsed") private var railCollapsed = false
     @AppStorage("pane.notesHidden") private var notesHidden = false
@@ -18,6 +19,7 @@ struct DMCApp: App {
                      engine: engine,
                      store: store,
                      router: router,
+                     campaigns: campaigns,
                      railCollapsed: $railCollapsed,
                      notesHidden: $notesHidden)
         }
@@ -34,6 +36,9 @@ struct DMCApp: App {
                 Button("Browse Tabletop Audio…") { router.showTabletop = true }
                     .keyboardShortcut("l", modifiers: [.command, .shift])
                 Button("Import SoundPad JSON…") { router.showPadImport = true }
+                Divider()
+                Button("New Campaign…") { router.showNewCampaign = true }
+                    .keyboardShortcut("n", modifiers: [.command, .shift])
             }
 
             // ⌘\ is deliberately left unbound so 1Password's Universal Autofill hotkey reaches
@@ -76,6 +81,13 @@ struct DMCApp: App {
                 Button("Stop All Audio") { engine.stopAll() }
                     .disabled(!engine.isPlaying)
                 Button("Macropad & Hotkeys…") { router.showHotkeys = true }
+
+                Menu("Switch Campaign") {
+                    ForEach(campaigns.sorted) { campaign in
+                        Button(campaign.name) { campaigns.activate(campaign.id) }
+                            .disabled(campaign.id == campaigns.activeID)
+                    }
+                }
                 Button("Import Folders as Scenes") { store.importFolders() }
                 Button("Reload Scenes") { store.reload() }
                 Button("Reveal Vault in Finder") { Vault.reveal(Vault.root) }

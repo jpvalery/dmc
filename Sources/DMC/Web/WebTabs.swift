@@ -27,14 +27,28 @@ final class TabsModel: ObservableObject {
     /// When set, this tab is shown beside the selected one.
     @Published var secondaryID: WebTab.ID?
 
-    private static let sessionKey = "web.openTabs"
-
-    /// Every tab shares `WKWebsiteDataStore.default()`, so one sign-in covers all of them.
+    /// Every tab shares `WKWebsiteDataStore.default()`, so one sign-in covers all of them —
+    /// including across campaigns, which is what you want: same account, different game.
     init() {
-        let saved = UserDefaults.standard.stringArray(forKey: Self.sessionKey) ?? []
-        let urls = saved.compactMap(URL.init(string:))
-        tabs = urls.isEmpty ? [makeTab(Home.url())] : urls.map { makeTab($0) }
+        Vault.bootstrap()
+        tabs = Self.savedURLs().map { makeTab($0) }
+        if tabs.isEmpty { tabs = [makeTab(Home.url())] }
         selectedID = tabs.first?.id
+    }
+
+    private static func savedURLs() -> [URL] {
+        guard let data = try? Data(contentsOf: Vault.tabsFile),
+              let strings = try? JSONDecoder().decode([String].self, from: data)
+        else { return [] }
+        return strings.compactMap(URL.init(string:))
+    }
+
+    /// Swap in another campaign's pages. The old tabs' web views go with them.
+    func reloadForCampaign() {
+        tabs = Self.savedURLs().map { makeTab($0) }
+        if tabs.isEmpty { tabs = [makeTab(Home.url())] }
+        selectedID = tabs.first?.id
+        secondaryID = nil
     }
 
     var selected: WebTab? {
@@ -120,9 +134,11 @@ final class TabsModel: ObservableObject {
     }
 
     /// Remember which pages were open, so a relaunch mid-session doesn't lose the DM's place.
+    /// Stored per campaign, next to that campaign's scenes.
     func persist() {
-        UserDefaults.standard.set(tabs.map(\.controller.urlText).filter { !$0.isEmpty },
-                                  forKey: Self.sessionKey)
+        let urls = tabs.map(\.controller.urlText).filter { !$0.isEmpty }
+        guard let data = try? JSONEncoder().encode(urls) else { return }
+        try? data.write(to: Vault.tabsFile, options: .atomic)
     }
 }
 

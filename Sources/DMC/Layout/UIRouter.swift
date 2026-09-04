@@ -17,6 +17,9 @@ final class UIRouter: ObservableObject {
     @Published var showTabletop = false
     @Published var showPadImport = false
     @Published var showHotkeys = false
+    @Published var showNewCampaign = false
+    @Published var renaming: Campaign?
+    @Published var deleting: Campaign?
 
     func newScene() {
         editing = EditorTarget(scene: SoundScene(name: "New scene", symbol: "waveform"), isNew: true)

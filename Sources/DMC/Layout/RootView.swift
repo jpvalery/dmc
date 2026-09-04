@@ -6,6 +6,7 @@ struct RootView: View {
     @ObservedObject var engine: SceneEngine
     @ObservedObject var store: SceneStore
     @ObservedObject var router: UIRouter
+    @ObservedObject var campaigns: CampaignStore
     @Binding var railCollapsed: Bool
     @Binding var notesHidden: Bool
 
@@ -19,6 +20,8 @@ struct RootView: View {
             SceneRail(engine: engine,
                       store: store,
                       collapsed: railCollapsed,
+                      campaigns: campaigns,
+                      router: router,
                       onNew: router.newScene,
                       onEdit: router.edit,
                       onBrowse: { router.showTabletop = true })
@@ -42,6 +45,19 @@ struct RootView: View {
         .sheet(isPresented: $router.showTabletop) {
             TabletopBrowser(catalogue: catalogue, downloader: downloader)
         }
+        .sheet(isPresented: $router.showNewCampaign) {
+            CampaignNameSheet(title: "New campaign",
+                              confirmLabel: "Create",
+                              name: "") { campaigns.create(name: $0) }
+        }
+        .sheet(item: $router.renaming) { campaign in
+            CampaignNameSheet(title: "Rename campaign",
+                              confirmLabel: "Save",
+                              name: campaign.name) { campaigns.rename(campaign.id, to: $0) }
+        }
+        .sheet(item: $router.deleting) { campaign in
+            DeleteCampaignSheet(campaign: campaign) { campaigns.delete(campaign.id) }
+        }
         .sheet(isPresented: $router.showHotkeys) {
             HotkeySettings(hotkeys: hotkeys, store: store)
         }
@@ -61,6 +77,9 @@ struct RootView: View {
                     break
                 case .scene(let id):
                     if let scene = store.scenes.first(where: { $0.id == id }) { engine.toggle(scene) }
+                case .sceneIndex(let position):
+                    let i = position - 1
+                    if store.scenes.indices.contains(i) { engine.toggle(store.scenes[i]) }
                 case .stopAll:
                     engine.stopAll()
                 case .volumeUp:
@@ -71,9 +90,23 @@ struct RootView: View {
                     stepScene(by: 1)
                 case .previousScene:
                     stepScene(by: -1)
+                case .newScene:
+                    router.newScene()
                 }
             }
             hotkeys.register()
+
+            // Switching campaigns swaps scenes, notes, tabs and macropad bindings together.
+            // Audio stops first: the scenes it is playing are about to be replaced.
+            campaigns.onWillSwitch = {
+                engine.stopAll()
+                tabs.persist()
+            }
+            campaigns.onDidSwitch = {
+                store.reload()
+                tabs.reloadForCampaign()
+                hotkeys.reloadForCampaign()
+            }
             // Capture the open pages on quit so a relaunch mid-session keeps the DM's place.
             NotificationCenter.default.addObserver(
                 forName: NSApplication.willTerminateNotification, object: nil, queue: .main

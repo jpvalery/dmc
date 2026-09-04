@@ -49,6 +49,22 @@ final class SceneStore: ObservableObject {
         persist()
     }
 
+    /// Reorder by identity rather than index: a drag knows which scene it grabbed and which it
+    /// was dropped on, and resolving indices at drop time avoids stale offsets.
+    /// A nil target means "put it last".
+    func move(_ id: UUID, before targetID: UUID?) {
+        guard id != targetID, let from = scenes.firstIndex(where: { $0.id == id }) else { return }
+        let moving = scenes.remove(at: from)
+        if let targetID, let to = scenes.firstIndex(where: { $0.id == targetID }) {
+            scenes.insert(moving, at: to)
+        } else {
+            scenes.append(moving)
+        }
+        persist()
+    }
+
+    func contains(_ id: UUID) -> Bool { scenes.contains { $0.id == id } }
+
     /// Bring in any audio subfolder that isn't already a scene.
     ///
     /// Saving a scene creates `scenes.json`, which switches off the folder-per-scene fallback —

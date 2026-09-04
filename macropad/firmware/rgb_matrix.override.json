@@ -1,0 +1,12 @@
+{
+    "rgb_matrix": {
+        "animations": {
+            "solid_reactive": true,
+            "solid_reactive_wide": true,
+            "splash": true
+        },
+        "default": {
+            "animation": "splash"
+        }
+    }
+}

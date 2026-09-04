@@ -5,13 +5,20 @@ import Foundation
 
 enum HotkeyAction: Codable, Hashable {
     case none
+    /// Pinned to one scene, wherever it sits in the rail.
     case scene(UUID)
+    /// Whatever is at this 1-based position in the rail. Survives renaming, deleting and
+    /// recreating a scene, and follows the rail when scenes are dragged into a new order —
+    /// which is what muscle memory actually wants from a pad.
+    case sceneIndex(Int)
     case stopAll
     case volumeUp
     case volumeDown
     /// Step through the rail. Made for a rotary encoder, where turning is cheap and precise.
     case nextScene
     case previousScene
+    /// Opens the scene editor on a blank scene — building a new ambience without leaving the pad.
+    case newScene
 }
 
 /// A macropad key DMC listens for.
@@ -61,7 +68,6 @@ final class HotkeyManager: ObservableObject {
     /// Dispatched on the main actor when a bound key fires.
     var onAction: ((HotkeyAction) -> Void)?
 
-    private static let defaultsKey = "hotkeys.bindings"
     private static let signature = OSType(0x444D4321)  // 'DMC!'
     private static weak var current: HotkeyManager?
 
@@ -69,16 +75,41 @@ final class HotkeyManager: ObservableObject {
     private var handler: EventHandlerRef?
 
     init() {
+        Vault.bootstrap()
         Self.current = self
-        if let data = UserDefaults.standard.data(forKey: Self.defaultsKey),
-           let decoded = try? JSONDecoder().decode([Int: HotkeyAction].self, from: data) {
-            bindings = decoded
-        } else {
-            // Sensible starting point: the Control bank is the suggested encoder bank.
-            bindings = [16: .volumeUp, 17: .volumeDown, 18: .stopAll,
-                        19: .nextScene, 20: .previousScene]
-        }
+        bindings = Self.saved() ?? Self.starterLayout
         register()
+    }
+
+    /// Bindings name scene ids, so they belong to the campaign those scenes live in.
+    private static func saved() -> [Int: HotkeyAction]? {
+        guard let data = try? Data(contentsOf: Vault.hotkeysFile),
+              let decoded = try? JSONDecoder().decode([Int: HotkeyAction].self, from: data),
+              !decoded.isEmpty
+        else { return nil }
+        return decoded
+    }
+
+    /// Matches the Winry315 pad on this desk: 12 keys in a 4x3 grid sending F13-F16 bare
+    /// (slots 0-3), with Shift (slots 8-11) and with Control (slots 16-19). The Control row is
+    /// transport; the two above it are the first eight rail positions.
+    /// The pad numbers its macros column-major (M0/M1/M2 are column one, top to bottom), so
+    /// M0-M8 are the first three columns and become rail positions 1-9 reading *down* each
+    /// column. The fourth column (M9/M10/M11) is scene navigation.
+    ///
+    ///     M0 -> F13        M1 -> LSFT(F13)   M2 -> LCTL(F13)
+    ///     M3 -> F14        M4 -> LSFT(F14)   M5 -> LCTL(F14)   ... etc
+    static let padLayout: [Int: HotkeyAction] = [
+        0: .sceneIndex(1),   8: .sceneIndex(2),  16: .sceneIndex(3),   // column 1  (M0,M1,M2)
+        1: .sceneIndex(4),   9: .sceneIndex(5),  17: .sceneIndex(6),   // column 2  (M3,M4,M5)
+        2: .sceneIndex(7),  10: .sceneIndex(8),  18: .sceneIndex(9),   // column 3  (M6,M7,M8)
+        3: .previousScene,  11: .newScene,       19: .nextScene,       // column 4  (M9,M10,M11)
+    ]
+
+    private static let starterLayout: [Int: HotkeyAction] = padLayout
+
+    func reloadForCampaign() {
+        bindings = Self.saved() ?? Self.starterLayout
     }
 
     // No deinit: `current` is a weak reference that clears itself, and this manager lives for
@@ -139,6 +170,6 @@ final class HotkeyManager: ObservableObject {
 
     private func persist() {
         guard let data = try? JSONEncoder().encode(bindings) else { return }
-        UserDefaults.standard.set(data, forKey: Self.defaultsKey)
+        try? data.write(to: Vault.hotkeysFile, options: .atomic)
     }
 }

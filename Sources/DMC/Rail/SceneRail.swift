@@ -4,11 +4,16 @@ struct SceneRail: View {
     @ObservedObject var engine: SceneEngine
     @ObservedObject var store: SceneStore
     let collapsed: Bool
+    @ObservedObject var campaigns: CampaignStore
+    @ObservedObject var router: UIRouter
     let onNew: () -> Void
     let onEdit: (SoundScene) -> Void
     let onBrowse: () -> Void
 
     @State private var showVolumePopover = false
+    /// The scene a drag would land in front of; nil while nothing is hovered.
+    @State private var dropTarget: UUID?
+    @State private var dropAtEnd = false
 
     var body: some View {
         VStack(spacing: 0) {
@@ -21,8 +26,9 @@ struct SceneRail: View {
                 ScrollView {
                     VStack(spacing: 4) {
                         ForEach(Array(store.scenes.enumerated()), id: \.element.id) { index, scene in
-                            sceneButton(scene, shortcutIndex: index)
+                            reorderable(scene, shortcutIndex: index)
                         }
+                        endDropZone
                     }
                     .padding(6)
                 }
@@ -36,6 +42,56 @@ struct SceneRail: View {
         .background(Color(nsColor: .controlBackgroundColor))
     }
 
+    // MARK: - Reordering
+
+    /// Drag to reorder. Order is not cosmetic — it drives ⌘1–⌘9 and "Assign scenes in order"
+    /// on the macropad, so putting the scenes you reach for first at the top actually matters.
+    private func reorderable(_ scene: SoundScene, shortcutIndex: Int) -> some View {
+        sceneButton(scene, shortcutIndex: shortcutIndex)
+            .opacity(dropTarget == scene.id ? 0.75 : 1)
+            .overlay(alignment: .top) { insertionLine(visible: dropTarget == scene.id) }
+            .draggable(scene.id.uuidString) {
+                Label(scene.name, systemImage: scene.symbol)
+                    .padding(6)
+                    .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 6))
+            }
+            .dropDestination(for: String.self) { items, _ in
+                dropTarget = nil
+                return accept(items, before: scene.id)
+            } isTargeted: { targeted in
+                if targeted { dropTarget = scene.id }
+                else if dropTarget == scene.id { dropTarget = nil }
+            }
+    }
+
+    /// A short strip under the last scene, so something can be dragged to the very end.
+    private var endDropZone: some View {
+        Color.clear
+            .frame(height: 20)
+            .overlay(alignment: .top) { insertionLine(visible: dropAtEnd) }
+            .dropDestination(for: String.self) { items, _ in
+                dropAtEnd = false
+                return accept(items, before: nil)
+            } isTargeted: { dropAtEnd = $0 }
+    }
+
+    private func insertionLine(visible: Bool) -> some View {
+        Capsule()
+            .fill(Color.accentColor)
+            .frame(height: 2)
+            .opacity(visible ? 1 : 0)
+    }
+
+    /// Only our own scene drags are honoured; stray text dropped on the rail is ignored.
+    private func accept(_ items: [String], before target: UUID?) -> Bool {
+        guard let raw = items.first,
+              let id = UUID(uuidString: raw),
+              store.contains(id)
+        else { return false }
+        store.move(id, before: target)
+        return true
+    }
+
     // MARK: - Pieces
 
     private var header: some View {
@@ -44,6 +100,8 @@ struct SceneRail: View {
                 Text("Scenes").font(.caption.weight(.semibold)).foregroundStyle(.secondary)
                 Spacer()
             }
+            CampaignMenu(campaigns: campaigns, router: router, collapsed: collapsed)
+            if !collapsed { Spacer(minLength: 0) }
             Button(action: onNew) { Image(systemName: "plus") }
                 .buttonStyle(.borderless)
                 .help("New scene")
