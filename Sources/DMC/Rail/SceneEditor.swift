@@ -181,10 +181,35 @@ private struct LayerRow: View {
                 Toggle("Loop", isOn: $layer.loops)
                     .toggleStyle(.checkbox)
                     .font(.caption)
+                    .disabled(layer.sporadic)
+                Toggle("Sporadic", isOn: $layer.sporadic)
+                    .toggleStyle(.checkbox)
+                    .font(.caption)
+                    .help("Fire at random intervals instead of looping")
                 Button(role: .destructive, action: onRemove) {
                     Image(systemName: "minus.circle")
                 }
                 .buttonStyle(.borderless)
+            }
+
+            if layer.sporadic {
+                HStack(spacing: 4) {
+                    Image(systemName: "dice").font(.caption2).foregroundStyle(.secondary)
+                    Text("every").font(.caption2).foregroundStyle(.secondary)
+                    Stepper(value: $layer.minGap, in: 1...300, step: 1) {
+                        Text("\(Int(layer.minGap))s").font(.caption2.monospacedDigit())
+                            .frame(width: 30, alignment: .trailing)
+                    }
+                    Text("to").font(.caption2).foregroundStyle(.secondary)
+                    Stepper(value: $layer.maxGap, in: 1...300, step: 1) {
+                        Text("\(Int(layer.maxGap))s").font(.caption2.monospacedDigit())
+                            .frame(width: 30, alignment: .trailing)
+                    }
+                    if !layer.variants.isEmpty {
+                        Text("· \(layer.variants.count + 1) variants")
+                            .font(.caption2).foregroundStyle(.tertiary)
+                    }
+                }
             }
 
             HStack(spacing: 6) {

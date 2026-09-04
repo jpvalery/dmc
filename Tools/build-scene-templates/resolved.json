@@ -1,0 +1,1266 @@
+{
+  "596bfc9ee4667c22202107c6": {
+    "id": "596bfc9ee4667c22202107c6",
+    "name": "Cave Ambience",
+    "fileName": "cave-ambience",
+    "tags": [
+      "cavern",
+      "ambient",
+      "bats",
+      "echo"
+    ],
+    "source": {
+      "urls": [
+        "https://freesound.org/people/LittleRobotSoundFactory/sounds/270387/"
+      ],
+      "author": "Morten Barfod S\u00f8egaard"
+    },
+    "type": "LOOP"
+  },
+  "596c0e141ad11a4338b81fc2": {
+    "id": "596c0e141ad11a4338b81fc2",
+    "name": "Small Fountain",
+    "fileName": "fountain-small",
+    "tags": [
+      "running",
+      "water",
+      "trickle"
+    ],
+    "source": {
+      "urls": [
+        "http://www.sonniss.com/gameaudiogdc2017/"
+      ],
+      "author": null
+    },
+    "type": "LOOP"
+  },
+  "596c0fe51ad11a4338b81fca": {
+    "id": "596c0fe51ad11a4338b81fca",
+    "name": "Ominous Ambience",
+    "fileName": "ominous-ambience",
+    "tags": [
+      "spooky",
+      "graveyard",
+      "horror",
+      "ghosts",
+      "spirits",
+      "crypt"
+    ],
+    "source": {
+      "urls": [
+        "http://www.sonniss.com/gameaudiogdc2017/"
+      ],
+      "author": null
+    },
+    "type": "LOOP"
+  },
+  "596c102c1ad11a4338b81fcb": {
+    "id": "596c102c1ad11a4338b81fcb",
+    "name": "Ghosts Pass By",
+    "samples": [
+      "ghosts-pass-by"
+    ],
+    "minSecondsBetween": 10,
+    "maxSecondsBetween": 20,
+    "tags": [
+      "spooky",
+      "spirits",
+      "horror",
+      "crypt",
+      "abandoned",
+      "ritual",
+      "temple",
+      "cult"
+    ],
+    "source": {
+      "urls": [
+        "http://www.sonniss.com/gameaudiogdc2017/"
+      ],
+      "author": null
+    },
+    "type": "ONESHOT"
+  },
+  "596c10731ad11a4338b81fcd": {
+    "id": "596c10731ad11a4338b81fcd",
+    "name": "Necromantic Spell",
+    "samples": [
+      "necromantic-spell"
+    ],
+    "minSecondsBetween": 10,
+    "maxSecondsBetween": 20,
+    "tags": [
+      "spooky",
+      "eerie",
+      "evil",
+      "haunted",
+      "dark"
+    ],
+    "source": {
+      "urls": [
+        "http://www.sonniss.com/gameaudiogdc2017/"
+      ],
+      "author": null
+    },
+    "type": "ONESHOT"
+  },
+  "596c15661ad11a4338b81fd7": {
+    "id": "596c15661ad11a4338b81fd7",
+    "name": "Back Alleys",
+    "fileName": "back-alleys",
+    "tags": [
+      "quiet",
+      "streets",
+      "ambience"
+    ],
+    "source": {
+      "urls": [
+        "http://www.sonniss.com/gameaudiogdc2017/"
+      ],
+      "author": null
+    },
+    "type": "LOOP"
+  },
+  "596c16241ad11a4338b81fd9": {
+    "id": "596c16241ad11a4338b81fd9",
+    "name": "Mangrove",
+    "fileName": "mangrove",
+    "tags": [
+      "dusk",
+      "insects",
+      "birds",
+      "tropical",
+      "swamp"
+    ],
+    "source": {
+      "urls": [
+        "http://www.sonniss.com/gameaudiogdc2017/"
+      ],
+      "author": null
+    },
+    "type": "LOOP"
+  },
+  "596c16911ad11a4338b81fdc": {
+    "id": "596c16911ad11a4338b81fdc",
+    "name": "Wetland",
+    "fileName": "wetland",
+    "tags": [
+      "night",
+      "swamp",
+      "insects",
+      "birds",
+      "tropical"
+    ],
+    "source": {
+      "urls": [
+        "http://www.sonniss.com/gameaudiogdc2017/"
+      ],
+      "author": null
+    },
+    "type": "LOOP"
+  },
+  "596c1c041ad11a4338b81fe8": {
+    "id": "596c1c041ad11a4338b81fe8",
+    "name": "High Altitude",
+    "fileName": "high-altitude",
+    "tags": [
+      "wind",
+      "mountains",
+      "birds",
+      "air",
+      "cold",
+      "forest",
+      "cliff",
+      "floating"
+    ],
+    "source": {
+      "urls": [
+        "http://www.sonniss.com/gameaudiogdc2017/"
+      ],
+      "author": "Charlie Atanasyan"
+    },
+    "type": "LOOP"
+  },
+  "596d2dc3c98d54325ca2c936": {
+    "id": "596d2dc3c98d54325ca2c936",
+    "name": "Jurassic Jungle",
+    "fileName": "jurassic-jungle",
+    "tags": [
+      "birds",
+      "insects",
+      "dinosaur",
+      "tropical",
+      "rainforest"
+    ],
+    "source": {
+      "urls": [
+        "http://www.sonniss.com/gameaudiogdc2017/"
+      ],
+      "author": "Charlie Atanasyan"
+    },
+    "type": "LOOP"
+  },
+  "596d2fdcc98d54325ca2c93c": {
+    "id": "596d2fdcc98d54325ca2c93c",
+    "name": "Occasional Waves",
+    "samples": [
+      "wave-large",
+      "wave-medium"
+    ],
+    "minSecondsBetween": 10,
+    "maxSecondsBetween": 20,
+    "tags": [
+      "ocean",
+      "sea",
+      "island",
+      "water",
+      "boat",
+      "ship"
+    ],
+    "source": {
+      "urls": [
+        "http://www.sonniss.com/gameaudiogdc2017/"
+      ],
+      "author": "Chris Skyes"
+    },
+    "type": "ONESHOT"
+  },
+  "596d300ec98d54325ca2c93f": {
+    "id": "596d300ec98d54325ca2c93f",
+    "name": "Huge Waves 1",
+    "fileName": "huge-waves-1",
+    "tags": [
+      "water",
+      "ocean",
+      "sea",
+      "island",
+      "tsunami",
+      "surf",
+      "boat",
+      "ship"
+    ],
+    "source": {
+      "urls": [
+        "http://www.sonniss.com/gameaudiogdc2017/"
+      ],
+      "author": "Chris Skyes"
+    },
+    "type": "LOOP"
+  },
+  "596d301ac98d54325ca2c940": {
+    "id": "596d301ac98d54325ca2c940",
+    "name": "Huge Waves 2",
+    "fileName": "huge-waves-2",
+    "tags": [
+      "water",
+      "ocean",
+      "sea",
+      "island",
+      "tsunami",
+      "surf",
+      "boat",
+      "ship"
+    ],
+    "source": {
+      "urls": [
+        "http://www.sonniss.com/gameaudiogdc2017/"
+      ],
+      "author": "Chris Skyes"
+    },
+    "type": "LOOP"
+  },
+  "596d31e1c98d54325ca2c942": {
+    "id": "596d31e1c98d54325ca2c942",
+    "name": "Water Below Decks",
+    "fileName": "water-below-decks",
+    "tags": [
+      "dinghy",
+      "boat",
+      "barrel",
+      "liquid",
+      "wine",
+      "sloshing"
+    ],
+    "source": {
+      "urls": [
+        "http://www.sonniss.com/gameaudiogdc2017/"
+      ],
+      "author": "Collected Transients"
+    },
+    "type": "LOOP"
+  },
+  "596d45d623ef2925a856ec03": {
+    "id": "596d45d623ef2925a856ec03",
+    "name": "Aurora Borealis",
+    "fileName": "aurora-borealis",
+    "tags": [
+      "reverb",
+      "echo",
+      "pad",
+      "portal",
+      "high"
+    ],
+    "source": {
+      "urls": [
+        "http://www.sonniss.com/gameaudiogdc2017/"
+      ],
+      "author": "Detunized"
+    },
+    "type": "LOOP"
+  },
+  "596d4b2223ef2925a856ec11": {
+    "id": "596d4b2223ef2925a856ec11",
+    "name": "Attercop",
+    "samples": [
+      "attercop-1",
+      "attercop-2",
+      "attercop-3"
+    ],
+    "minSecondsBetween": 10,
+    "maxSecondsBetween": 25,
+    "tags": [
+      "spider",
+      "bit",
+      "giant",
+      "insect",
+      "grotesque",
+      "eating",
+      "ettercap"
+    ],
+    "source": {
+      "urls": [
+        "http://www.sonniss.com/gameaudiogdc2017/"
+      ],
+      "author": "Double Trouble Audio"
+    },
+    "type": "ONESHOT"
+  },
+  "596d516523ef2925a856ec18": {
+    "id": "596d516523ef2925a856ec18",
+    "name": "Debris",
+    "samples": [
+      "debris-1",
+      "debris-2",
+      "debris-3",
+      "debris-4",
+      "debris-5",
+      "debris-6",
+      "debris-7",
+      "debris-8"
+    ],
+    "minSecondsBetween": 5,
+    "maxSecondsBetween": 15,
+    "tags": [
+      "tools",
+      "junk",
+      "breaking",
+      "dropping",
+      "workshop",
+      "wood",
+      "metal",
+      "crunch",
+      "clatter"
+    ],
+    "source": {
+      "urls": [
+        "http://www.sonniss.com/gameaudiogdc2017/"
+      ],
+      "author": "Double Trouble Audio"
+    },
+    "type": "ONESHOT"
+  },
+  "596d523023ef2925a856ec21": {
+    "id": "596d523023ef2925a856ec21",
+    "name": "Fizzy Drink",
+    "samples": [
+      "fizzy-drink-1",
+      "fizzy-drink-2",
+      "fizzy-drink-3",
+      "fizzy-drink-4"
+    ],
+    "minSecondsBetween": 15,
+    "maxSecondsBetween": 25,
+    "tags": [
+      "pouring",
+      "liquid",
+      "ale",
+      "beer",
+      "cider",
+      "urination",
+      "tavern",
+      "bar"
+    ],
+    "source": {
+      "urls": [
+        "http://www.sonniss.com/gameaudiogdc2017/"
+      ],
+      "author": "Eiravaein Sound"
+    },
+    "type": "ONESHOT"
+  },
+  "596d5968ab828c44d8ff3544": {
+    "id": "596d5968ab828c44d8ff3544",
+    "name": "Horse Walking on Stone",
+    "fileName": "horse-on-stone",
+    "tags": [
+      "cobbled",
+      "streets"
+    ],
+    "source": {
+      "urls": [
+        "http://www.sonniss.com/gameaudiogdc2017/"
+      ],
+      "author": "G4F SFX"
+    },
+    "type": "LOOP"
+  },
+  "596d5aabab828c44d8ff3549": {
+    "id": "596d5aabab828c44d8ff3549",
+    "name": "Anvil Strikes",
+    "samples": [
+      "anvil-strike",
+      "anvil-strikes"
+    ],
+    "minSecondsBetween": 5,
+    "maxSecondsBetween": 10,
+    "tags": [
+      "blacksmith",
+      "forge",
+      "hammer",
+      "workshop",
+      "metal",
+      "hit"
+    ],
+    "source": {
+      "urls": [
+        "http://www.sonniss.com/gameaudiogdc2017/"
+      ],
+      "author": "Gamemaster Audio"
+    },
+    "type": "ONESHOT"
+  },
+  "596fef6bb4c0bb0d405d4b10": {
+    "id": "596fef6bb4c0bb0d405d4b10",
+    "name": "Spit Take",
+    "samples": [
+      "spit-take"
+    ],
+    "minSecondsBetween": 10,
+    "maxSecondsBetween": 30,
+    "tags": [
+      "ale",
+      "drink",
+      "surprise",
+      "shock",
+      "spray"
+    ],
+    "source": {
+      "urls": [
+        "http://www.sonniss.com/gameaudiogdc2017/"
+      ],
+      "author": "Joshua Reinhardt"
+    },
+    "type": "ONESHOT"
+  },
+  "596ff022b4c0bb0d405d4b14": {
+    "id": "596ff022b4c0bb0d405d4b14",
+    "name": "Saddlebags",
+    "fileName": "saddlebags",
+    "tags": [
+      "leather",
+      "jog",
+      "riding",
+      "horses",
+      "running",
+      "buckles"
+    ],
+    "source": {
+      "urls": [
+        "http://www.sonniss.com/gameaudiogdc2017/"
+      ],
+      "author": "Joshua Reinhardt"
+    },
+    "type": "LOOP"
+  },
+  "596ff21db4c0bb0d405d4b18": {
+    "id": "596ff21db4c0bb0d405d4b18",
+    "name": "Dragon Roar",
+    "samples": [
+      "dragon-roar"
+    ],
+    "minSecondsBetween": 15,
+    "maxSecondsBetween": 45,
+    "tags": [
+      "snarl",
+      "roar",
+      "fire",
+      "enemy",
+      "elemental",
+      "fiend",
+      "monstrosity",
+      "wyvern",
+      "ancient",
+      "angry"
+    ],
+    "source": {
+      "urls": [
+        "http://www.sonniss.com/gameaudiogdc2017/"
+      ],
+      "author": "MatiasMacSD"
+    },
+    "type": "ONESHOT"
+  },
+  "596ff34fb4c0bb0d405d4b1e": {
+    "id": "596ff34fb4c0bb0d405d4b1e",
+    "name": "Crystal Cave",
+    "fileName": "crystal-cave",
+    "tags": [
+      "ambience",
+      "underground",
+      "mysterious",
+      "eerie",
+      "echo"
+    ],
+    "source": {
+      "urls": [
+        "http://www.sonniss.com/gameaudiogdc2017/"
+      ],
+      "author": "MatiasMacSD"
+    },
+    "type": "LOOP"
+  },
+  "596ff4f7b4c0bb0d405d4b23": {
+    "id": "596ff4f7b4c0bb0d405d4b23",
+    "name": "Torture Dungeon",
+    "fileName": "torture-dungeon",
+    "tags": [
+      "ominous",
+      "suspenseful",
+      "horror",
+      "cave",
+      "lair",
+      "intense",
+      "dramatic"
+    ],
+    "source": {
+      "urls": [
+        "http://www.sonniss.com/gameaudiogdc2017/"
+      ],
+      "author": "MatiasMacSD"
+    },
+    "type": "LOOP"
+  },
+  "596ff69bb4c0bb0d405d4b27": {
+    "id": "596ff69bb4c0bb0d405d4b27",
+    "name": "Falling Ice",
+    "samples": [
+      "falling-ice-1",
+      "falling-ice-2",
+      "falling-ice-3",
+      "falling-ice-4"
+    ],
+    "minSecondsBetween": 10,
+    "maxSecondsBetween": 20,
+    "tags": [
+      "frost",
+      "frozen",
+      "cavern",
+      "stalactites",
+      "blocks",
+      "crack",
+      "crash",
+      "smash",
+      "impact",
+      "shatter",
+      "lair",
+      "cave"
+    ],
+    "source": {
+      "urls": [
+        "http://www.sonniss.com/gameaudiogdc2017/"
+      ],
+      "author": "Mattia Cellotto"
+    },
+    "type": "ONESHOT"
+  },
+  "596ffa1bb4c0bb0d405d4b30": {
+    "id": "596ffa1bb4c0bb0d405d4b30",
+    "name": "Thin Ice",
+    "samples": [
+      "thin-ice-1",
+      "thin-ice-2"
+    ],
+    "minSecondsBetween": 10,
+    "maxSecondsBetween": 20,
+    "tags": [
+      "frost",
+      "frozen",
+      "cavern",
+      "creak",
+      "crack",
+      "crunch",
+      "strain",
+      "groan",
+      "lair",
+      "cave",
+      "snow"
+    ],
+    "source": {
+      "urls": [
+        "http://www.sonniss.com/gameaudiogdc2017/"
+      ],
+      "author": "Mindful Audio"
+    },
+    "type": "ONESHOT"
+  },
+  "596ffaadb4c0bb0d405d4b37": {
+    "id": "596ffaadb4c0bb0d405d4b37",
+    "name": "Bellows Ambience",
+    "fileName": "bellows-ambience",
+    "tags": [
+      "blacksmith",
+      "smithy",
+      "forge",
+      "fire",
+      "oven",
+      "stoking"
+    ],
+    "source": {
+      "urls": [
+        "http://www.sonniss.com/gameaudiogdc2017/"
+      ],
+      "author": "Mononeshot"
+    },
+    "type": "LOOP"
+  },
+  "596ffe6320dbd71470b936c0": {
+    "id": "596ffe6320dbd71470b936c0",
+    "name": "Cannibalism",
+    "samples": [
+      "cannibalism-1",
+      "cannibalism-2",
+      "cannibalism-3",
+      "cannibalism-4"
+    ],
+    "minSecondsBetween": 15,
+    "maxSecondsBetween": 25,
+    "tags": [
+      "eating",
+      "devouring",
+      "crunch",
+      "squish",
+      "bite",
+      "chew",
+      "slurp",
+      "disgusting",
+      "gross",
+      "grotesque",
+      "undead",
+      "monster",
+      "swamp"
+    ],
+    "source": {
+      "urls": [
+        "http://www.sonniss.com/gameaudiogdc2017/"
+      ],
+      "author": "Nikk\u00f6 Barrera-Amaya"
+    },
+    "type": "ONESHOT"
+  },
+  "597000e420dbd71470b936cd": {
+    "id": "597000e420dbd71470b936cd",
+    "name": "Hall of the Ancients",
+    "fileName": "hall-of-the-ancients",
+    "tags": [
+      "epic",
+      "dramatic",
+      "cathedral",
+      "ruins",
+      "temple",
+      "vast",
+      "hum",
+      "mysterious",
+      "magical"
+    ],
+    "source": {
+      "urls": [
+        "http://www.sonniss.com/gameaudiogdc2017/"
+      ],
+      "author": "Raconteur Sound"
+    },
+    "type": "LOOP"
+  },
+  "5970012920dbd71470b936ce": {
+    "id": "5970012920dbd71470b936ce",
+    "name": "Crickets",
+    "fileName": "crickets",
+    "tags": [
+      "nighttime",
+      "grasslands",
+      "forest",
+      "woods",
+      "jungle",
+      "insects",
+      "chirping",
+      "buzzing"
+    ],
+    "source": {
+      "urls": [
+        "http://www.sonniss.com/gameaudiogdc2017/"
+      ],
+      "author": "RedSonic"
+    },
+    "type": "LOOP"
+  },
+  "5970061c85c3b4391cb994c9": {
+    "id": "5970061c85c3b4391cb994c9",
+    "name": "Ice Knife",
+    "samples": [
+      "ice-knife"
+    ],
+    "minSecondsBetween": 10,
+    "maxSecondsBetween": 20,
+    "tags": [
+      "magic",
+      "spell",
+      "casting",
+      "conjuration",
+      "frozen",
+      "frost",
+      "cold"
+    ],
+    "source": {
+      "urls": [
+        "http://www.sonniss.com/gameaudiogdc2017/"
+      ],
+      "author": "Sergey Eybog"
+    },
+    "type": "ONESHOT"
+  },
+  "5970073b85c3b4391cb994cb": {
+    "id": "5970073b85c3b4391cb994cb",
+    "name": "Restaurant Ambience",
+    "fileName": "restaurant-ambience",
+    "tags": [
+      "village",
+      "city",
+      "voices",
+      "people",
+      "calm",
+      "children",
+      "kids"
+    ],
+    "source": {
+      "urls": [
+        "http://www.sonniss.com/gameaudiogdc2017/"
+      ],
+      "author": "Sound Ex Machina"
+    },
+    "type": "LOOP"
+  },
+  "59700b97fd689e1514ac8a3e": {
+    "id": "59700b97fd689e1514ac8a3e",
+    "name": "Hiding the Body (Road)",
+    "fileName": "body-drag-road",
+    "tags": [
+      "dragging",
+      "rocks",
+      "corpse",
+      "moving",
+      "clearing",
+      "rubble",
+      "rustle"
+    ],
+    "source": {
+      "urls": [
+        "http://www.sonniss.com/gameaudiogdc2017/"
+      ],
+      "author": "SoundBits"
+    },
+    "type": "LOOP"
+  },
+  "59700bc4fd689e1514ac8a3f": {
+    "id": "59700bc4fd689e1514ac8a3f",
+    "name": "Hiding the Body (Soil)",
+    "fileName": "body-drag-soil",
+    "tags": [
+      "dragging",
+      "wood",
+      "corpse",
+      "moving",
+      "clearing",
+      "forest",
+      "rustle",
+      "dirt",
+      "path"
+    ],
+    "source": {
+      "urls": [
+        "http://www.sonniss.com/gameaudiogdc2017/"
+      ],
+      "author": "SoundBits"
+    },
+    "type": "LOOP"
+  },
+  "59700dfbfd689e1514ac8a44": {
+    "id": "59700dfbfd689e1514ac8a44",
+    "name": "Metal Plate Strike",
+    "samples": [
+      "metal-plate"
+    ],
+    "minSecondsBetween": 5,
+    "maxSecondsBetween": 15,
+    "tags": [
+      "blacksmith",
+      "forge",
+      "hammer",
+      "workshop",
+      "hit"
+    ],
+    "source": {
+      "urls": [
+        "http://www.sonniss.com/gameaudiogdc2017/"
+      ],
+      "author": "SoundBits"
+    },
+    "type": "ONESHOT"
+  },
+  "59700e5ffd689e1514ac8a49": {
+    "id": "59700e5ffd689e1514ac8a49",
+    "name": "Smouldering Metal",
+    "samples": [
+      "smouldering-metal"
+    ],
+    "minSecondsBetween": 10,
+    "maxSecondsBetween": 25,
+    "tags": [
+      "blacksmith",
+      "forge",
+      "workshop",
+      "iron",
+      "hiss",
+      "boil"
+    ],
+    "source": {
+      "urls": [
+        "http://www.sonniss.com/gameaudiogdc2017/"
+      ],
+      "author": "SoundBits"
+    },
+    "type": "ONESHOT"
+  },
+  "59700ec3fd689e1514ac8a4f": {
+    "id": "59700ec3fd689e1514ac8a4f",
+    "name": "Tinkering",
+    "samples": [
+      "tinkering"
+    ],
+    "minSecondsBetween": 10,
+    "maxSecondsBetween": 15,
+    "tags": [
+      "blacksmith",
+      "tinkerer",
+      "workshop",
+      "metal",
+      "handling",
+      "fiddling",
+      "jingling",
+      "clinking"
+    ],
+    "source": {
+      "urls": [
+        "http://www.sonniss.com/gameaudiogdc2017/"
+      ],
+      "author": "SoundBits"
+    },
+    "type": "ONESHOT"
+  },
+  "597010f9fd689e1514ac8a68": {
+    "id": "597010f9fd689e1514ac8a68",
+    "name": "Swarm of Bees",
+    "fileName": "swarm-of-bees",
+    "tags": [
+      "wasps",
+      "hornets",
+      "giant",
+      "bugs",
+      "insects",
+      "ASMR",
+      "close",
+      "buzzing",
+      "mosquitoes",
+      "humming"
+    ],
+    "source": {
+      "urls": [
+        "http://www.sonniss.com/gameaudiogdc2017/"
+      ],
+      "author": "SoundHolder"
+    },
+    "type": "LOOP"
+  },
+  "59701190fd689e1514ac8a6a": {
+    "id": "59701190fd689e1514ac8a6a",
+    "name": "Dripping Walls",
+    "fileName": "dripping-walls",
+    "tags": [
+      "reverb",
+      "echo",
+      "water",
+      "slime",
+      "wet",
+      "cave",
+      "tunnel"
+    ],
+    "source": {
+      "urls": [
+        "http://www.sonniss.com/gameaudiogdc2017/"
+      ],
+      "author": "SoundHolder"
+    },
+    "type": "LOOP"
+  },
+  "59701311fd689e1514ac8a6d": {
+    "id": "59701311fd689e1514ac8a6d",
+    "name": "Tools and Drawers",
+    "fileName": "tools-and-drawers",
+    "tags": [
+      "tinkering",
+      "workshop",
+      "metal",
+      "sliding",
+      "clanking",
+      "rattling"
+    ],
+    "source": {
+      "urls": [
+        "http://www.sonniss.com/gameaudiogdc2017/"
+      ],
+      "author": null
+    },
+    "type": "LOOP"
+  },
+  "59701c475b8d1b0d3cb0a7f4": {
+    "id": "59701c475b8d1b0d3cb0a7f4",
+    "name": "City Streets",
+    "fileName": "city-streets",
+    "tags": [
+      "town",
+      "voices",
+      "talking",
+      "people",
+      "cobblestone",
+      "ambience"
+    ],
+    "source": {
+      "urls": [
+        "http://www.sonniss.com/gameaudiogdc2017/"
+      ],
+      "author": "West Wolf"
+    },
+    "type": "LOOP"
+  },
+  "597021e0083fff0c8415d5b8": {
+    "id": "597021e0083fff0c8415d5b8",
+    "name": "Fireplace",
+    "fileName": "fireplace",
+    "tags": [
+      "burning",
+      "flame",
+      "snapping",
+      "crackling",
+      "popping"
+    ],
+    "source": {
+      "urls": [
+        "http://freesound.org/people/FractalStudios/sounds/363092/"
+      ],
+      "author": null
+    },
+    "type": "LOOP"
+  },
+  "59702389083fff0c8415d5bb": {
+    "id": "59702389083fff0c8415d5bb",
+    "name": "Hearth",
+    "fileName": "hearth",
+    "tags": [
+      "burning",
+      "flame",
+      "contained",
+      "indoor",
+      "snapping",
+      "crackling",
+      "popping"
+    ],
+    "source": {
+      "urls": [
+        "http://freesound.org/people/Batuhan/sounds/17733/"
+      ],
+      "author": null
+    },
+    "type": "LOOP"
+  },
+  "597023fb083fff0c8415d5bc": {
+    "id": "597023fb083fff0c8415d5bc",
+    "name": "Campfire",
+    "fileName": "campfire",
+    "tags": [
+      "burning",
+      "flame",
+      "small",
+      "cooking",
+      "snapping",
+      "crackling",
+      "popping",
+      "nighttime"
+    ],
+    "source": {
+      "urls": [
+        "http://freesound.org/people/Kukensius/sounds/320231/"
+      ],
+      "author": null
+    },
+    "type": "LOOP"
+  },
+  "59702a64083fff0c8415d5ce": {
+    "id": "59702a64083fff0c8415d5ce",
+    "name": "Monster Breath",
+    "samples": [
+      "monster-breath"
+    ],
+    "minSecondsBetween": 5,
+    "maxSecondsBetween": 10,
+    "tags": [
+      "inhale",
+      "rest",
+      "peaceful",
+      "dragon",
+      "giant",
+      "calm"
+    ],
+    "source": {
+      "urls": [
+        "http://freesound.org/people/Christopherderp/sounds/342203/"
+      ],
+      "author": null
+    },
+    "type": "ONESHOT"
+  },
+  "59702b56083fff0c8415d5d0": {
+    "id": "59702b56083fff0c8415d5d0",
+    "name": "Dragon Snarl",
+    "samples": [
+      "dragon-snarl"
+    ],
+    "minSecondsBetween": 10,
+    "maxSecondsBetween": 20,
+    "tags": [
+      "flying",
+      "roar",
+      "fire",
+      "enemy",
+      "elemental",
+      "fiend",
+      "monstrosity",
+      "wyvern",
+      "ancient"
+    ],
+    "source": {
+      "urls": [
+        "http://freesound.org/people/JoelAudio/sounds/85568/"
+      ],
+      "author": null
+    },
+    "type": "ONESHOT"
+  },
+  "59702cd7083fff0c8415d5d6": {
+    "id": "59702cd7083fff0c8415d5d6",
+    "name": "Passive Undead",
+    "samples": [
+      "passive-undead"
+    ],
+    "minSecondsBetween": 10,
+    "maxSecondsBetween": 20,
+    "tags": [
+      "ghoul",
+      "zombie",
+      "slime",
+      "hiss",
+      "slurp",
+      "grotesque",
+      "gross",
+      "horror",
+      "graveyard",
+      "necromancy",
+      "tomb",
+      "cemetery"
+    ],
+    "source": {
+      "urls": [
+        "http://freesound.org/people/bolkmar/sounds/393781/"
+      ],
+      "author": null
+    },
+    "type": "ONESHOT"
+  },
+  "597034bb083fff0c8415d5e1": {
+    "id": "597034bb083fff0c8415d5e1",
+    "name": "Carefree Whistling",
+    "fileName": "carefree-whistling",
+    "tags": [
+      "music",
+      "tinkerer",
+      "happy",
+      "pleasant",
+      "cottage",
+      "cooking",
+      "guard"
+    ],
+    "source": {
+      "urls": [
+        "http://freesound.org/people/thepearl/sounds/67677/"
+      ],
+      "author": null
+    },
+    "type": "LOOP"
+  },
+  "59703652083fff0c8415d5e5": {
+    "id": "59703652083fff0c8415d5e5",
+    "name": "Stand and Fight",
+    "fileName": "stand-and-fight",
+    "tags": [
+      "music",
+      "dramatic",
+      "battle",
+      "combat",
+      "epic",
+      "orchestral"
+    ],
+    "source": {
+      "urls": [
+        "http://freesound.org/people/joshuaempyre/sounds/250856/"
+      ],
+      "author": null
+    },
+    "type": "LOOP"
+  },
+  "59703a96083fff0c8415d5e8": {
+    "id": "59703a96083fff0c8415d5e8",
+    "name": "Wonder",
+    "fileName": "wonder",
+    "tags": [
+      "music",
+      "violin",
+      "solo",
+      "beautiful",
+      "bard",
+      "dramatic",
+      "sad"
+    ],
+    "source": {
+      "urls": [
+        "http://freesound.org/people/dingo1/sounds/181546/"
+      ],
+      "author": "Marcus Dellicompagni, www.PoundSound.co.uk"
+    },
+    "type": "LOOP"
+  },
+  "59703c40083fff0c8415d5ec": {
+    "id": "59703c40083fff0c8415d5ec",
+    "name": "Jungle Chase",
+    "fileName": "jungle-chase",
+    "tags": [
+      "music",
+      "hunt",
+      "battle",
+      "combat",
+      "fighting",
+      "predator",
+      "panther",
+      "drums",
+      "rhythmic",
+      "percussion",
+      "intense"
+    ],
+    "source": {
+      "urls": [
+        "https://freesound.org/people/LittleRobotSoundFactory/"
+      ],
+      "author": "Morten Barfod S\u00f8egaard, Little Robot Sound Factory"
+    },
+    "type": "LOOP"
+  },
+  "5972b59c4d68c8340864bb23": {
+    "id": "5972b59c4d68c8340864bb23",
+    "name": "The Jig of Slurs",
+    "fileName": "jig-of-slurs",
+    "tags": [
+      "music",
+      "tavern",
+      "upbeat",
+      "jovial",
+      "celtic",
+      "happy",
+      "pleasant",
+      "fiddle",
+      "flute",
+      "merry",
+      "halfling",
+      "village",
+      "town"
+    ],
+    "source": {
+      "urls": [
+        "http://freemusicarchive.org/music/Slinte/Cup_of_Tea/slinte_-_14_-_jig_of_slurs_dublin_reel_-_merry_blacksmith_the_mountain_road"
+      ],
+      "author": "Jig of Slurs. Dublin Reel, Merry Blacksmith. The Mountain Road, Sl\u00e1inte"
+    },
+    "type": "LOOP"
+  },
+  "5972c1114d68c8340864bb37": {
+    "id": "5972c1114d68c8340864bb37",
+    "name": "A Time Forgotten",
+    "fileName": "a-time-forgotten",
+    "tags": [
+      "music",
+      "elven",
+      "chill",
+      "calm",
+      "village",
+      "forest",
+      "travel",
+      "nighttime",
+      "peaceful",
+      "harp",
+      "duduk",
+      "feywild",
+      "relaxing"
+    ],
+    "source": {
+      "urls": [
+        "https://www.darrencurtismusic.com"
+      ],
+      "author": "Darren Curtis"
+    },
+    "type": "LOOP"
+  },
+  "59c3174c96808b2ef0bb56a6": {
+    "id": "59c3174c96808b2ef0bb56a6",
+    "name": "Journey of Solitude",
+    "fileName": "journey-of-solitude",
+    "tags": [
+      "music",
+      "travel",
+      "strings",
+      "drums",
+      "solemn",
+      "march"
+    ],
+    "source": {
+      "urls": [
+        "https://freepd.com/Cinematic/Journey%20of%20Solitude"
+      ],
+      "author": "Kevin MacLeod"
+    },
+    "type": "LOOP"
+  }
+}

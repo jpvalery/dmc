@@ -15,6 +15,7 @@ final class SceneStore: ObservableObject {
     func reload() {
         scenes = SceneLibrary.load()
         unplayable = SceneLibrary.unplayableFiles()
+        if let error = SceneLibrary.lastError { unplayable.insert(error, at: 0) }
     }
 
     func upsert(_ scene: SoundScene) {

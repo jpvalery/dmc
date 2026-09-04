@@ -47,6 +47,9 @@ final class SceneEngine: ObservableObject {
     /// Keyed by player so one layer's ramp can be cancelled without disturbing the others —
     /// needed when a gain slider moves while a fade is still in flight.
     private var fades: [ObjectIdentifier: Task<Void, Never>] = [:]
+    /// Repeating timers for the sporadic layers of the active scene.
+    private var sporadicTasks: [UUID: Task<Void, Never>] = [:]
+
     /// Effect nodes currently sounding, keyed so each can remove itself when it finishes.
     /// The effect id rides along so a stop request can find every node it spawned.
     private var oneShots: [ObjectIdentifier: (node: AVAudioPlayerNode, effect: UUID)] = [:]
@@ -84,17 +87,23 @@ final class SceneEngine: ObservableObject {
     /// tears itself down on completion. Deliberately unaffected by `isPaused`: a paused bed is
     /// the moment you most want a door slam.
     func fire(_ effect: SoundEffect) {
+        playOneShot(url: effect.url, gain: effect.gain, tag: effect.id, label: effect.name)
+    }
+
+    /// One node per firing, torn down on completion. `tag` groups nodes so a stop request can
+    /// find every copy; sporadic scene layers pass their layer id, effects their effect id.
+    private func playOneShot(url: URL, gain: Double, tag: UUID, label: String) {
         do {
-            let file = try AVAudioFile(forReading: effect.url)
+            let file = try AVAudioFile(forReading: url)
             let node = AVAudioPlayerNode()
             engine.attach(node)
             engine.connect(node, to: engine.mainMixerNode, format: file.processingFormat)
             try ensureRunningForEffect()
-            node.volume = Float(effect.gain)
+            node.volume = Float(gain)
 
             let key = ObjectIdentifier(node)
-            oneShots[key] = (node, effect.id)
-            soundingEffects[effect.id, default: 0] += 1
+            oneShots[key] = (node, tag)
+            soundingEffects[tag, default: 0] += 1
             // The completion handler fires on an audio thread, so it captures only the key —
             // an ObjectIdentifier is Sendable, an AVAudioPlayerNode is not. The node is looked
             // up again on the main actor, where the dictionary is the source of truth.
@@ -110,11 +119,35 @@ final class SceneEngine: ObservableObject {
             }
             node.play()
         } catch {
-            problems.append("Could not play \(effect.name) — \(error.localizedDescription)")
+            problems.append("Could not play \(label) — \(error.localizedDescription)")
         }
     }
 
     func isSounding(_ id: UUID) -> Bool { (soundingEffects[id] ?? 0) > 0 }
+
+    private func startSporadicLayers(of scene: SoundScene) {
+        stopSporadicLayers()
+        for layer in scene.layers where layer.sporadic && layer.isBound {
+            let low = min(layer.minGap, layer.maxGap)
+            let high = max(layer.minGap, layer.maxGap)
+            sporadicTasks[layer.id] = Task { @MainActor [weak self] in
+                while !Task.isCancelled {
+                    // Wait first: firing the instant a scene starts would stack every sporadic
+                    // layer on the downbeat, which is exactly the regularity being avoided.
+                    let gap = Double.random(in: low...max(low, high))
+                    try? await Task.sleep(for: .seconds(gap))
+                    guard !Task.isCancelled, let self, !self.isPaused else { continue }
+                    self.playOneShot(url: layer.randomVariantURL, gain: layer.gain,
+                                     tag: layer.id, label: (layer.file as NSString).lastPathComponent)
+                }
+            }
+        }
+    }
+
+    private func stopSporadicLayers() {
+        for task in sporadicTasks.values { task.cancel() }
+        sporadicTasks = [:]
+    }
 
     /// Cuts an effect short — every copy of it that is currently sounding.
     func stopEffect(_ id: UUID) {
@@ -190,13 +223,15 @@ final class SceneEngine: ObservableObject {
         let fadeOut = activeScene?.fadeOut ?? 1.0
         retireAll(fade: fadeOut)
 
+        startSporadicLayers(of: scene)
+
         var players: [LayerPlayer] = []
         let unbound = scene.layers.filter { !$0.isBound }
         if !unbound.isEmpty {
             problems.append("\(unbound.count) imported slot\(unbound.count == 1 ? "" : "s") "
                             + "still need a sound assigned.")
         }
-        for layer in scene.layers where layer.isBound {
+        for layer in scene.layers where layer.isBound && !layer.sporadic {
             do {
                 players.append(try LayerPlayer(layer: layer))
             } catch {
@@ -204,8 +239,11 @@ final class SceneEngine: ObservableObject {
             }
         }
 
-        guard !players.isEmpty else {
+        // A scene made only of sporadic layers has no looping players at all, and is still
+        // perfectly valid — its timers are already running.
+        guard !players.isEmpty || !sporadicTasks.isEmpty else {
             if scene.layers.isEmpty { problems.append("\(scene.name) has no sounds yet.") }
+            stopSporadicLayers()
             activeScene = nil
             activeSceneID = nil
             return
@@ -237,6 +275,7 @@ final class SceneEngine: ObservableObject {
     }
 
     func stopAll() {
+        stopSporadicLayers()
         stopAllEffects()
         retireAll(fade: activeScene?.fadeOut ?? 1.0)
         activeScene = nil

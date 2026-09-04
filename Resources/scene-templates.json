@@ -1,0 +1,1043 @@
+{
+  "note": "Audio is re-hosted third-party material; licences come from the original libraries (Sonniss GDC, Freesound, FreePD and others), not from Turbo Bard. For personal, non-commercial use.",
+  "source": "Turbo Bard packs (https://turbobard.com)",
+  "templates": [
+    {
+      "credit": "",
+      "layers": [
+        {
+          "download": "https://storage.googleapis.com/turbo-bard.appspot.com/ghosts-pass-by.mp3",
+          "file": "Turbo Bard/ghosts-pass-by.mp3",
+          "gain": 0.3,
+          "loops": false,
+          "maxGap": 20.0,
+          "minGap": 5.0,
+          "randomStart": false,
+          "sporadic": true,
+          "variantDownloads": [],
+          "variants": []
+        },
+        {
+          "download": "https://storage.googleapis.com/turbo-bard.appspot.com/necromantic-spell.mp3",
+          "file": "Turbo Bard/necromantic-spell.mp3",
+          "gain": 0.4,
+          "loops": false,
+          "maxGap": 15.0,
+          "minGap": 5.0,
+          "randomStart": false,
+          "sporadic": true,
+          "variantDownloads": [],
+          "variants": []
+        },
+        {
+          "download": "https://storage.googleapis.com/turbo-bard.appspot.com/ominous-ambience.mp3",
+          "file": "Turbo Bard/ominous-ambience.mp3",
+          "gain": 1.0,
+          "loops": true,
+          "maxGap": 20,
+          "minGap": 8,
+          "randomStart": true,
+          "sporadic": false,
+          "variantDownloads": [],
+          "variants": []
+        }
+      ],
+      "name": "Graveyard",
+      "symbol": "moon.stars",
+      "tags": [
+        "pack",
+        "spooky",
+        "scary",
+        "eerie",
+        "haunted",
+        "ghosts",
+        "spirits",
+        "cemetery",
+        "crypt"
+      ]
+    },
+    {
+      "credit": "Chris Skyes, Collected Transients",
+      "layers": [
+        {
+          "download": "https://storage.googleapis.com/turbo-bard.appspot.com/wave-large.mp3",
+          "file": "Turbo Bard/wave-large.mp3",
+          "gain": 1.0,
+          "loops": false,
+          "maxGap": 30.0,
+          "minGap": 20.0,
+          "randomStart": false,
+          "sporadic": true,
+          "variantDownloads": [
+            "https://storage.googleapis.com/turbo-bard.appspot.com/wave-medium.mp3"
+          ],
+          "variants": [
+            "Turbo Bard/wave-medium.mp3"
+          ]
+        },
+        {
+          "download": "https://storage.googleapis.com/turbo-bard.appspot.com/huge-waves-1.mp3",
+          "file": "Turbo Bard/huge-waves-1.mp3",
+          "gain": 1.0,
+          "loops": true,
+          "maxGap": 20,
+          "minGap": 8,
+          "randomStart": true,
+          "sporadic": false,
+          "variantDownloads": [],
+          "variants": []
+        },
+        {
+          "download": "https://storage.googleapis.com/turbo-bard.appspot.com/huge-waves-2.mp3",
+          "file": "Turbo Bard/huge-waves-2.mp3",
+          "gain": 0.2,
+          "loops": true,
+          "maxGap": 20,
+          "minGap": 8,
+          "randomStart": true,
+          "sporadic": false,
+          "variantDownloads": [],
+          "variants": []
+        },
+        {
+          "download": "https://storage.googleapis.com/turbo-bard.appspot.com/water-below-decks.mp3",
+          "file": "Turbo Bard/water-below-decks.mp3",
+          "gain": 0.3,
+          "loops": true,
+          "maxGap": 20,
+          "minGap": 8,
+          "randomStart": true,
+          "sporadic": false,
+          "variantDownloads": [],
+          "variants": []
+        }
+      ],
+      "name": "Adrift at Sea",
+      "symbol": "water.waves",
+      "tags": [
+        "pack",
+        "ambience",
+        "ocean",
+        "waves",
+        "water",
+        "boat",
+        "ship"
+      ]
+    },
+    {
+      "credit": "Gamemaster Audio, Mononeshot, SoundBits",
+      "layers": [
+        {
+          "download": "https://storage.googleapis.com/turbo-bard.appspot.com/anvil-strike.mp3",
+          "file": "Turbo Bard/anvil-strike.mp3",
+          "gain": 1.0,
+          "loops": false,
+          "maxGap": 20.0,
+          "minGap": 15.0,
+          "randomStart": false,
+          "sporadic": true,
+          "variantDownloads": [
+            "https://storage.googleapis.com/turbo-bard.appspot.com/anvil-strikes.mp3"
+          ],
+          "variants": [
+            "Turbo Bard/anvil-strikes.mp3"
+          ]
+        },
+        {
+          "download": "https://storage.googleapis.com/turbo-bard.appspot.com/metal-plate.mp3",
+          "file": "Turbo Bard/metal-plate.mp3",
+          "gain": 0.3,
+          "loops": false,
+          "maxGap": 5.0,
+          "minGap": 2.0,
+          "randomStart": false,
+          "sporadic": true,
+          "variantDownloads": [],
+          "variants": []
+        },
+        {
+          "download": "https://storage.googleapis.com/turbo-bard.appspot.com/smouldering-metal.mp3",
+          "file": "Turbo Bard/smouldering-metal.mp3",
+          "gain": 1.0,
+          "loops": false,
+          "maxGap": 45.0,
+          "minGap": 15.0,
+          "randomStart": false,
+          "sporadic": true,
+          "variantDownloads": [],
+          "variants": []
+        },
+        {
+          "download": "https://storage.googleapis.com/turbo-bard.appspot.com/bellows-ambience.mp3",
+          "file": "Turbo Bard/bellows-ambience.mp3",
+          "gain": 0.8,
+          "loops": true,
+          "maxGap": 20,
+          "minGap": 8,
+          "randomStart": true,
+          "sporadic": false,
+          "variantDownloads": [],
+          "variants": []
+        },
+        {
+          "download": "https://storage.googleapis.com/turbo-bard.appspot.com/hearth.mp3",
+          "file": "Turbo Bard/hearth.mp3",
+          "gain": 1.0,
+          "loops": true,
+          "maxGap": 20,
+          "minGap": 8,
+          "randomStart": true,
+          "sporadic": false,
+          "variantDownloads": [],
+          "variants": []
+        }
+      ],
+      "name": "The Forge",
+      "symbol": "hammer",
+      "tags": [
+        "pack",
+        "blacksmith",
+        "smithy",
+        "workshop",
+        "armourer",
+        "tools",
+        ""
+      ]
+    },
+    {
+      "credit": "Charlie Atanasyan, Morten Barfod S\u00f8egaard, Little Robot Sound Factory, RedSonic",
+      "layers": [
+        {
+          "download": "https://storage.googleapis.com/turbo-bard.appspot.com/crickets.mp3",
+          "file": "Turbo Bard/crickets.mp3",
+          "gain": 1.0,
+          "loops": true,
+          "maxGap": 20,
+          "minGap": 8,
+          "randomStart": true,
+          "sporadic": false,
+          "variantDownloads": [],
+          "variants": []
+        },
+        {
+          "download": "https://storage.googleapis.com/turbo-bard.appspot.com/jungle-chase.mp3",
+          "file": "Turbo Bard/jungle-chase.mp3",
+          "gain": 0.4,
+          "loops": true,
+          "maxGap": 20,
+          "minGap": 8,
+          "randomStart": true,
+          "sporadic": false,
+          "variantDownloads": [],
+          "variants": []
+        },
+        {
+          "download": "https://storage.googleapis.com/turbo-bard.appspot.com/jurassic-jungle.mp3",
+          "file": "Turbo Bard/jurassic-jungle.mp3",
+          "gain": 1.0,
+          "loops": true,
+          "maxGap": 20,
+          "minGap": 8,
+          "randomStart": true,
+          "sporadic": false,
+          "variantDownloads": [],
+          "variants": []
+        }
+      ],
+      "name": "Jungle",
+      "symbol": "tree",
+      "tags": [
+        "pack",
+        "optional music",
+        "rainforest",
+        "humid",
+        "chase",
+        "insects",
+        "overgrown"
+      ]
+    },
+    {
+      "credit": "Eiravaein Sound, Jig of Slurs. Dublin Reel, Merry Blacksmith. The Mountain Road, Sl\u00e1inte, Joshua Reinhardt, West Wolf",
+      "layers": [
+        {
+          "download": "https://storage.googleapis.com/turbo-bard.appspot.com/fizzy-drink-1.mp3",
+          "file": "Turbo Bard/fizzy-drink-1.mp3",
+          "gain": 0.7,
+          "loops": false,
+          "maxGap": 20.0,
+          "minGap": 15.0,
+          "randomStart": false,
+          "sporadic": true,
+          "variantDownloads": [
+            "https://storage.googleapis.com/turbo-bard.appspot.com/fizzy-drink-2.mp3",
+            "https://storage.googleapis.com/turbo-bard.appspot.com/fizzy-drink-3.mp3",
+            "https://storage.googleapis.com/turbo-bard.appspot.com/fizzy-drink-4.mp3"
+          ],
+          "variants": [
+            "Turbo Bard/fizzy-drink-2.mp3",
+            "Turbo Bard/fizzy-drink-3.mp3",
+            "Turbo Bard/fizzy-drink-4.mp3"
+          ]
+        },
+        {
+          "download": "https://storage.googleapis.com/turbo-bard.appspot.com/spit-take.mp3",
+          "file": "Turbo Bard/spit-take.mp3",
+          "gain": 0.5,
+          "loops": false,
+          "maxGap": 45.0,
+          "minGap": 20.0,
+          "randomStart": false,
+          "sporadic": true,
+          "variantDownloads": [],
+          "variants": []
+        },
+        {
+          "download": "https://storage.googleapis.com/turbo-bard.appspot.com/fireplace.mp3",
+          "file": "Turbo Bard/fireplace.mp3",
+          "gain": 0.9,
+          "loops": true,
+          "maxGap": 20,
+          "minGap": 8,
+          "randomStart": true,
+          "sporadic": false,
+          "variantDownloads": [],
+          "variants": []
+        },
+        {
+          "download": "https://storage.googleapis.com/turbo-bard.appspot.com/city-streets.mp3",
+          "file": "Turbo Bard/city-streets.mp3",
+          "gain": 1.0,
+          "loops": true,
+          "maxGap": 20,
+          "minGap": 8,
+          "randomStart": true,
+          "sporadic": false,
+          "variantDownloads": [],
+          "variants": []
+        },
+        {
+          "download": "https://storage.googleapis.com/turbo-bard.appspot.com/carefree-whistling.mp3",
+          "file": "Turbo Bard/carefree-whistling.mp3",
+          "gain": 1.0,
+          "loops": true,
+          "maxGap": 20,
+          "minGap": 8,
+          "randomStart": true,
+          "sporadic": false,
+          "variantDownloads": [],
+          "variants": []
+        },
+        {
+          "download": "https://storage.googleapis.com/turbo-bard.appspot.com/jig-of-slurs.mp3",
+          "file": "Turbo Bard/jig-of-slurs.mp3",
+          "gain": 0.9,
+          "loops": true,
+          "maxGap": 20,
+          "minGap": 8,
+          "randomStart": true,
+          "sporadic": false,
+          "variantDownloads": [],
+          "variants": []
+        }
+      ],
+      "name": "Crowded Tavern",
+      "symbol": "cup.and.saucer",
+      "tags": [
+        "pack",
+        "lively",
+        "ale",
+        "beer",
+        "inn",
+        "warm",
+        "cozy",
+        "busy",
+        "happy",
+        "drinks",
+        "merry"
+      ]
+    },
+    {
+      "credit": "MatiasMacSD, Mattia Cellotto, Mindful Audio, Sergey Eybog",
+      "layers": [
+        {
+          "download": "https://storage.googleapis.com/turbo-bard.appspot.com/falling-ice-1.mp3",
+          "file": "Turbo Bard/falling-ice-1.mp3",
+          "gain": 0.8,
+          "loops": false,
+          "maxGap": 20.0,
+          "minGap": 15.0,
+          "randomStart": false,
+          "sporadic": true,
+          "variantDownloads": [
+            "https://storage.googleapis.com/turbo-bard.appspot.com/falling-ice-2.mp3",
+            "https://storage.googleapis.com/turbo-bard.appspot.com/falling-ice-3.mp3",
+            "https://storage.googleapis.com/turbo-bard.appspot.com/falling-ice-4.mp3"
+          ],
+          "variants": [
+            "Turbo Bard/falling-ice-2.mp3",
+            "Turbo Bard/falling-ice-3.mp3",
+            "Turbo Bard/falling-ice-4.mp3"
+          ]
+        },
+        {
+          "download": "https://storage.googleapis.com/turbo-bard.appspot.com/ice-knife.mp3",
+          "file": "Turbo Bard/ice-knife.mp3",
+          "gain": 0.7,
+          "loops": false,
+          "maxGap": 20.0,
+          "minGap": 5.0,
+          "randomStart": false,
+          "sporadic": true,
+          "variantDownloads": [],
+          "variants": []
+        },
+        {
+          "download": "https://storage.googleapis.com/turbo-bard.appspot.com/thin-ice-1.mp3",
+          "file": "Turbo Bard/thin-ice-1.mp3",
+          "gain": 1.0,
+          "loops": false,
+          "maxGap": 10.0,
+          "minGap": 5.0,
+          "randomStart": false,
+          "sporadic": true,
+          "variantDownloads": [
+            "https://storage.googleapis.com/turbo-bard.appspot.com/thin-ice-2.mp3"
+          ],
+          "variants": [
+            "Turbo Bard/thin-ice-2.mp3"
+          ]
+        },
+        {
+          "download": "https://storage.googleapis.com/turbo-bard.appspot.com/dragon-roar.mp3",
+          "file": "Turbo Bard/dragon-roar.mp3",
+          "gain": 0.8,
+          "loops": false,
+          "maxGap": 45.0,
+          "minGap": 10.0,
+          "randomStart": false,
+          "sporadic": true,
+          "variantDownloads": [],
+          "variants": []
+        },
+        {
+          "download": "https://storage.googleapis.com/turbo-bard.appspot.com/dragon-snarl.mp3",
+          "file": "Turbo Bard/dragon-snarl.mp3",
+          "gain": 0.8,
+          "loops": false,
+          "maxGap": 45.0,
+          "minGap": 10.0,
+          "randomStart": false,
+          "sporadic": true,
+          "variantDownloads": [],
+          "variants": []
+        },
+        {
+          "download": "https://storage.googleapis.com/turbo-bard.appspot.com/stand-and-fight.mp3",
+          "file": "Turbo Bard/stand-and-fight.mp3",
+          "gain": 1.0,
+          "loops": true,
+          "maxGap": 20,
+          "minGap": 8,
+          "randomStart": true,
+          "sporadic": false,
+          "variantDownloads": [],
+          "variants": []
+        }
+      ],
+      "name": "White Dragon",
+      "symbol": "mountain.2",
+      "tags": [
+        "pack",
+        "boss fight",
+        "battle",
+        "frozen",
+        "cavern",
+        "ice",
+        "epic"
+      ]
+    },
+    {
+      "credit": "Double Trouble Audio, SoundBits",
+      "layers": [
+        {
+          "download": "https://storage.googleapis.com/turbo-bard.appspot.com/debris-1.mp3",
+          "file": "Turbo Bard/debris-1.mp3",
+          "gain": 0.4,
+          "loops": false,
+          "maxGap": 10.0,
+          "minGap": 2.0,
+          "randomStart": false,
+          "sporadic": true,
+          "variantDownloads": [
+            "https://storage.googleapis.com/turbo-bard.appspot.com/debris-2.mp3",
+            "https://storage.googleapis.com/turbo-bard.appspot.com/debris-3.mp3",
+            "https://storage.googleapis.com/turbo-bard.appspot.com/debris-4.mp3",
+            "https://storage.googleapis.com/turbo-bard.appspot.com/debris-5.mp3",
+            "https://storage.googleapis.com/turbo-bard.appspot.com/debris-6.mp3",
+            "https://storage.googleapis.com/turbo-bard.appspot.com/debris-7.mp3",
+            "https://storage.googleapis.com/turbo-bard.appspot.com/debris-8.mp3"
+          ],
+          "variants": [
+            "Turbo Bard/debris-2.mp3",
+            "Turbo Bard/debris-3.mp3",
+            "Turbo Bard/debris-4.mp3",
+            "Turbo Bard/debris-5.mp3",
+            "Turbo Bard/debris-6.mp3",
+            "Turbo Bard/debris-7.mp3",
+            "Turbo Bard/debris-8.mp3"
+          ]
+        },
+        {
+          "download": "https://storage.googleapis.com/turbo-bard.appspot.com/tinkering.mp3",
+          "file": "Turbo Bard/tinkering.mp3",
+          "gain": 1.0,
+          "loops": false,
+          "maxGap": 20.0,
+          "minGap": 10.0,
+          "randomStart": false,
+          "sporadic": true,
+          "variantDownloads": [],
+          "variants": []
+        },
+        {
+          "download": "https://storage.googleapis.com/turbo-bard.appspot.com/fireplace.mp3",
+          "file": "Turbo Bard/fireplace.mp3",
+          "gain": 1.0,
+          "loops": true,
+          "maxGap": 20,
+          "minGap": 8,
+          "randomStart": true,
+          "sporadic": false,
+          "variantDownloads": [],
+          "variants": []
+        },
+        {
+          "download": "https://storage.googleapis.com/turbo-bard.appspot.com/tools-and-drawers.mp3",
+          "file": "Turbo Bard/tools-and-drawers.mp3",
+          "gain": 0.3,
+          "loops": true,
+          "maxGap": 20,
+          "minGap": 8,
+          "randomStart": true,
+          "sporadic": false,
+          "variantDownloads": [],
+          "variants": []
+        }
+      ],
+      "name": "Tinkerer's Workshop",
+      "symbol": "wrench.adjustable",
+      "tags": [
+        "pack",
+        "rustling",
+        "rattling",
+        "gnome",
+        "clockmaker",
+        "engineer",
+        "fiddling"
+      ]
+    },
+    {
+      "credit": "MatiasMacSD, Morten Barfod S\u00f8egaard, SoundHolder",
+      "layers": [
+        {
+          "download": "https://storage.googleapis.com/turbo-bard.appspot.com/dripping-walls.mp3",
+          "file": "Turbo Bard/dripping-walls.mp3",
+          "gain": 1.0,
+          "loops": true,
+          "maxGap": 20,
+          "minGap": 8,
+          "randomStart": true,
+          "sporadic": false,
+          "variantDownloads": [],
+          "variants": []
+        },
+        {
+          "download": "https://storage.googleapis.com/turbo-bard.appspot.com/cave-ambience.mp3",
+          "file": "Turbo Bard/cave-ambience.mp3",
+          "gain": 1.0,
+          "loops": true,
+          "maxGap": 20,
+          "minGap": 8,
+          "randomStart": true,
+          "sporadic": false,
+          "variantDownloads": [],
+          "variants": []
+        },
+        {
+          "download": "https://storage.googleapis.com/turbo-bard.appspot.com/torture-dungeon.mp3",
+          "file": "Turbo Bard/torture-dungeon.mp3",
+          "gain": 0.3,
+          "loops": true,
+          "maxGap": 20,
+          "minGap": 8,
+          "randomStart": true,
+          "sporadic": false,
+          "variantDownloads": [],
+          "variants": []
+        }
+      ],
+      "name": "The Underdark",
+      "symbol": "mountain.2",
+      "tags": [
+        "pack",
+        "dungeon",
+        "tense",
+        "ominous",
+        "spooky",
+        "underground",
+        "cave",
+        "tunnel"
+      ]
+    },
+    {
+      "credit": "MatiasMacSD, Morten Barfod S\u00f8egaard, SoundHolder",
+      "layers": [
+        {
+          "download": "https://storage.googleapis.com/turbo-bard.appspot.com/monster-breath.mp3",
+          "file": "Turbo Bard/monster-breath.mp3",
+          "gain": 0.5,
+          "loops": false,
+          "maxGap": 60.0,
+          "minGap": 30.0,
+          "randomStart": false,
+          "sporadic": true,
+          "variantDownloads": [],
+          "variants": []
+        },
+        {
+          "download": "https://storage.googleapis.com/turbo-bard.appspot.com/crystal-cave.mp3",
+          "file": "Turbo Bard/crystal-cave.mp3",
+          "gain": 1.0,
+          "loops": true,
+          "maxGap": 20,
+          "minGap": 8,
+          "randomStart": true,
+          "sporadic": false,
+          "variantDownloads": [],
+          "variants": []
+        },
+        {
+          "download": "https://storage.googleapis.com/turbo-bard.appspot.com/campfire.mp3",
+          "file": "Turbo Bard/campfire.mp3",
+          "gain": 0.3,
+          "loops": true,
+          "maxGap": 20,
+          "minGap": 8,
+          "randomStart": true,
+          "sporadic": false,
+          "variantDownloads": [],
+          "variants": []
+        },
+        {
+          "download": "https://storage.googleapis.com/turbo-bard.appspot.com/cave-ambience.mp3",
+          "file": "Turbo Bard/cave-ambience.mp3",
+          "gain": 1.0,
+          "loops": true,
+          "maxGap": 20,
+          "minGap": 8,
+          "randomStart": true,
+          "sporadic": false,
+          "variantDownloads": [],
+          "variants": []
+        },
+        {
+          "download": "https://storage.googleapis.com/turbo-bard.appspot.com/dripping-walls.mp3",
+          "file": "Turbo Bard/dripping-walls.mp3",
+          "gain": 0.7,
+          "loops": true,
+          "maxGap": 20,
+          "minGap": 8,
+          "randomStart": true,
+          "sporadic": false,
+          "variantDownloads": [],
+          "variants": []
+        }
+      ],
+      "name": "Camping in a Cave",
+      "symbol": "mountain.2",
+      "tags": [
+        "pack",
+        "underdark",
+        "ominous",
+        "underground",
+        "spooky",
+        "bats",
+        "echoes",
+        "abandoned",
+        "temple",
+        "cathedral",
+        "mansion",
+        "tunnel"
+      ]
+    },
+    {
+      "credit": "G4F SFX, Marcus Dellicompagni, www.PoundSound.co.uk, Sound Ex Machina, SoundBits, West Wolf",
+      "layers": [
+        {
+          "download": "https://storage.googleapis.com/turbo-bard.appspot.com/body-drag-road.mp3",
+          "file": "Turbo Bard/body-drag-road.mp3",
+          "gain": 0.1,
+          "loops": true,
+          "maxGap": 20,
+          "minGap": 8,
+          "randomStart": true,
+          "sporadic": false,
+          "variantDownloads": [],
+          "variants": []
+        },
+        {
+          "download": "https://storage.googleapis.com/turbo-bard.appspot.com/wonder.mp3",
+          "file": "Turbo Bard/wonder.mp3",
+          "gain": 0.2,
+          "loops": true,
+          "maxGap": 20,
+          "minGap": 8,
+          "randomStart": true,
+          "sporadic": false,
+          "variantDownloads": [],
+          "variants": []
+        },
+        {
+          "download": "https://storage.googleapis.com/turbo-bard.appspot.com/back-alleys.mp3",
+          "file": "Turbo Bard/back-alleys.mp3",
+          "gain": 0.5,
+          "loops": true,
+          "maxGap": 20,
+          "minGap": 8,
+          "randomStart": true,
+          "sporadic": false,
+          "variantDownloads": [],
+          "variants": []
+        },
+        {
+          "download": "https://storage.googleapis.com/turbo-bard.appspot.com/restaurant-ambience.mp3",
+          "file": "Turbo Bard/restaurant-ambience.mp3",
+          "gain": 0.5,
+          "loops": true,
+          "maxGap": 20,
+          "minGap": 8,
+          "randomStart": true,
+          "sporadic": false,
+          "variantDownloads": [],
+          "variants": []
+        },
+        {
+          "download": "https://storage.googleapis.com/turbo-bard.appspot.com/horse-on-stone.mp3",
+          "file": "Turbo Bard/horse-on-stone.mp3",
+          "gain": 1.0,
+          "loops": true,
+          "maxGap": 20,
+          "minGap": 8,
+          "randomStart": true,
+          "sporadic": false,
+          "variantDownloads": [],
+          "variants": []
+        },
+        {
+          "download": "https://storage.googleapis.com/turbo-bard.appspot.com/fountain-small.mp3",
+          "file": "Turbo Bard/fountain-small.mp3",
+          "gain": 0.2,
+          "loops": true,
+          "maxGap": 20,
+          "minGap": 8,
+          "randomStart": true,
+          "sporadic": false,
+          "variantDownloads": [],
+          "variants": []
+        },
+        {
+          "download": "https://storage.googleapis.com/turbo-bard.appspot.com/city-streets.mp3",
+          "file": "Turbo Bard/city-streets.mp3",
+          "gain": 1.0,
+          "loops": true,
+          "maxGap": 20,
+          "minGap": 8,
+          "randomStart": true,
+          "sporadic": false,
+          "variantDownloads": [],
+          "variants": []
+        }
+      ],
+      "name": "Quiet City Square",
+      "symbol": "building.2",
+      "tags": [
+        "pack",
+        "people",
+        "talking",
+        "lively",
+        "bard",
+        "fountain",
+        "horses",
+        "crowd"
+      ]
+    },
+    {
+      "credit": "Darren Curtis, MatiasMacSD, Raconteur Sound, SoundHolder",
+      "layers": [
+        {
+          "download": "https://storage.googleapis.com/turbo-bard.appspot.com/monster-breath.mp3",
+          "file": "Turbo Bard/monster-breath.mp3",
+          "gain": 1.0,
+          "loops": false,
+          "maxGap": 30.0,
+          "minGap": 10.0,
+          "randomStart": false,
+          "sporadic": true,
+          "variantDownloads": [],
+          "variants": []
+        },
+        {
+          "download": "https://storage.googleapis.com/turbo-bard.appspot.com/a-time-forgotten.mp3",
+          "file": "Turbo Bard/a-time-forgotten.mp3",
+          "gain": 0.2,
+          "loops": true,
+          "maxGap": 20,
+          "minGap": 8,
+          "randomStart": true,
+          "sporadic": false,
+          "variantDownloads": [],
+          "variants": []
+        },
+        {
+          "download": "https://storage.googleapis.com/turbo-bard.appspot.com/crystal-cave.mp3",
+          "file": "Turbo Bard/crystal-cave.mp3",
+          "gain": 0.3,
+          "loops": true,
+          "maxGap": 20,
+          "minGap": 8,
+          "randomStart": true,
+          "sporadic": false,
+          "variantDownloads": [],
+          "variants": []
+        },
+        {
+          "download": "https://storage.googleapis.com/turbo-bard.appspot.com/dripping-walls.mp3",
+          "file": "Turbo Bard/dripping-walls.mp3",
+          "gain": 1.0,
+          "loops": true,
+          "maxGap": 20,
+          "minGap": 8,
+          "randomStart": true,
+          "sporadic": false,
+          "variantDownloads": [],
+          "variants": []
+        },
+        {
+          "download": "https://storage.googleapis.com/turbo-bard.appspot.com/hall-of-the-ancients.mp3",
+          "file": "Turbo Bard/hall-of-the-ancients.mp3",
+          "gain": 0.1,
+          "loops": true,
+          "maxGap": 20,
+          "minGap": 8,
+          "randomStart": true,
+          "sporadic": false,
+          "variantDownloads": [],
+          "variants": []
+        }
+      ],
+      "name": "Abandoned Ruin",
+      "symbol": "building.columns",
+      "tags": [
+        "pack",
+        "majestic",
+        "epic",
+        "peaceful",
+        "cathedral",
+        "temple",
+        "lonely"
+      ]
+    },
+    {
+      "credit": "Charlie Atanasyan, Detunized, G4F SFX, Joshua Reinhardt, SoundBits",
+      "layers": [
+        {
+          "download": "https://storage.googleapis.com/turbo-bard.appspot.com/saddlebags.mp3",
+          "file": "Turbo Bard/saddlebags.mp3",
+          "gain": 0.2,
+          "loops": true,
+          "maxGap": 20,
+          "minGap": 8,
+          "randomStart": true,
+          "sporadic": false,
+          "variantDownloads": [],
+          "variants": []
+        },
+        {
+          "download": "https://storage.googleapis.com/turbo-bard.appspot.com/horse-on-stone.mp3",
+          "file": "Turbo Bard/horse-on-stone.mp3",
+          "gain": 1.0,
+          "loops": true,
+          "maxGap": 20,
+          "minGap": 8,
+          "randomStart": true,
+          "sporadic": false,
+          "variantDownloads": [],
+          "variants": []
+        },
+        {
+          "download": "https://storage.googleapis.com/turbo-bard.appspot.com/aurora-borealis.mp3",
+          "file": "Turbo Bard/aurora-borealis.mp3",
+          "gain": 0.1,
+          "loops": true,
+          "maxGap": 20,
+          "minGap": 8,
+          "randomStart": true,
+          "sporadic": false,
+          "variantDownloads": [],
+          "variants": []
+        },
+        {
+          "download": "https://storage.googleapis.com/turbo-bard.appspot.com/body-drag-soil.mp3",
+          "file": "Turbo Bard/body-drag-soil.mp3",
+          "gain": 0.3,
+          "loops": true,
+          "maxGap": 20,
+          "minGap": 8,
+          "randomStart": true,
+          "sporadic": false,
+          "variantDownloads": [],
+          "variants": []
+        },
+        {
+          "download": "https://storage.googleapis.com/turbo-bard.appspot.com/high-altitude.mp3",
+          "file": "Turbo Bard/high-altitude.mp3",
+          "gain": 1.0,
+          "loops": true,
+          "maxGap": 20,
+          "minGap": 8,
+          "randomStart": true,
+          "sporadic": false,
+          "variantDownloads": [],
+          "variants": []
+        }
+      ],
+      "name": "Mountain Travel",
+      "symbol": "mountain.2",
+      "tags": [
+        "pack",
+        "peaceful",
+        "horses",
+        "snow",
+        "wind",
+        "cold",
+        "frozen tundra"
+      ]
+    },
+    {
+      "credit": "Double Trouble Audio, Kevin MacLeod, Nikk\u00f6 Barrera-Amaya, SoundHolder",
+      "layers": [
+        {
+          "download": "https://storage.googleapis.com/turbo-bard.appspot.com/cannibalism-1.mp3",
+          "file": "Turbo Bard/cannibalism-1.mp3",
+          "gain": 1.0,
+          "loops": false,
+          "maxGap": 15.0,
+          "minGap": 5.0,
+          "randomStart": false,
+          "sporadic": true,
+          "variantDownloads": [
+            "https://storage.googleapis.com/turbo-bard.appspot.com/cannibalism-2.mp3",
+            "https://storage.googleapis.com/turbo-bard.appspot.com/cannibalism-3.mp3",
+            "https://storage.googleapis.com/turbo-bard.appspot.com/cannibalism-4.mp3"
+          ],
+          "variants": [
+            "Turbo Bard/cannibalism-2.mp3",
+            "Turbo Bard/cannibalism-3.mp3",
+            "Turbo Bard/cannibalism-4.mp3"
+          ]
+        },
+        {
+          "download": "https://storage.googleapis.com/turbo-bard.appspot.com/passive-undead.mp3",
+          "file": "Turbo Bard/passive-undead.mp3",
+          "gain": 0.5,
+          "loops": false,
+          "maxGap": 15.0,
+          "minGap": 5.0,
+          "randomStart": false,
+          "sporadic": true,
+          "variantDownloads": [],
+          "variants": []
+        },
+        {
+          "download": "https://storage.googleapis.com/turbo-bard.appspot.com/attercop-1.mp3",
+          "file": "Turbo Bard/attercop-1.mp3",
+          "gain": 0.2,
+          "loops": false,
+          "maxGap": 15.0,
+          "minGap": 5.0,
+          "randomStart": false,
+          "sporadic": true,
+          "variantDownloads": [
+            "https://storage.googleapis.com/turbo-bard.appspot.com/attercop-2.mp3",
+            "https://storage.googleapis.com/turbo-bard.appspot.com/attercop-3.mp3"
+          ],
+          "variants": [
+            "Turbo Bard/attercop-2.mp3",
+            "Turbo Bard/attercop-3.mp3"
+          ]
+        },
+        {
+          "download": "https://storage.googleapis.com/turbo-bard.appspot.com/swarm-of-bees.mp3",
+          "file": "Turbo Bard/swarm-of-bees.mp3",
+          "gain": 0.1,
+          "loops": true,
+          "maxGap": 20,
+          "minGap": 8,
+          "randomStart": true,
+          "sporadic": false,
+          "variantDownloads": [],
+          "variants": []
+        },
+        {
+          "download": "https://storage.googleapis.com/turbo-bard.appspot.com/mangrove.mp3",
+          "file": "Turbo Bard/mangrove.mp3",
+          "gain": 0.5,
+          "loops": true,
+          "maxGap": 20,
+          "minGap": 8,
+          "randomStart": true,
+          "sporadic": false,
+          "variantDownloads": [],
+          "variants": []
+        },
+        {
+          "download": "https://storage.googleapis.com/turbo-bard.appspot.com/journey-of-solitude.mp3",
+          "file": "Turbo Bard/journey-of-solitude.mp3",
+          "gain": 0.3,
+          "loops": true,
+          "maxGap": 20,
+          "minGap": 8,
+          "randomStart": true,
+          "sporadic": false,
+          "variantDownloads": [],
+          "variants": []
+        },
+        {
+          "download": "https://storage.googleapis.com/turbo-bard.appspot.com/wetland.mp3",
+          "file": "Turbo Bard/wetland.mp3",
+          "gain": 1.0,
+          "loops": true,
+          "maxGap": 20,
+          "minGap": 8,
+          "randomStart": true,
+          "sporadic": false,
+          "variantDownloads": [],
+          "variants": []
+        }
+      ],
+      "name": "Swamp Travel",
+      "symbol": "leaf",
+      "tags": [
+        "pack",
+        "wetland",
+        "marsh",
+        "mangrove",
+        "gross",
+        "insects",
+        "slurps",
+        "birds",
+        "buzzing"
+      ]
+    }
+  ]
+}

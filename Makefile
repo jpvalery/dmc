@@ -17,6 +17,7 @@ bundle: build
 	@cp Resources/Info.plist "$(BUNDLE)/Contents/Info.plist"
 	@cp Resources/AppIcon.icns "$(BUNDLE)/Contents/Resources/AppIcon.icns"
 	@cp Resources/tta_data.json "$(BUNDLE)/Contents/Resources/tta_data.json"
+	@cp Resources/scene-templates.json "$(BUNDLE)/Contents/Resources/scene-templates.json"
 	@printf 'APPL????' > "$(BUNDLE)/Contents/PkgInfo"
 	@codesign --force --sign - "$(BUNDLE)" 2>/dev/null
 	@echo "built $(BUNDLE)"

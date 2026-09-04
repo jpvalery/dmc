@@ -22,6 +22,7 @@ final class UIRouter: ObservableObject {
     @Published var editing: EditorTarget?
     @Published var editingEffect: EffectTarget?
     @Published var showTabletop = false
+    @Published var showTemplates = false
     @Published var showPadImport = false
     @Published var showHotkeys = false
     @Published var showNewCampaign = false

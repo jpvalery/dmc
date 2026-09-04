@@ -78,6 +78,13 @@ struct SceneRail: View {
                         .font(.system(size: 9, weight: .semibold))
                         .tracking(0.5)
                     Spacer()
+                    if title == "Scenes" {
+                        Button { router.showTemplates = true } label: {
+                            Image(systemName: "square.grid.2x2").font(.system(size: 9))
+                        }
+                        .buttonStyle(.borderless)
+                        .help("Scene templates  ⌘⇧T")
+                    }
                     Button(action: action) { Image(systemName: "plus").font(.system(size: 9)) }
                         .buttonStyle(.borderless)
                         .help("New \(title.lowercased())")
@@ -313,6 +320,8 @@ struct SceneRail: View {
                     .font(.caption2)
                     .multilineTextAlignment(.center)
                     .foregroundStyle(.tertiary)
+                Button("Scene templates…") { router.showTemplates = true }
+                    .buttonStyle(.link).font(.caption)
                 Button("Browse Tabletop Audio…", action: onBrowse)
                     .buttonStyle(.link).font(.caption)
                 Button("New scene…", action: onNew)

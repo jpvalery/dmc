@@ -11,6 +11,14 @@ struct AudioLayer: Codable, Identifiable, Hashable {
     /// phase-lock and the mix develops an audible repeating pattern.
     var randomStart: Bool = true
     var pan: Double = 0
+    /// Fires at random intervals instead of looping: a distant owl, a dripping pipe, a creak.
+    /// This is what stops a bed sounding like a loop — the irregularity is the point.
+    var sporadic: Bool = false
+    var minGap: Double = 8
+    var maxGap: Double = 20
+    /// Alternate files chosen at random alongside `file`, so repeats don't sound identical.
+    var variants: [String] = []
+
     /// Set when the layer came from an imported SoundPad slot and has no file bound yet.
     /// Keeping the original slot id is what lets the imported mix be reassembled by hand.
     var padID: String?
@@ -19,6 +27,45 @@ struct AudioLayer: Codable, Identifiable, Hashable {
     /// flagged in the editor rather than failing silently.
     var isBound: Bool { !file.isEmpty }
     var url: URL { Vault.audio.appending(path: file) }
+
+    /// Decoded by hand because Swift's synthesized `Codable` ignores property defaults: a key
+    /// absent from an older `scenes.json` throws instead of falling back, which would break
+    /// every layer written before a new field was added.
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        id = try c.decodeIfPresent(UUID.self, forKey: .id) ?? UUID()
+        file = try c.decodeIfPresent(String.self, forKey: .file) ?? ""
+        gain = try c.decodeIfPresent(Double.self, forKey: .gain) ?? 0.8
+        loops = try c.decodeIfPresent(Bool.self, forKey: .loops) ?? true
+        randomStart = try c.decodeIfPresent(Bool.self, forKey: .randomStart) ?? true
+        pan = try c.decodeIfPresent(Double.self, forKey: .pan) ?? 0
+        sporadic = try c.decodeIfPresent(Bool.self, forKey: .sporadic) ?? false
+        minGap = try c.decodeIfPresent(Double.self, forKey: .minGap) ?? 8
+        maxGap = try c.decodeIfPresent(Double.self, forKey: .maxGap) ?? 20
+        variants = try c.decodeIfPresent([String].self, forKey: .variants) ?? []
+        padID = try c.decodeIfPresent(String.self, forKey: .padID)
+    }
+
+    init(file: String, gain: Double = 0.8, loops: Bool = true, randomStart: Bool = true,
+         pan: Double = 0, sporadic: Bool = false, minGap: Double = 8, maxGap: Double = 20,
+         variants: [String] = [], padID: String? = nil) {
+        self.file = file
+        self.gain = gain
+        self.loops = loops
+        self.randomStart = randomStart
+        self.pan = pan
+        self.sporadic = sporadic
+        self.minGap = minGap
+        self.maxGap = maxGap
+        self.variants = variants
+        self.padID = padID
+    }
+
+    /// One of `file` or `variants`, picked fresh for each firing.
+    var randomVariantURL: URL {
+        let all = [file] + variants.filter { !$0.isEmpty }
+        return Vault.audio.appending(path: all.randomElement() ?? file)
+    }
 }
 
 struct SoundScene: Codable, Identifiable, Hashable {
@@ -41,13 +88,23 @@ enum AudioFormats {
 /// of `~/DMConsole/audio` becomes a scene and its files become equal-gain layers. That makes
 /// the app useful the moment files are dropped in, before any scene has been authored.
 enum SceneLibrary {
+    /// Set when a `scenes.json` exists but could not be read, so the UI can say so instead of
+    /// quietly showing folder-derived scenes that look like data loss.
+    private(set) nonisolated(unsafe) static var lastError: String?
+
     static func load() -> [SoundScene] {
-        if let data = try? Data(contentsOf: Vault.scenesFile),
-           let scenes = try? JSONDecoder().decode([SoundScene].self, from: data),
-           !scenes.isEmpty {
-            return scenes
+        lastError = nil
+        guard let data = try? Data(contentsOf: Vault.scenesFile) else {
+            return derivedFromFolders()
         }
-        return derivedFromFolders()
+        do {
+            let scenes = try JSONDecoder().decode([SoundScene].self, from: data)
+            return scenes.isEmpty ? derivedFromFolders() : scenes
+        } catch {
+            lastError = "scenes.json could not be read (\(error.localizedDescription)). "
+                      + "Showing folder-derived scenes; your file has not been changed."
+            return derivedFromFolders()
+        }
     }
 
     static func save(_ scenes: [SoundScene]) {

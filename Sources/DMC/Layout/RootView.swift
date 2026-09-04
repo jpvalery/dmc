@@ -15,6 +15,7 @@ struct RootView: View {
     @StateObject private var downloader = TrackDownloader()
     @StateObject private var hotkeys = HotkeyManager()
     @StateObject private var effects = EffectStore()
+    @StateObject private var templates = TemplateLibrary()
 
     var body: some View {
         ThreePaneView(railCollapsed: railCollapsed, notesHidden: notesHidden) {
@@ -45,6 +46,11 @@ struct RootView: View {
                         engine: engine,
                         onSave: { store.upsert($0) },
                         onDelete: { store.delete(target.scene) })
+        }
+        .sheet(isPresented: $router.showTemplates) {
+            TemplateBrowser(library: templates, store: store) {
+                Task { await library.scan() }
+            }
         }
         .sheet(isPresented: $router.showTabletop) {
             TabletopBrowser(catalogue: catalogue, downloader: downloader)
