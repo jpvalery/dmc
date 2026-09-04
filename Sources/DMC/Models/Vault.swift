@@ -40,6 +40,7 @@ enum Vault {
     // Per-campaign.
     static var notes: URL { campaignDir.appending(path: "notes", directoryHint: .isDirectory) }
     static var scenesFile: URL { campaignDir.appending(path: "scenes.json") }
+    static var effectsFile: URL { campaignDir.appending(path: "effects.json") }
     static var tabsFile: URL { campaignDir.appending(path: "tabs.json") }
     static var hotkeysFile: URL { campaignDir.appending(path: "hotkeys.json") }
 

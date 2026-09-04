@@ -13,7 +13,14 @@ final class UIRouter: ObservableObject {
         var isNew: Bool
     }
 
+    struct EffectTarget: Identifiable {
+        let id = UUID()
+        var effect: SoundEffect
+        var isNew: Bool
+    }
+
     @Published var editing: EditorTarget?
+    @Published var editingEffect: EffectTarget?
     @Published var showTabletop = false
     @Published var showPadImport = false
     @Published var showHotkeys = false
@@ -27,5 +34,14 @@ final class UIRouter: ObservableObject {
 
     func edit(_ scene: SoundScene) {
         editing = EditorTarget(scene: scene, isNew: false)
+    }
+
+    func newEffect() {
+        editingEffect = EffectTarget(effect: SoundEffect(name: "", symbol: "bell", file: ""),
+                                     isNew: true)
+    }
+
+    func edit(_ effect: SoundEffect) {
+        editingEffect = EffectTarget(effect: effect, isNew: false)
     }
 }

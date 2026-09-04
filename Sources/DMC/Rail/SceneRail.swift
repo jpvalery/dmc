@@ -6,32 +6,53 @@ struct SceneRail: View {
     let collapsed: Bool
     @ObservedObject var campaigns: CampaignStore
     @ObservedObject var router: UIRouter
+    @ObservedObject var effects: EffectStore
     let onNew: () -> Void
     let onEdit: (SoundScene) -> Void
+    let onNewEffect: () -> Void
+    let onEditEffect: (SoundEffect) -> Void
     let onBrowse: () -> Void
 
     @State private var showVolumePopover = false
     /// The scene a drag would land in front of; nil while nothing is hovered.
     @State private var dropTarget: UUID?
     @State private var dropAtEnd = false
+    @State private var effectDropTarget: UUID?
+    @State private var firedEffect: UUID?
 
     var body: some View {
         VStack(spacing: 0) {
             header
             Divider()
 
-            if store.scenes.isEmpty {
-                emptyState
-            } else {
-                ScrollView {
-                    VStack(spacing: 4) {
+            ScrollView {
+                VStack(spacing: 4) {
+                    if store.scenes.isEmpty && effects.effects.isEmpty {
+                        emptyState
+                    } else {
+                        sectionHeader("Scenes", systemImage: "waveform", action: onNew)
                         ForEach(Array(store.scenes.enumerated()), id: \.element.id) { index, scene in
                             reorderable(scene, shortcutIndex: index)
                         }
                         endDropZone
+
+                        sectionHeader("Effects", systemImage: "bolt.fill", action: onNewEffect)
+                        if effects.effects.isEmpty {
+                            if !collapsed {
+                                Text("One-shot sounds you fire over a scene.")
+                                    .font(.caption2)
+                                    .foregroundStyle(.tertiary)
+                                    .multilineTextAlignment(.center)
+                                    .padding(.vertical, 4)
+                            }
+                        } else {
+                            ForEach(effects.effects) { effect in
+                                effectRow(effect)
+                            }
+                        }
                     }
-                    .padding(6)
                 }
+                .padding(6)
             }
 
             if !collapsed { problemsSection }
@@ -40,6 +61,120 @@ struct SceneRail: View {
             footer
         }
         .background(Color(nsColor: .controlBackgroundColor))
+    }
+
+    // MARK: - Sections
+
+    /// Collapses to a hairline when the rail is icon-only — a text label would not fit, but the
+    /// two groups still need separating.
+    private func sectionHeader(_ title: String, systemImage: String, action: @escaping () -> Void) -> some View {
+        Group {
+            if collapsed {
+                Divider().padding(.vertical, 4)
+            } else {
+                HStack(spacing: 4) {
+                    Image(systemName: systemImage).font(.system(size: 9))
+                    Text(title.uppercased())
+                        .font(.system(size: 9, weight: .semibold))
+                        .tracking(0.5)
+                    Spacer()
+                    Button(action: action) { Image(systemName: "plus").font(.system(size: 9)) }
+                        .buttonStyle(.borderless)
+                        .help("New \(title.lowercased())")
+                }
+                .foregroundStyle(.secondary)
+                .padding(.top, 6)
+                .padding(.horizontal, 2)
+            }
+        }
+    }
+
+    private func effectRow(_ effect: SoundEffect) -> some View {
+        let sounding = engine.isSounding(effect.id)
+        let copies = engine.soundingEffects[effect.id] ?? 0
+
+        // Not a Button: the row needs its own stop button inside it, and SwiftUI will not nest
+        // one button in another. A tap gesture on the fire area does the same job.
+        return HStack(spacing: 6) {
+            HStack(spacing: 8) {
+                // Collapsed there is no room for a separate control, so the icon itself becomes
+                // the stop button while the effect sounds.
+                Image(systemName: (collapsed && sounding) ? "stop.fill" : effect.symbol)
+                    .font(.system(size: collapsed ? 16 : 13))
+                    .frame(width: collapsed ? 28 : 18)
+                    .foregroundStyle(collapsed && sounding ? Color.accentColor : Color.primary)
+
+                if !collapsed {
+                    Text(effect.name).font(.caption).lineLimit(1)
+                    if copies > 1 {
+                        Text("\(copies)")
+                            .font(.system(size: 9, weight: .semibold))
+                            .padding(.horizontal, 4).padding(.vertical, 1)
+                            .background(Color.accentColor.opacity(0.25))
+                            .clipShape(Capsule())
+                    }
+                    Spacer(minLength: 0)
+                    if effect.isMissing {
+                        Image(systemName: "exclamationmark.triangle.fill")
+                            .font(.caption2).foregroundStyle(.orange)
+                    }
+                }
+            }
+            .contentShape(Rectangle())
+            .onTapGesture {
+                if collapsed && sounding {
+                    engine.stopEffect(effect.id)
+                } else {
+                    engine.fire(effect)
+                    firedEffect = effect.id
+                    Task {
+                        try? await Task.sleep(for: .milliseconds(220))
+                        if firedEffect == effect.id { firedEffect = nil }
+                    }
+                }
+            }
+
+            if !collapsed && sounding {
+                Button { engine.stopEffect(effect.id) } label: {
+                    Image(systemName: "stop.fill").font(.caption2)
+                }
+                .buttonStyle(.borderless)
+                .foregroundStyle(.secondary)
+                .help("Stop this effect")
+            }
+        }
+        .padding(.vertical, 5)
+        .padding(.horizontal, collapsed ? 0 : 6)
+        .frame(maxWidth: .infinity)
+        .background(
+            sounding ? Color.accentColor.opacity(0.18)
+                     : (firedEffect == effect.id ? Color.accentColor.opacity(0.35) : Color.clear)
+        )
+        .clipShape(RoundedRectangle(cornerRadius: 6))
+        .opacity(effect.isMissing ? 0.5 : 1)
+        .help(sounding ? "\(effect.name) — playing, click to stop" : effect.name)
+        .overlay(alignment: .top) { insertionLine(visible: effectDropTarget == effect.id) }
+        .draggable(effect.id.uuidString) {
+            Label(effect.name, systemImage: effect.symbol)
+                .padding(6)
+                .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 6))
+        }
+        .dropDestination(for: String.self) { items, _ in
+            effectDropTarget = nil
+            guard let raw = items.first, let id = UUID(uuidString: raw), effects.contains(id)
+            else { return false }
+            effects.move(id, before: effect.id)
+            return true
+        } isTargeted: { targeted in
+            if targeted { effectDropTarget = effect.id }
+            else if effectDropTarget == effect.id { effectDropTarget = nil }
+        }
+        .contextMenu {
+            if sounding { Button("Stop") { engine.stopEffect(effect.id) } }
+            Button("Edit…") { onEditEffect(effect) }
+            Divider()
+            Button("Delete", role: .destructive) { effects.delete(effect) }
+        }
     }
 
     // MARK: - Reordering

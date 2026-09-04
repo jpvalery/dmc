@@ -33,6 +33,8 @@ struct DMCApp: App {
                 Divider()
                 Button("New Scene…") { router.newScene() }
                     .keyboardShortcut("n", modifiers: .command)
+                Button("New Effect…") { router.newEffect() }
+                    .keyboardShortcut("e", modifiers: [.command, .shift])
                 Button("Browse Tabletop Audio…") { router.showTabletop = true }
                     .keyboardShortcut("l", modifiers: [.command, .shift])
                 Button("Import SoundPad JSON…") { router.showPadImport = true }

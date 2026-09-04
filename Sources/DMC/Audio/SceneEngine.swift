@@ -47,6 +47,13 @@ final class SceneEngine: ObservableObject {
     /// Keyed by player so one layer's ramp can be cancelled without disturbing the others —
     /// needed when a gain slider moves while a fade is still in flight.
     private var fades: [ObjectIdentifier: Task<Void, Never>] = [:]
+    /// Effect nodes currently sounding, keyed so each can remove itself when it finishes.
+    /// The effect id rides along so a stop request can find every node it spawned.
+    private var oneShots: [ObjectIdentifier: (node: AVAudioPlayerNode, effect: UUID)] = [:]
+
+    /// How many copies of each effect are sounding. An effect can be fired again before the
+    /// first has finished, so this is a count rather than a flag.
+    @Published private(set) var soundingEffects: [UUID: Int] = [:]
     private var activeScene: SoundScene?
     private var configChangePending = false
 
@@ -56,21 +63,91 @@ final class SceneEngine: ObservableObject {
     /// so resuming picks up mid-loop instead of restarting the scene.
     @Published private(set) var isPaused = false
 
-    /// Transport toggle for the whole mix. Does nothing when no scene is loaded — "play" here
+    /// Transport toggle for the scene bed. Does nothing when no scene is loaded — "play" here
     /// resumes what was paused rather than guessing which scene to start.
+    ///
+    /// Pauses the scene's player nodes rather than the engine, so the graph keeps running and a
+    /// one-shot effect can still be fired over a paused bed.
     func togglePlayPause() {
         guard activeSceneID != nil else { return }
-        if isPaused {
-            do {
-                try ensureRunning()
-                isPaused = false
-            } catch {
-                problems.append("Could not resume audio: \(error.localizedDescription)")
-            }
-        } else {
-            engine.pause()
-            isPaused = true
+        isPaused.toggle()
+        for player in active {
+            if isPaused { player.node.pause() } else { player.node.play() }
         }
+    }
+
+    // MARK: - One-shot effects
+
+    /// Overlays a single sound on whatever is already playing.
+    ///
+    /// Each firing gets its own node so effects stack — on the scene bed and on each other — and
+    /// tears itself down on completion. Deliberately unaffected by `isPaused`: a paused bed is
+    /// the moment you most want a door slam.
+    func fire(_ effect: SoundEffect) {
+        do {
+            let file = try AVAudioFile(forReading: effect.url)
+            let node = AVAudioPlayerNode()
+            engine.attach(node)
+            engine.connect(node, to: engine.mainMixerNode, format: file.processingFormat)
+            try ensureRunningForEffect()
+            node.volume = Float(effect.gain)
+
+            let key = ObjectIdentifier(node)
+            oneShots[key] = (node, effect.id)
+            soundingEffects[effect.id, default: 0] += 1
+            // The completion handler fires on an audio thread, so it captures only the key —
+            // an ObjectIdentifier is Sendable, an AVAudioPlayerNode is not. The node is looked
+            // up again on the main actor, where the dictionary is the source of truth.
+            node.scheduleFile(file, at: nil, completionCallbackType: .dataPlayedBack) { [weak self] _ in
+                Task { @MainActor in
+                    guard let self, let entry = self.oneShots[key] else { return }
+                    entry.node.stop()
+                    self.engine.detach(entry.node)
+                    self.oneShots[key] = nil
+                    self.release(entry.effect)
+                    self.stopEngineIfIdle()
+                }
+            }
+            node.play()
+        } catch {
+            problems.append("Could not play \(effect.name) — \(error.localizedDescription)")
+        }
+    }
+
+    func isSounding(_ id: UUID) -> Bool { (soundingEffects[id] ?? 0) > 0 }
+
+    /// Cuts an effect short — every copy of it that is currently sounding.
+    func stopEffect(_ id: UUID) {
+        for (key, entry) in oneShots where entry.effect == id {
+            entry.node.stop()
+            engine.detach(entry.node)
+            oneShots[key] = nil
+        }
+        soundingEffects[id] = nil
+        stopEngineIfIdle()
+    }
+
+    func stopAllEffects() {
+        for (key, entry) in oneShots {
+            entry.node.stop()
+            engine.detach(entry.node)
+            oneShots[key] = nil
+        }
+        soundingEffects = [:]
+        stopEngineIfIdle()
+    }
+
+    private func release(_ id: UUID) {
+        guard let count = soundingEffects[id] else { return }
+        if count <= 1 { soundingEffects[id] = nil } else { soundingEffects[id] = count - 1 }
+    }
+
+    /// Starting the engine for an effect must not clear the paused flag — the bed stays paused
+    /// because its own nodes are paused, independently of the engine.
+    private func ensureRunningForEffect() throws {
+        guard !engine.isRunning else { return }
+        engine.prepare()
+        try engine.start()
     }
     var currentScene: SoundScene? { activeScene }
 
@@ -160,6 +237,7 @@ final class SceneEngine: ObservableObject {
     }
 
     func stopAll() {
+        stopAllEffects()
         retireAll(fade: activeScene?.fadeOut ?? 1.0)
         activeScene = nil
         activeSceneID = nil
@@ -203,7 +281,7 @@ final class SceneEngine: ObservableObject {
     /// Let the engine go idle when nothing is playing, so the app stops holding the audio
     /// hardware awake between scenes — it matters on battery.
     private func stopEngineIfIdle() {
-        guard active.isEmpty, retiring.isEmpty, engine.isRunning else { return }
+        guard active.isEmpty, retiring.isEmpty, oneShots.isEmpty, engine.isRunning else { return }
         engine.stop()
         isPaused = false
     }

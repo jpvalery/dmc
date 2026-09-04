@@ -23,6 +23,10 @@ enum HotkeyAction: Codable, Hashable {
     case toggleMute
     /// Pause the mix in place and resume it mid-loop.
     case togglePlayPause
+    /// Fire the effect at this 1-based position in the effects list.
+    case effectIndex(Int)
+    /// Fire one specific effect, wherever it sits.
+    case effect(UUID)
 }
 
 /// A macropad key DMC listens for.
@@ -107,7 +111,9 @@ final class HotkeyManager: ObservableObject {
         0: .sceneIndex(1),   8: .sceneIndex(2),  16: .sceneIndex(3),   // column 1  (M0,M1,M2)
         1: .sceneIndex(4),   9: .sceneIndex(5),  17: .sceneIndex(6),   // column 2  (M3,M4,M5)
         2: .sceneIndex(7),  10: .sceneIndex(8),  18: .sceneIndex(9),   // column 3  (M6,M7,M8)
-        3: .previousScene,  11: .newScene,       19: .nextScene,       // column 4  (M9,M10,M11)
+        // Column 4 fires the first three effects. Scene navigation moved off the pad to make
+        // room; it is still on ⌘/the menus and can be rebound here at any time.
+        3: .effectIndex(1), 11: .effectIndex(2), 19: .effectIndex(3),  // column 4  (M9,M10,M11)
 
         // The left knob drives DMC's own master volume rather than the system's: macOS routes
         // system volume to AirPods over AVRCP absolute volume, which coalesces rapid encoder

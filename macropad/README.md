@@ -37,7 +37,9 @@ and macOS claims them whatever modifier you add: `LALT(KC_F14)` opened Displays 
 as* reaching DMC. `F17`-`F20` carry no default binding at all.
 
 DMC reads these as hotkey slots: bare `F13`–`F16` are slots 0–3, shifted 8–11, control 16–19.
-See `HotkeyManager.padLayout`.
+The first three columns are rail positions 1–9, read *down* each column because the pad numbers
+its macros column-major. The fourth column fires the first three sound effects. See
+`HotkeyManager.padLayout`.
 
 ## Rebuilding the firmware
 

@@ -4,6 +4,7 @@ import SwiftUI
 struct HotkeySettings: View {
     @ObservedObject var hotkeys: HotkeyManager
     @ObservedObject var store: SceneStore
+    @ObservedObject var effects: EffectStore
 
     @Environment(\.dismiss) private var dismiss
     @State private var copied = false
@@ -91,6 +92,23 @@ struct HotkeySettings: View {
                     }
                 }
 
+                Section("Effects by position") {
+                    ForEach(1...8, id: \.self) { position in
+                        let name = effects.effects.indices.contains(position - 1)
+                            ? effects.effects[position - 1].name
+                            : "empty"
+                        Text("Effect \(position) — \(name)").tag(HotkeyAction.effectIndex(position))
+                    }
+                }
+
+                if !effects.effects.isEmpty {
+                    Section("Pinned to one effect") {
+                        ForEach(effects.effects) { effect in
+                            Text(effect.name).tag(HotkeyAction.effect(effect.id))
+                        }
+                    }
+                }
+
                 if !store.scenes.isEmpty {
                     Section("Pinned to one scene") {
                         ForEach(store.scenes) { scene in
@@ -139,6 +157,8 @@ struct HotkeySettings: View {
         case .newScene: "New scene"
         case .toggleMute: "Mute / unmute"
         case .togglePlayPause: "Pause / resume"
+        case .effectIndex(let position): "Effect \(position)"
+        case .effect(let id): effects.effects.first { $0.id == id }.map { "Effect: \($0.name)" } ?? "Effect: (deleted)"
         case .scene(let id): store.scenes.first { $0.id == id }.map { "Scene: \($0.name)" } ?? "Scene: (deleted)"
         case .sceneIndex(let position): "Position \(position)"
         }

@@ -14,6 +14,7 @@ struct RootView: View {
     @StateObject private var catalogue = TabletopCatalogue()
     @StateObject private var downloader = TrackDownloader()
     @StateObject private var hotkeys = HotkeyManager()
+    @StateObject private var effects = EffectStore()
 
     var body: some View {
         ThreePaneView(railCollapsed: railCollapsed, notesHidden: notesHidden) {
@@ -22,8 +23,11 @@ struct RootView: View {
                       collapsed: railCollapsed,
                       campaigns: campaigns,
                       router: router,
+                      effects: effects,
                       onNew: router.newScene,
                       onEdit: router.edit,
+                      onNewEffect: router.newEffect,
+                      onEditEffect: router.edit,
                       onBrowse: { router.showTabletop = true })
         } web: {
             WebPane(tabs: tabs,
@@ -45,6 +49,14 @@ struct RootView: View {
         .sheet(isPresented: $router.showTabletop) {
             TabletopBrowser(catalogue: catalogue, downloader: downloader)
         }
+        .sheet(item: $router.editingEffect) { target in
+            EffectEditor(effect: target.effect,
+                         isNew: target.isNew,
+                         library: library,
+                         engine: engine,
+                         onSave: { effects.upsert($0) },
+                         onDelete: { effects.delete(target.effect) })
+        }
         .sheet(isPresented: $router.showNewCampaign) {
             CampaignNameSheet(title: "New campaign",
                               confirmLabel: "Create",
@@ -59,7 +71,7 @@ struct RootView: View {
             DeleteCampaignSheet(campaign: campaign) { campaigns.delete(campaign.id) }
         }
         .sheet(isPresented: $router.showHotkeys) {
-            HotkeySettings(hotkeys: hotkeys, store: store)
+            HotkeySettings(hotkeys: hotkeys, store: store, effects: effects)
         }
         .sheet(isPresented: $router.showPadImport) {
             PadImportView { scene in
@@ -90,6 +102,11 @@ struct RootView: View {
                     engine.toggleMute()
                 case .togglePlayPause:
                     engine.togglePlayPause()
+                case .effectIndex(let position):
+                    let i = position - 1
+                    if effects.effects.indices.contains(i) { engine.fire(effects.effects[i]) }
+                case .effect(let id):
+                    if let effect = effects.effects.first(where: { $0.id == id }) { engine.fire(effect) }
                 case .nextScene:
                     stepScene(by: 1)
                 case .previousScene:
@@ -108,6 +125,7 @@ struct RootView: View {
             }
             campaigns.onDidSwitch = {
                 store.reload()
+                effects.reload()
                 tabs.reloadForCampaign()
                 hotkeys.reloadForCampaign()
             }
