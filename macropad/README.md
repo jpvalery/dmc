@@ -16,13 +16,21 @@ RGB effects, and let VIA remap encoder rotation. Both needed a rebuild.
 
 | Encoder | Rotate | Press |
 |---------|--------|-------|
-| left    | RGB brightness | mute |
+| left    | DMC master volume | stop all audio |
 | centre  | mousewheel | middle click |
-| right   | volume | RGB mode next |
+| right   | RGB brightness | RGB mode next |
 
-The presses look mismatched against their knobs, and that is deliberate: this exact arrangement
-is the one that works. Rearranging them broke smooth volume tracking, reproducibly, for reasons
-that were never explained. Change one at a time and test if you touch it.
+The left knob deliberately does **not** send `KC_VOLU`/`KC_VOLD`. macOS routes system volume to
+Bluetooth headphones over AVRCP absolute volume, where each keypress is a round trip on a coarse
+scale; rapid encoder taps get coalesced into jumps straight to 0 or ~50% instead of progressive
+steps. Over the laptop speakers the identical keycodes behave perfectly, which makes the fault
+look intermittent and sends you chasing the encoder, the tap timing and `ENCODER_MAP` in turn.
+None of those are the cause.
+
+Instead it sends `LALT(KC_F13)` / `LALT(KC_F14)` / `LALT(KC_F15)`, which DMC reads as hotkey
+slots 24-26 and maps to master volume up, down and stop-all. That bypasses macOS and Bluetooth
+entirely, and only rides the ambience — a Discord ping stays where you set it. The trade-off is
+that it does nothing while DMC is closed.
 
 DMC reads these as hotkey slots: bare `F13`–`F16` are slots 0–3, shifted 8–11, control 16–19.
 See `HotkeyManager.padLayout`.

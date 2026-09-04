@@ -19,6 +19,8 @@ enum HotkeyAction: Codable, Hashable {
     case previousScene
     /// Opens the scene editor on a blank scene — building a new ambience without leaving the pad.
     case newScene
+    /// Silence the ambience without stopping it.
+    case toggleMute
 }
 
 /// A macropad key DMC listens for.
@@ -104,6 +106,11 @@ final class HotkeyManager: ObservableObject {
         1: .sceneIndex(4),   9: .sceneIndex(5),  17: .sceneIndex(6),   // column 2  (M3,M4,M5)
         2: .sceneIndex(7),  10: .sceneIndex(8),  18: .sceneIndex(9),   // column 3  (M6,M7,M8)
         3: .previousScene,  11: .newScene,       19: .nextScene,       // column 4  (M9,M10,M11)
+
+        // The left knob, on the otherwise-unused Option bank. It drives DMC's own master
+        // volume rather than the system's: macOS routes system volume to AirPods over AVRCP
+        // absolute volume, which coalesces rapid encoder taps into jumps instead of steps.
+        24: .volumeUp, 25: .volumeDown, 26: .stopAll,
     ]
 
     private static let starterLayout: [Int: HotkeyAction] = padLayout

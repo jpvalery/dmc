@@ -19,6 +19,28 @@ final class SceneEngine: ObservableObject {
 
     private static let masterKey = "audio.masterVolume"
 
+    /// Level to come back to when unmuting; nil when not muted.
+    private var premuteVolume: Double?
+
+    var isMuted: Bool { premuteVolume != nil }
+
+    /// Silences the ambience without stopping it, so a scene keeps its place and its fades.
+    func toggleMute() {
+        if let previous = premuteVolume {
+            masterVolume = previous
+            premuteVolume = nil
+        } else {
+            premuteVolume = masterVolume
+            masterVolume = 0
+        }
+    }
+
+    /// One encoder detent. Finer than a keyboard shortcut's step because a knob gives you many.
+    func nudgeVolume(_ delta: Double) {
+        premuteVolume = nil
+        masterVolume = (masterVolume + delta).clamped(0, 1)
+    }
+
     private let engine = AVAudioEngine()
     private var active: [LayerPlayer] = []
     private var retiring: [ObjectIdentifier: LayerPlayer] = [:]

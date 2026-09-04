@@ -2,16 +2,16 @@
   "encoders" : [
     [
       [
-        "RM_VALD",
-        "RM_VALU"
+        "0x0469",
+        "0x0468"
       ],
       [
         "KC_WH_D",
         "KC_WH_U"
       ],
       [
-        "KC_VOLD",
-        "KC_VOLU"
+        "RM_VALD",
+        "RM_VALU"
       ]
     ],
     [
@@ -132,7 +132,7 @@
       "KC_X",
       "KC_BTN3",
       "RM_NEXT",
-      "KC_MUTE",
+      "0x046A",
       "KC_NO",
       "KC_NO",
       "KC_NO",

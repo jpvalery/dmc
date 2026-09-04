@@ -83,9 +83,11 @@ struct RootView: View {
                 case .stopAll:
                     engine.stopAll()
                 case .volumeUp:
-                    engine.masterVolume = min(1, engine.masterVolume + 0.08)
+                    engine.nudgeVolume(0.04)
                 case .volumeDown:
-                    engine.masterVolume = max(0, engine.masterVolume - 0.08)
+                    engine.nudgeVolume(-0.04)
+                case .toggleMute:
+                    engine.toggleMute()
                 case .nextScene:
                     stepScene(by: 1)
                 case .previousScene:

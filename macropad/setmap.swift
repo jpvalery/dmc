@@ -14,16 +14,16 @@ struct SetMap {
         (8,  0x026B, "LSFT(F16)"),  (9,  0x0015, "R"),
         (10, 0x0168, "LCTL(F13)"),  (11, 0x0169, "LCTL(F14)"),  (12, 0x016A, "LCTL(F15)"),
         (13, 0x016B, "LCTL(F16)"),  (14, 0x001B, "X"),
-        (17, 0x7843, "press L: RGB mode next"),
+        (17, 0x046A, "press L: DMC mute  LALT(F15)"),
         (15, 0x00D3, "press C: middle-click"),
-        (16, 0x00A8, "press R: mute"),
+        (16, 0x7843, "press R: RGB mode next"),
     ]
 
     // (encoder index, ccw, cw)
     static let encoders: [(idx: UInt8, ccw: UInt16, cw: UInt16, name: String)] = [
-        (0, 0x784A, 0x7849, "left   RGB brightness"),
+        (0, 0x0469, 0x0468, "left   DMC volume  LALT(F14/F13)"),
         (1, 0x00DA, 0x00D9, "centre wheel down/up"),
-        (2, 0x00AA, 0x00A9, "right  volume down/up"),
+        (2, 0x784A, 0x7849, "right  RGB brightness"),
     ]
 
     static func main() {
