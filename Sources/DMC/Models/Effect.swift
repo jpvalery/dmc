@@ -12,9 +12,39 @@ struct SoundEffect: Codable, Identifiable, Hashable {
     /// Relative to `Vault.audio`, the same convention as `AudioLayer.file`.
     var file: String
     var gain: Double = 0.9
+    /// Alternate takes chosen at random per firing, so three knocks aren't three identical ones.
+    var variants: [String] = []
 
     var url: URL { Vault.audio.appending(path: file) }
     var isMissing: Bool { !FileManager.default.fileExists(atPath: url.path) }
+
+    /// One of `file` or `variants`, picked fresh each time it fires.
+    var randomURL: URL {
+        let all = ([file] + variants).filter { !$0.isEmpty }
+        return Vault.audio.appending(path: all.randomElement() ?? file)
+    }
+
+    /// Decoded by hand for the same reason as `AudioLayer`: Swift's synthesized `Codable`
+    /// ignores property defaults, so a field added later would orphan every effect already
+    /// written to disk.
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        id = try c.decodeIfPresent(UUID.self, forKey: .id) ?? UUID()
+        name = try c.decodeIfPresent(String.self, forKey: .name) ?? "Untitled"
+        symbol = try c.decodeIfPresent(String.self, forKey: .symbol) ?? "bell"
+        file = try c.decodeIfPresent(String.self, forKey: .file) ?? ""
+        gain = try c.decodeIfPresent(Double.self, forKey: .gain) ?? 0.9
+        variants = try c.decodeIfPresent([String].self, forKey: .variants) ?? []
+    }
+
+    init(name: String, symbol: String = "bell", file: String, gain: Double = 0.9,
+         variants: [String] = []) {
+        self.name = name
+        self.symbol = symbol
+        self.file = file
+        self.gain = gain
+        self.variants = variants
+    }
 }
 
 enum EffectLibrary {

@@ -87,7 +87,7 @@ final class SceneEngine: ObservableObject {
     /// tears itself down on completion. Deliberately unaffected by `isPaused`: a paused bed is
     /// the moment you most want a door slam.
     func fire(_ effect: SoundEffect) {
-        playOneShot(url: effect.url, gain: effect.gain, tag: effect.id, label: effect.name)
+        playOneShot(url: effect.randomURL, gain: effect.gain, tag: effect.id, label: effect.name)
     }
 
     /// One node per firing, torn down on completion. `tag` groups nodes so a stop request can

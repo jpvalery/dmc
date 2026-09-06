@@ -108,12 +108,16 @@ final class HotkeyManager: ObservableObject {
     ///     M0 -> F13        M1 -> LSFT(F13)   M2 -> LCTL(F13)
     ///     M3 -> F14        M4 -> LSFT(F14)   M5 -> LCTL(F14)   ... etc
     static let padLayout: [Int: HotkeyAction] = [
-        0: .sceneIndex(1),   8: .sceneIndex(2),  16: .sceneIndex(3),   // column 1  (M0,M1,M2)
-        1: .sceneIndex(4),   9: .sceneIndex(5),  17: .sceneIndex(6),   // column 2  (M3,M4,M5)
-        2: .sceneIndex(7),  10: .sceneIndex(8),  18: .sceneIndex(9),   // column 3  (M6,M7,M8)
-        // Column 4 fires the first three effects. Scene navigation moved off the pad to make
-        // room; it is still on ⌘/the menus and can be rebound here at any time.
-        3: .effectIndex(1), 11: .effectIndex(2), 19: .effectIndex(3),  // column 4  (M9,M10,M11)
+        // Read down each column: the pad numbers its macros column-major, so M0/M1/M2 are the
+        // first column top to bottom, M3/M4/M5 the second, and so on.
+        //
+        //   col 1        col 2      col 3      col 4
+        //   previous     scene 1    scene 4    effect 2
+        //   next         scene 2    scene 5    effect 3
+        //   effect 1     scene 3    scene 6    effect 4
+        0: .previousScene,  1: .sceneIndex(1),  2: .sceneIndex(4),  3: .effectIndex(2),
+        8: .nextScene,      9: .sceneIndex(2), 10: .sceneIndex(5), 11: .effectIndex(3),
+       16: .effectIndex(1), 17: .sceneIndex(3), 18: .sceneIndex(6), 19: .effectIndex(4),
 
         // The left knob drives DMC's own master volume rather than the system's: macOS routes
         // system volume to AirPods over AVRCP absolute volume, which coalesces rapid encoder

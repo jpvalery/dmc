@@ -46,6 +46,10 @@ struct EffectEditor: View {
                     } else {
                         Text("None chosen").font(.callout).foregroundStyle(.tertiary)
                     }
+                    if !effect.variants.isEmpty {
+                        Text("+\(effect.variants.count) takes")
+                            .font(.caption2).foregroundStyle(.tertiary)
+                    }
                     Spacer()
                     Button(hasFile ? "Change…" : "Choose…") { showSounds = true }
                 }
