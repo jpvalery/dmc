@@ -78,7 +78,7 @@ struct RootView: View {
             DeleteCampaignSheet(campaign: campaign) { campaigns.delete(campaign.id) }
         }
         .sheet(isPresented: $router.showHotkeys) {
-            HotkeySettings(hotkeys: hotkeys, store: store, effects: effects)
+            PadMapper(hotkeys: hotkeys, store: store, effects: effects)
         }
         .sheet(isPresented: $router.showPadImport) {
             PadImportView { scene in
