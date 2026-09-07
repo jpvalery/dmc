@@ -7,6 +7,7 @@ struct RootView: View {
     @ObservedObject var store: SceneStore
     @ObservedObject var router: UIRouter
     @ObservedObject var campaigns: CampaignStore
+    @ObservedObject var notes: NotesStore
     @Binding var railCollapsed: Bool
     @Binding var notesHidden: Bool
 
@@ -35,7 +36,7 @@ struct RootView: View {
                     railCollapsed: $railCollapsed,
                     notesHidden: $notesHidden)
         } notes: {
-            NotesPane()
+            NotesPane(notes: notes)
         }
         .frame(minWidth: 720, minHeight: 620)
         .background(SceneHotkeys(engine: engine, store: store))
@@ -128,17 +129,19 @@ struct RootView: View {
             campaigns.onWillSwitch = {
                 engine.stopAll()
                 tabs.persist()
+                notes.saveNow()
             }
             campaigns.onDidSwitch = {
                 store.reload()
                 effects.reload()
+                notes.reload()
                 tabs.reloadForCampaign()
                 hotkeys.reloadForCampaign()
             }
             // Capture the open pages on quit so a relaunch mid-session keeps the DM's place.
             NotificationCenter.default.addObserver(
                 forName: NSApplication.willTerminateNotification, object: nil, queue: .main
-            ) { _ in MainActor.assumeIsolated { tabs.persist() } }
+            ) { _ in MainActor.assumeIsolated { tabs.persist(); notes.saveNow() } }
         }
     }
 

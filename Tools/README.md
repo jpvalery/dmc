@@ -39,6 +39,21 @@ renders a blank icon.
 swift Tools/verify-symbols/main.swift
 ```
 
+## `verify-notes` — notepad persistence
+
+Exercises the session store headlessly: today's session, debounced autosave with no explicit
+save, survival across a simulated force-quit, switching between sessions without losing an
+in-flight edit, and renaming while keeping the date prefix.
+
+```sh
+mkdir -p /tmp/nv && cp Tools/verify-notes/main.swift /tmp/nv/
+swiftc -O -parse-as-library -swift-version 5 -o /tmp/nv/run /tmp/nv/main.swift \
+  Sources/DMC/Models/Vault.swift Sources/DMC/Models/Campaign.swift \
+  Sources/DMC/Notes/NotesStore.swift \
+  -target arm64-apple-macos15 -framework AppKit
+/tmp/nv/run /tmp/nv/vault
+```
+
 ## `verify-padimport` — SoundPad import
 
 Parses a saved pad (JSON or share link) and confirms levels, loop flags and slot ids survive a

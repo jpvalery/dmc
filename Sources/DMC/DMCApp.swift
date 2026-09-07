@@ -7,6 +7,7 @@ struct DMCApp: App {
     @StateObject private var store = SceneStore()
     @StateObject private var router = UIRouter()
     @StateObject private var campaigns = CampaignStore()
+    @StateObject private var notes = NotesStore()
 
     @AppStorage("pane.railCollapsed") private var railCollapsed = false
     @AppStorage("pane.notesHidden") private var notesHidden = false
@@ -20,6 +21,7 @@ struct DMCApp: App {
                      store: store,
                      router: router,
                      campaigns: campaigns,
+                     notes: notes,
                      railCollapsed: $railCollapsed,
                      notesHidden: $notesHidden)
         }
@@ -35,6 +37,9 @@ struct DMCApp: App {
                     .keyboardShortcut("n", modifiers: .command)
                 Button("New Effect…") { router.newEffect() }
                     .keyboardShortcut("e", modifiers: [.command, .shift])
+                // ⌘N is New Scene, so today's session takes ⌘⌥N.
+                Button("Today's Session") { notes.openToday() }
+                    .keyboardShortcut("n", modifiers: [.command, .option])
                 Button("Scene Templates…") { router.showTemplates = true }
                     .keyboardShortcut("t", modifiers: [.command, .shift])
                 Button("Browse Tabletop Audio…") { router.showTabletop = true }
@@ -97,6 +102,9 @@ struct DMCApp: App {
                 }
                 Button("Import Folders as Scenes") { store.importFolders() }
                 Button("Reload Scenes") { store.reload() }
+                Button("Save Notes") { notes.saveNow() }
+                    .keyboardShortcut("s", modifiers: .command)
+                Button("Reveal Notes Folder") { Vault.reveal(Vault.notes) }
                 Button("Reveal Vault in Finder") { Vault.reveal(Vault.root) }
             }
         }
