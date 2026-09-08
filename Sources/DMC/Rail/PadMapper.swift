@@ -41,11 +41,24 @@ enum PadSpec {
         return out
     }()
 
+    struct Encoder: Identifiable {
+        let id: String
+        let name: String
+        /// Slots for counter-clockwise, clockwise and press; nil where DMC never hears it.
+        let ccw: Int?
+        let cw: Int?
+        let press: Int?
+        /// Shown instead of bindings when the knob acts on the host or the board itself.
+        let fixed: (ccw: String, cw: String, press: String)?
+    }
+
     /// The left knob is the only encoder DMC hears; the other two act on the host or the board.
-    static let encoders: [(name: String, slots: [Int?], detail: String)] = [
-        ("Left",   [5, 4, 6], "F18 · F17 · F19"),
-        ("Centre", [nil, nil, nil], "mousewheel · middle click"),
-        ("Right",  [nil, nil, nil], "RGB brightness · mode"),
+    static let encoders: [Encoder] = [
+        .init(id: "L", name: "Left",   ccw: 5, cw: 4, press: 6, fixed: nil),
+        .init(id: "C", name: "Centre", ccw: nil, cw: nil, press: nil,
+              fixed: ("scroll ↓", "scroll ↑", "middle click")),
+        .init(id: "R", name: "Right",  ccw: nil, cw: nil, press: nil,
+              fixed: ("dimmer", "brighter", "RGB mode")),
     ]
 }
 
@@ -56,6 +69,8 @@ struct PadMapper: View {
 
     @Environment(\.dismiss) private var dismiss
     @State private var selectedSlot: Int?
+    /// The slot a drag is currently hovering, for highlight.
+    @State private var dropSlot: Int?
     @State private var showAllSlots = false
     @State private var copied = false
 
@@ -95,41 +110,95 @@ struct PadMapper: View {
         VStack(alignment: .leading, spacing: 6) {
             Text("ENCODERS").font(.system(size: 9, weight: .semibold)).tracking(0.5)
                 .foregroundStyle(.secondary)
-            HStack(spacing: 8) {
-                ForEach(PadSpec.encoders, id: \.name) { encoder in
-                    VStack(spacing: 4) {
-                        Text(encoder.name).font(.caption.weight(.medium))
-                        if encoder.slots.contains(where: { $0 != nil }) {
-                            ForEach(Array(zip(["⟲", "⟳", "press"], encoder.slots)), id: \.0) { symbol, slot in
-                                if let slot {
-                                    Button { selectedSlot = slot } label: {
-                                        HStack(spacing: 3) {
-                                            Text(symbol).font(.system(size: 9))
-                                            Text(describe(hotkeys.binding(for: HotkeySlot.all[slot])))
-                                                .font(.system(size: 9)).lineLimit(1)
-                                        }
-                                        .frame(maxWidth: .infinity)
-                                        .padding(.vertical, 2)
-                                        .background(selectedSlot == slot ? Color.accentColor.opacity(0.25)
-                                                                         : Color(nsColor: .controlBackgroundColor))
-                                        .clipShape(RoundedRectangle(cornerRadius: 4))
-                                    }
-                                    .buttonStyle(.plain)
-                                }
-                            }
-                        } else {
-                            Text(encoder.detail)
-                                .font(.system(size: 9)).foregroundStyle(.tertiary)
-                                .multilineTextAlignment(.center)
-                                .frame(maxWidth: .infinity, minHeight: 44)
-                        }
-                    }
-                    .padding(6)
-                    .frame(maxWidth: .infinity)
-                    .background(Color(nsColor: .windowBackgroundColor))
-                    .clipShape(RoundedRectangle(cornerRadius: 7))
+            HStack(spacing: 10) {
+                ForEach(PadSpec.encoders) { encoder in
+                    knob(encoder)
                 }
             }
+        }
+    }
+
+    private func knob(_ encoder: PadSpec.Encoder) -> some View {
+        VStack(spacing: 5) {
+            Text(encoder.name)
+                .font(.system(size: 9, weight: .semibold))
+                .foregroundStyle(.secondary)
+
+            HStack(spacing: 4) {
+                rotation(slot: encoder.ccw, fixed: encoder.fixed?.ccw,
+                         glyph: "arrow.counterclockwise", alignment: .trailing)
+                press(slot: encoder.press, fixed: encoder.fixed?.press)
+                rotation(slot: encoder.cw, fixed: encoder.fixed?.cw,
+                         glyph: "arrow.clockwise", alignment: .leading)
+            }
+        }
+        .padding(.vertical, 8)
+        .padding(.horizontal, 6)
+        .frame(maxWidth: .infinity)
+        .background(Color(nsColor: .windowBackgroundColor))
+        .clipShape(RoundedRectangle(cornerRadius: 8))
+    }
+
+    /// One side of the knob: which way you turn it, and what that does.
+    private func rotation(slot: Int?, fixed: String?, glyph: String,
+                          alignment: Alignment) -> some View {
+        let isSelected = slot != nil && slot == selectedSlot
+        return VStack(spacing: 2) {
+            Image(systemName: glyph)
+                .font(.system(size: 9))
+                .foregroundStyle(slot == nil ? .tertiary : .secondary)
+            Text(slot.map { describe(hotkeys.binding(for: HotkeySlot.all[$0])) } ?? (fixed ?? "—"))
+                .font(.system(size: 9))
+                .foregroundStyle(slot == nil ? .tertiary : .primary)
+                .lineLimit(2)
+                .multilineTextAlignment(.center)
+        }
+        .frame(maxWidth: .infinity, minHeight: 34, alignment: alignment)
+        .padding(.vertical, 3)
+        .padding(.horizontal, 3)
+        .background(isSelected ? Color.accentColor.opacity(0.25) : Color.clear)
+        .clipShape(RoundedRectangle(cornerRadius: 5))
+        .contentShape(Rectangle())
+        .onTapGesture { if let slot { selectedSlot = slot } }
+        .modifier(SlotDropTarget(slot: slot, hovered: $dropSlot, assign: assign))
+    }
+
+    /// The knob itself — pressing it is a binding too, so the circle is a drop target.
+    private func press(slot: Int?, fixed: String?) -> some View {
+        let isSelected = slot != nil && slot == selectedSlot
+        let isHovered = slot != nil && slot == dropSlot
+        return VStack(spacing: 1) {
+            Circle()
+                .strokeBorder(isSelected || isHovered ? Color.accentColor
+                                                     : Color(nsColor: .separatorColor),
+                              lineWidth: isSelected || isHovered ? 2 : 1)
+                .background(Circle().fill(slot == nil ? Color(nsColor: .controlBackgroundColor)
+                                                      : Color(nsColor: .controlBackgroundColor)))
+                .frame(width: 34, height: 34)
+                .overlay {
+                    Image(systemName: pressGlyph(slot: slot, fixed: fixed))
+                        .font(.system(size: 12))
+                        .foregroundStyle(slot == nil ? .tertiary : .primary)
+                }
+            Text(slot.map { describe(hotkeys.binding(for: HotkeySlot.all[$0])) } ?? (fixed ?? "—"))
+                .font(.system(size: 8))
+                .foregroundStyle(slot == nil ? .tertiary : .secondary)
+                .lineLimit(1)
+        }
+        .contentShape(Rectangle())
+        .onTapGesture { if let slot { selectedSlot = slot } }
+        .modifier(SlotDropTarget(slot: slot, hovered: $dropSlot, assign: assign))
+        .help(slot == nil ? (fixed ?? "") : "Click to bind, or drop a scene or effect here")
+    }
+
+    private func pressGlyph(slot: Int?, fixed: String?) -> String {
+        guard let slot else { return "hand.tap" }
+        switch hotkeys.binding(for: HotkeySlot.all[slot]) {
+        case .togglePlayPause: return "playpause.fill"
+        case .stopAll: return "stop.fill"
+        case .toggleMute: return "speaker.slash.fill"
+        case .none: return "circle.dashed"
+        default: return "hand.tap.fill"
         }
     }
 
@@ -150,6 +219,7 @@ struct PadMapper: View {
     private func keyCell(_ key: PadSpec.Key) -> some View {
         let bound = key.slot.map { hotkeys.binding(for: HotkeySlot.all[$0]) } ?? .none
         let isSelected = key.slot != nil && key.slot == selectedSlot
+        let isHovered = key.slot != nil && key.slot == dropSlot
         let unreachable = key.slot == nil
 
         return Button {
@@ -170,20 +240,25 @@ struct PadMapper: View {
             .frame(maxWidth: .infinity)
             .padding(.horizontal, 4)
             .background(
-                isSelected ? Color.accentColor.opacity(0.28)
-                           : (unreachable ? Color(nsColor: .windowBackgroundColor)
-                                          : Color(nsColor: .controlBackgroundColor))
+                isHovered ? Color.accentColor.opacity(0.4)
+                          : (isSelected ? Color.accentColor.opacity(0.28)
+                             : (unreachable ? Color(nsColor: .windowBackgroundColor)
+                                            : Color(nsColor: .controlBackgroundColor)))
             )
             .overlay(
                 RoundedRectangle(cornerRadius: 6)
-                    .stroke(isSelected ? Color.accentColor : Color(nsColor: .separatorColor),
-                            lineWidth: isSelected ? 1.5 : 0.5)
+                    .stroke(isHovered || isSelected ? Color.accentColor
+                                                    : Color(nsColor: .separatorColor),
+                            lineWidth: isHovered ? 2 : (isSelected ? 1.5 : 0.5))
             )
             .clipShape(RoundedRectangle(cornerRadius: 6))
         }
         .buttonStyle(.plain)
         .disabled(unreachable)
-        .help(unreachable ? "\(key.via) — remap it in VIA to F20 to reach DMC" : key.via)
+        .modifier(SlotDropTarget(slot: key.slot, hovered: $dropSlot, assign: assign))
+        .help(unreachable
+              ? "\(key.via) — remap it in VIA to F20 to reach DMC"
+              : "\(key.via) — click to bind, or drop a scene or effect here")
     }
 
     @ViewBuilder
@@ -218,20 +293,47 @@ struct PadMapper: View {
         }
     }
 
-    /// What "Scene 3" and "Effect 2" actually refer to right now.
+    /// What "Scene 3" and "Effect 2" refer to right now — and the drag source for binding them.
     private var reference: some View {
-        HStack(alignment: .top, spacing: 16) {
-            column(title: "SCENES", systemImage: "waveform",
-                   rows: store.scenes.prefix(9).enumerated().map { ($0.offset + 1, $0.element.name) },
-                   empty: "No scenes yet")
-            column(title: "EFFECTS", systemImage: "bolt.fill",
-                   rows: effects.effects.prefix(8).enumerated().map { ($0.offset + 1, $0.element.name) },
-                   empty: "No effects yet")
+        VStack(alignment: .leading, spacing: 10) {
+            Text("DRAG ONTO A KEY OR KNOB")
+                .font(.system(size: 9, weight: .semibold)).tracking(0.5)
+                .foregroundStyle(.secondary)
+
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 5) {
+                    ActionChip(action: .togglePlayPause, label: "Pause", systemImage: "playpause.fill")
+                    ActionChip(action: .stopAll, label: "Stop all", systemImage: "stop.fill")
+                    ActionChip(action: .toggleMute, label: "Mute", systemImage: "speaker.slash.fill")
+                    ActionChip(action: .volumeUp, label: "Vol +", systemImage: "speaker.wave.2.fill")
+                    ActionChip(action: .volumeDown, label: "Vol −", systemImage: "speaker.fill")
+                    ActionChip(action: .nextScene, label: "Next", systemImage: "forward.fill")
+                    ActionChip(action: .previousScene, label: "Prev", systemImage: "backward.fill")
+                    ActionChip(action: .newScene, label: "New scene", systemImage: "plus")
+                }
+                .padding(.vertical, 1)
+            }
+
+            HStack(alignment: .top, spacing: 16) {
+                column(title: "SCENES", systemImage: "waveform",
+                       rows: store.scenes.prefix(9).enumerated().map {
+                           ($0.offset + 1, $0.element.name, $0.element.symbol,
+                            HotkeyAction.scene($0.element.id))
+                       },
+                       empty: "No scenes yet")
+                column(title: "EFFECTS", systemImage: "bolt.fill",
+                       rows: effects.effects.prefix(8).enumerated().map {
+                           ($0.offset + 1, $0.element.name, $0.element.symbol,
+                            HotkeyAction.effect($0.element.id))
+                       },
+                       empty: "No effects yet")
+            }
         }
     }
 
     private func column(title: String, systemImage: String,
-                        rows: [(Int, String)], empty: String) -> some View {
+                        rows: [(Int, String, String, HotkeyAction)],
+                        empty: String) -> some View {
         VStack(alignment: .leading, spacing: 3) {
             Label(title, systemImage: systemImage)
                 .font(.system(size: 9, weight: .semibold)).tracking(0.5)
@@ -239,13 +341,28 @@ struct PadMapper: View {
             if rows.isEmpty {
                 Text(empty).font(.caption2).foregroundStyle(.tertiary)
             } else {
-                ForEach(rows, id: \.0) { index, name in
+                ForEach(rows, id: \.0) { index, name, symbol, action in
                     HStack(spacing: 5) {
                         Text("\(index)")
                             .font(.system(size: 10, design: .monospaced))
                             .foregroundStyle(.tertiary)
                             .frame(width: 12, alignment: .trailing)
+                        Image(systemName: symbol).font(.system(size: 9))
+                            .foregroundStyle(.secondary).frame(width: 12)
                         Text(name).font(.caption).lineLimit(1)
+                        Spacer(minLength: 0)
+                    }
+                    .padding(.vertical, 2)
+                    .padding(.horizontal, 4)
+                    .background(Color(nsColor: .controlBackgroundColor).opacity(0.6))
+                    .clipShape(RoundedRectangle(cornerRadius: 4))
+                    .contentShape(Rectangle())
+                    // Dropping a named thing pins that thing. By-position bindings stay
+                    // available in the picker, where the distinction can be spelled out.
+                    .draggable(action.dragPayload) {
+                        Label(name, systemImage: symbol)
+                            .padding(6)
+                            .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 6))
                     }
                 }
             }
@@ -303,6 +420,15 @@ struct PadMapper: View {
     }
 
     // MARK: - Helpers
+
+    /// Applies a dropped payload. Returns false for anything unrecognised so the drop animates
+    /// back rather than silently doing nothing.
+    private func assign(_ payload: String, to slot: Int) -> Bool {
+        guard let action = HotkeyAction.fromDragPayload(payload) else { return false }
+        hotkeys.setBinding(action, for: HotkeySlot.all[slot])
+        selectedSlot = slot
+        return true
+    }
 
     private func describe(_ action: HotkeyAction) -> String {
         switch action {
@@ -387,5 +513,96 @@ struct ActionPicker: View {
             }
         }
         .labelsHidden()
+    }
+}
+
+
+// MARK: - Drag and drop
+
+/// Actions travel between the reference lists and the pad as a short string, because
+/// `Transferable` on an enum with associated values needs a custom UTType and this does not
+/// warrant one. Anything unrecognised is simply refused.
+extension HotkeyAction {
+    var dragPayload: String {
+        switch self {
+        case .none: "none"
+        case .stopAll: "stopAll"
+        case .volumeUp: "volumeUp"
+        case .volumeDown: "volumeDown"
+        case .nextScene: "nextScene"
+        case .previousScene: "previousScene"
+        case .newScene: "newScene"
+        case .toggleMute: "toggleMute"
+        case .togglePlayPause: "togglePlayPause"
+        case .sceneIndex(let n): "sceneIndex:\(n)"
+        case .effectIndex(let n): "effectIndex:\(n)"
+        case .scene(let id): "scene:\(id.uuidString)"
+        case .effect(let id): "effect:\(id.uuidString)"
+        }
+    }
+
+    static func fromDragPayload(_ raw: String) -> HotkeyAction? {
+        let parts = raw.split(separator: ":", maxSplits: 1).map(String.init)
+        switch parts.first {
+        case "none": return HotkeyAction.none
+        case "stopAll": return .stopAll
+        case "volumeUp": return .volumeUp
+        case "volumeDown": return .volumeDown
+        case "nextScene": return .nextScene
+        case "previousScene": return .previousScene
+        case "newScene": return .newScene
+        case "toggleMute": return .toggleMute
+        case "togglePlayPause": return .togglePlayPause
+        case "sceneIndex": return Int(parts.last ?? "").map { .sceneIndex($0) }
+        case "effectIndex": return Int(parts.last ?? "").map { .effectIndex($0) }
+        case "scene": return UUID(uuidString: parts.last ?? "").map { .scene($0) }
+        case "effect": return UUID(uuidString: parts.last ?? "").map { .effect($0) }
+        default: return nil
+        }
+    }
+}
+
+/// Makes a key, knob face or rotation label accept a dropped action. A nil slot is inert, so
+/// the keys DMC cannot hear reject drops rather than pretending to take them.
+struct SlotDropTarget: ViewModifier {
+    let slot: Int?
+    @Binding var hovered: Int?
+    let assign: (String, Int) -> Bool
+
+    func body(content: Content) -> some View {
+        if let slot {
+            content.dropDestination(for: String.self) { items, _ in
+                hovered = nil
+                guard let payload = items.first else { return false }
+                return assign(payload, slot)
+            } isTargeted: { targeted in
+                if targeted { hovered = slot } else if hovered == slot { hovered = nil }
+            }
+        } else {
+            content
+        }
+    }
+}
+
+/// A draggable chip for the transport actions, so everything bindable can be dragged and not
+/// just the named scenes and effects.
+struct ActionChip: View {
+    let action: HotkeyAction
+    let label: String
+    let systemImage: String
+
+    var body: some View {
+        Label(label, systemImage: systemImage)
+            .font(.system(size: 10))
+            .padding(.horizontal, 7)
+            .padding(.vertical, 3)
+            .background(Color(nsColor: .controlBackgroundColor))
+            .clipShape(Capsule())
+            .overlay(Capsule().stroke(Color(nsColor: .separatorColor), lineWidth: 0.5))
+            .draggable(action.dragPayload) {
+                Label(label, systemImage: systemImage)
+                    .padding(6)
+                    .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 6))
+            }
     }
 }
