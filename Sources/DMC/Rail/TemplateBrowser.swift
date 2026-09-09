@@ -12,7 +12,7 @@ final class TemplateFetcher: ObservableObject {
     var isBusy: Bool { active != nil }
 
     /// Downloads whatever the template is missing, then reports whether the vault is complete.
-    func fetch(_ template: SceneTemplate) async -> Bool {
+    func fetch(_ template: some AudioTemplate) async -> Bool {
         let missing = template.missingFiles
         guard !missing.isEmpty else { return true }
 
@@ -53,17 +53,29 @@ final class TemplateFetcher: ObservableObject {
 struct TemplateBrowser: View {
     @ObservedObject var library: TemplateLibrary
     @ObservedObject var store: SceneStore
+    @ObservedObject var effects: EffectStore
     let onAdded: () -> Void
+
+    private enum Kind: String, CaseIterable { case scenes = "Scenes", effects = "Effects" }
+    @State private var kind: Kind = .scenes
 
     @Environment(\.dismiss) private var dismiss
     @StateObject private var fetcher = TemplateFetcher()
     @State private var search = ""
     @State private var justAdded: Set<String> = []
 
+    private var needle: String { search.trimmingCharacters(in: .whitespaces).lowercased() }
+
     private var matches: [SceneTemplate] {
-        let needle = search.trimmingCharacters(in: .whitespaces).lowercased()
         guard !needle.isEmpty else { return library.templates }
         return library.templates.filter {
+            ($0.name + " " + $0.tags.joined(separator: " ")).lowercased().contains(needle)
+        }
+    }
+
+    private var effectMatches: [EffectTemplate] {
+        guard !needle.isEmpty else { return library.effectTemplates }
+        return library.effectTemplates.filter {
             ($0.name + " " + $0.tags.joined(separator: " ")).lowercased().contains(needle)
         }
     }
@@ -82,46 +94,68 @@ struct TemplateBrowser: View {
     private var header: some View {
         VStack(spacing: 8) {
             HStack {
-                Text("Scene templates").font(.headline)
+                Text("Templates").font(.headline)
                 Spacer()
                 Button("Done") { dismiss() }.keyboardShortcut(.defaultAction)
             }
+            Picker("", selection: $kind) {
+                ForEach(Kind.allCases, id: \.self) { Text($0.rawValue).tag($0) }
+            }
+            .pickerStyle(.segmented)
+            .labelsHidden()
             TextField("Search templates and tags", text: $search)
                 .textFieldStyle(.roundedBorder)
         }
         .padding(12)
     }
 
+    @ViewBuilder
     private var list: some View {
-        List(matches) { template in
-            HStack(alignment: .top, spacing: 10) {
-                Image(systemName: template.symbol)
-                    .font(.system(size: 16))
-                    .frame(width: 26, height: 26)
-
-                VStack(alignment: .leading, spacing: 2) {
-                    Text(template.name).font(.callout.weight(.medium))
-                    Text(summary(for: template))
-                        .font(.caption).foregroundStyle(.secondary)
-                    if !template.tags.isEmpty {
-                        Text(template.tags.prefix(6).joined(separator: " · "))
-                            .font(.caption2).foregroundStyle(.tertiary).lineLimit(1)
-                    }
-                }
-
-                Spacer(minLength: 8)
-
-                if justAdded.contains(template.name) {
-                    Label("Added", systemImage: "checkmark.circle.fill")
-                        .labelStyle(.iconOnly).foregroundStyle(.green)
-                } else {
-                    Button("Add") { Task { await add(template) } }
-                        .disabled(fetcher.isBusy)
+        switch kind {
+        case .scenes:
+            List(matches) { template in
+                row(symbol: template.symbol, name: template.name,
+                    detail: summary(for: template), tags: template.tags,
+                    added: justAdded.contains("scene:" + template.name)) {
+                    Task { await addScene(template) }
                 }
             }
-            .padding(.vertical, 3)
+            .listStyle(.inset)
+        case .effects:
+            List(effectMatches) { template in
+                row(symbol: template.symbol, name: template.name,
+                    detail: effectSummary(for: template), tags: template.tags,
+                    added: justAdded.contains("effect:" + template.name)) {
+                    Task { await addEffect(template) }
+                }
+            }
+            .listStyle(.inset)
         }
-        .listStyle(.inset)
+    }
+
+    private func row(symbol: String, name: String, detail: String, tags: [String],
+                     added: Bool, add: @escaping () -> Void) -> some View {
+        HStack(alignment: .top, spacing: 10) {
+            Image(systemName: symbol).font(.system(size: 15)).frame(width: 24, height: 24)
+            VStack(alignment: .leading, spacing: 2) {
+                Text(name).font(.callout.weight(.medium))
+                if !detail.isEmpty {
+                    Text(detail).font(.caption).foregroundStyle(.secondary)
+                }
+                if !tags.isEmpty {
+                    Text(tags.prefix(6).joined(separator: " · "))
+                        .font(.caption2).foregroundStyle(.tertiary).lineLimit(1)
+                }
+            }
+            Spacer(minLength: 8)
+            if added {
+                Label("Added", systemImage: "checkmark.circle.fill")
+                    .labelStyle(.iconOnly).foregroundStyle(.green)
+            } else {
+                Button("Add", action: add).disabled(fetcher.isBusy)
+            }
+        }
+        .padding(.vertical, 3)
     }
 
     private var footer: some View {
@@ -145,9 +179,20 @@ struct TemplateBrowser: View {
                     .fixedSize(horizontal: false, vertical: true)
                 Spacer()
                 Button("Add all") {
-                    Task { for t in matches where !justAdded.contains(t.name) { await add(t) } }
+                    Task {
+                        switch kind {
+                        case .scenes:
+                            for t in matches where !justAdded.contains("scene:" + t.name) {
+                                await addScene(t)
+                            }
+                        case .effects:
+                            for t in effectMatches where !justAdded.contains("effect:" + t.name) {
+                                await addEffect(t)
+                            }
+                        }
+                    }
                 }
-                .disabled(fetcher.isBusy || matches.isEmpty)
+                .disabled(fetcher.isBusy || (kind == .scenes ? matches.isEmpty : effectMatches.isEmpty))
             }
 
             if !library.note.isEmpty {
@@ -167,12 +212,27 @@ struct TemplateBrowser: View {
         return parts.joined(separator: " · ")
     }
 
-    private func add(_ template: SceneTemplate) async {
+    private func effectSummary(for template: EffectTemplate) -> String {
+        var parts: [String] = []
+        if template.takeCount > 1 { parts.append("\(template.takeCount) takes") }
+        let missing = template.missingFiles.count
+        if missing > 0 { parts.append("\(missing) file\(missing == 1 ? "" : "s") to download") }
+        if !template.credit.isEmpty { parts.append(template.credit) }
+        return parts.joined(separator: " · ")
+    }
+
+    private func addScene(_ template: SceneTemplate) async {
         // Fetch first so a scene is never added with layers pointing at nothing.
-        let complete = await fetcher.fetch(template)
-        guard complete else { return }
+        guard await fetcher.fetch(template) else { return }
         store.upsert(template.makeScene())
-        justAdded.insert(template.name)
+        justAdded.insert("scene:" + template.name)
+        onAdded()
+    }
+
+    private func addEffect(_ template: EffectTemplate) async {
+        guard await fetcher.fetch(template) else { return }
+        effects.upsert(template.makeEffect())
+        justAdded.insert("effect:" + template.name)
         onAdded()
     }
 }

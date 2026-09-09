@@ -1,0 +1,1345 @@
+{
+  "note": "One-shots re-hosted by Turbo Bard; licences come from the original libraries (Sonniss GDC, Freesound, FreePD and others). For personal, non-commercial use.",
+  "templates": [
+    {
+      "credit": "",
+      "download": "https://storage.googleapis.com/turbo-bard.appspot.com/sixteen-dice-on-felt.mp3",
+      "file": "Turbo Bard/Effects/sixteen-dice-on-felt.mp3",
+      "gain": 0.85,
+      "name": "16 Dice On Felt",
+      "symbol": "bolt.fill",
+      "tags": [
+        "sixteen",
+        "many",
+        "gambling",
+        "casino",
+        "meta"
+      ],
+      "variantDownloads": [],
+      "variants": []
+    },
+    {
+      "credit": "",
+      "download": "https://storage.googleapis.com/turbo-bard.appspot.com/two-dice-on-hard-wood.mp3",
+      "file": "Turbo Bard/Effects/two-dice-on-hard-wood.mp3",
+      "gain": 0.85,
+      "name": "2 Dice On Hard Wood",
+      "symbol": "bolt.fill",
+      "tags": [
+        "two",
+        "gambling",
+        "casino",
+        "meta"
+      ],
+      "variantDownloads": [],
+      "variants": []
+    },
+    {
+      "credit": "",
+      "download": "https://storage.googleapis.com/turbo-bard.appspot.com/five-dice-on-felt.mp3",
+      "file": "Turbo Bard/Effects/five-dice-on-felt.mp3",
+      "gain": 0.85,
+      "name": "5 Dice On Felt",
+      "symbol": "bolt.fill",
+      "tags": [
+        "five",
+        "gambling",
+        "casino",
+        "meta"
+      ],
+      "variantDownloads": [],
+      "variants": []
+    },
+    {
+      "credit": "",
+      "download": "https://storage.googleapis.com/turbo-bard.appspot.com/aboleth.mp3",
+      "file": "Turbo Bard/Effects/aboleth.mp3",
+      "gain": 0.85,
+      "name": "Aboleth",
+      "symbol": "figure.fencing",
+      "tags": [
+        "deep",
+        "gargantuan",
+        "growl",
+        "huge",
+        "roar",
+        "underwater",
+        "bellow",
+        "echo",
+        "reverb"
+      ],
+      "variantDownloads": [],
+      "variants": []
+    },
+    {
+      "credit": "Mattia Cellotto",
+      "download": "https://storage.googleapis.com/turbo-bard.appspot.com/acid-burn.mp3",
+      "file": "Turbo Bard/Effects/acid-burn.mp3",
+      "gain": 0.85,
+      "name": "Acid Burn",
+      "symbol": "flame",
+      "tags": [
+        "sizzle",
+        "sting",
+        "drop",
+        "corrosion",
+        "lava",
+        "hiss",
+        "venom",
+        "spit",
+        "poison"
+      ],
+      "variantDownloads": [],
+      "variants": []
+    },
+    {
+      "credit": "",
+      "download": "https://storage.googleapis.com/turbo-bard.appspot.com/choir-aah.mp3",
+      "file": "Turbo Bard/Effects/choir-aah.mp3",
+      "gain": 0.85,
+      "name": "An Angel Gets Its Wings",
+      "symbol": "bird",
+      "tags": [
+        "holy",
+        "aah",
+        "choir",
+        "heaven",
+        "cleric",
+        "temple",
+        "deity",
+        "paladin",
+        "comedy"
+      ],
+      "variantDownloads": [],
+      "variants": []
+    },
+    {
+      "credit": "SoundBits",
+      "download": "https://storage.googleapis.com/turbo-bard.appspot.com/augmented-slam-1.mp3",
+      "file": "Turbo Bard/Effects/augmented-slam-1.mp3",
+      "gain": 0.85,
+      "name": "Augmented Slams",
+      "symbol": "shield",
+      "tags": [
+        "combat",
+        "fight",
+        "hit",
+        "heavy",
+        "magic",
+        "spell",
+        "boom",
+        "hard"
+      ],
+      "variantDownloads": [
+        "https://storage.googleapis.com/turbo-bard.appspot.com/augmented-slam-2.mp3"
+      ],
+      "variants": [
+        "Turbo Bard/Effects/augmented-slam-2.mp3"
+      ]
+    },
+    {
+      "credit": "Detunized",
+      "download": "https://storage.googleapis.com/turbo-bard.appspot.com/b3.mp3",
+      "file": "Turbo Bard/Effects/b3.mp3",
+      "gain": 0.85,
+      "name": "B3",
+      "symbol": "bolt.fill",
+      "tags": [
+        "dramatic",
+        "meta",
+        "piano",
+        "plot"
+      ],
+      "variantDownloads": [],
+      "variants": []
+    },
+    {
+      "credit": "Eiravaein Sound",
+      "download": "https://storage.googleapis.com/turbo-bard.appspot.com/battering-ram-1.mp3",
+      "file": "Turbo Bard/Effects/battering-ram-1.mp3",
+      "gain": 0.85,
+      "name": "Battering Ram",
+      "symbol": "door.left.hand.open",
+      "tags": [
+        "thud",
+        "drawbridge",
+        "door",
+        "pound",
+        "slam",
+        "impact"
+      ],
+      "variantDownloads": [
+        "https://storage.googleapis.com/turbo-bard.appspot.com/battering-ram-2.mp3",
+        "https://storage.googleapis.com/turbo-bard.appspot.com/battering-ram-3.mp3",
+        "https://storage.googleapis.com/turbo-bard.appspot.com/battering-ram-4.mp3"
+      ],
+      "variants": [
+        "Turbo Bard/Effects/battering-ram-2.mp3",
+        "Turbo Bard/Effects/battering-ram-3.mp3",
+        "Turbo Bard/Effects/battering-ram-4.mp3"
+      ]
+    },
+    {
+      "credit": "",
+      "download": "https://storage.googleapis.com/turbo-bard.appspot.com/battle-horn.mp3",
+      "file": "Turbo Bard/Effects/battle-horn.mp3",
+      "gain": 0.85,
+      "name": "Battle Horn",
+      "symbol": "shield",
+      "tags": [
+        "war",
+        "orc",
+        "low",
+        "distant"
+      ],
+      "variantDownloads": [],
+      "variants": []
+    },
+    {
+      "credit": "MatiasMacSD",
+      "download": "https://storage.googleapis.com/turbo-bard.appspot.com/blink.mp3",
+      "file": "Turbo Bard/Effects/blink.mp3",
+      "gain": 0.85,
+      "name": "Blink",
+      "symbol": "wand.and.stars",
+      "tags": [
+        "spell",
+        "magic",
+        "transition",
+        "teleport",
+        "casting",
+        "transmutation",
+        "conjuration",
+        "mysterious",
+        "disappear",
+        "vanish",
+        "invisibility"
+      ],
+      "variantDownloads": [],
+      "variants": []
+    },
+    {
+      "credit": "bbc.co.uk, \u00a9 copyright 2018 BBC, Clock Cartoon 1970",
+      "download": "https://storage.googleapis.com/turbo-bard.appspot.com/cartoon-time-machine.mp3",
+      "file": "Turbo Bard/Effects/cartoon-time-machine.mp3",
+      "gain": 0.85,
+      "name": "Cartoon Time Machine",
+      "symbol": "wand.and.stars",
+      "tags": [
+        "spell",
+        "magic",
+        "chaos",
+        "slide whistle",
+        "comedic",
+        "madness",
+        "deity",
+        "whimsical",
+        "shenanigans",
+        "jester",
+        "fey"
+      ],
+      "variantDownloads": [],
+      "variants": []
+    },
+    {
+      "credit": "SoundBits",
+      "download": "https://storage.googleapis.com/turbo-bard.appspot.com/behind-dresser.mp3",
+      "file": "Turbo Bard/Effects/behind-dresser.mp3",
+      "gain": 0.85,
+      "name": "Checking Behind the Dresser",
+      "symbol": "door.left.hand.open",
+      "tags": [
+        "wood",
+        "sliding",
+        "secret door",
+        "passage",
+        "rumble",
+        "roll",
+        "scrape",
+        "stone",
+        "tomb",
+        "opening",
+        "closing"
+      ],
+      "variantDownloads": [],
+      "variants": []
+    },
+    {
+      "credit": "bbc.co.uk, \u00a9 copyright 2018 BBC",
+      "download": "https://storage.googleapis.com/turbo-bard.appspot.com/chimpanzees.mp3",
+      "file": "Turbo Bard/Effects/chimpanzees.mp3",
+      "gain": 0.85,
+      "name": "Chimpanzees",
+      "symbol": "pawprint",
+      "tags": [
+        "monkeys",
+        "apes",
+        "gorillas",
+        "jungle",
+        "tropical",
+        "animals"
+      ],
+      "variantDownloads": [],
+      "variants": []
+    },
+    {
+      "credit": "bbc.co.uk, \u00a9 copyright 2018 BBC",
+      "download": "https://storage.googleapis.com/turbo-bard.appspot.com/church-door-exterior.mp3",
+      "file": "Turbo Bard/Effects/church-door-exterior.mp3",
+      "gain": 0.85,
+      "name": "Church Door Exterior Open and Close",
+      "symbol": "door.left.hand.open",
+      "tags": [
+        "cathedral",
+        "latch",
+        "courtyard",
+        "temple",
+        "keep",
+        "hall"
+      ],
+      "variantDownloads": [],
+      "variants": []
+    },
+    {
+      "credit": "bbc.co.uk, \u00a9 copyright 2018 BBC",
+      "download": "https://storage.googleapis.com/turbo-bard.appspot.com/church-door-interior.mp3",
+      "file": "Turbo Bard/Effects/church-door-interior.mp3",
+      "gain": 0.85,
+      "name": "Church Door Interior Open and Close",
+      "symbol": "door.left.hand.open",
+      "tags": [
+        "cathedral",
+        "bolts",
+        "temple",
+        "chapel",
+        "hall",
+        "keep"
+      ],
+      "variantDownloads": [],
+      "variants": []
+    },
+    {
+      "credit": "bbc.co.uk, \u00a9 copyright 2018 BBC, Independence Hall",
+      "download": "https://storage.googleapis.com/turbo-bard.appspot.com/clock-strikes-eleven.mp3",
+      "file": "Turbo Bard/Effects/clock-strikes-eleven.mp3",
+      "gain": 0.85,
+      "name": "Clock Strikes Eleven",
+      "symbol": "bell",
+      "tags": [
+        "bell",
+        "tower",
+        "church",
+        "tolling",
+        "ringing",
+        "ominous",
+        "midnight",
+        "gothic",
+        "courtyard"
+      ],
+      "variantDownloads": [],
+      "variants": []
+    },
+    {
+      "credit": "bbc.co.uk, \u00a9 copyright 2018 BBC, Radiophonic Stomach",
+      "download": "https://storage.googleapis.com/turbo-bard.appspot.com/comedic-polymorph.mp3",
+      "file": "Turbo Bard/Effects/comedic-polymorph.mp3",
+      "gain": 0.85,
+      "name": "Comedic Polymorph",
+      "symbol": "wand.and.stars",
+      "tags": [
+        "drugs",
+        "spell",
+        "transfiguration",
+        "transformation",
+        "funny",
+        "magic",
+        "chaos",
+        "madness",
+        "fey"
+      ],
+      "variantDownloads": [],
+      "variants": []
+    },
+    {
+      "credit": "Resonance Sound Design, SoundBits",
+      "download": "https://storage.googleapis.com/turbo-bard.appspot.com/door-creak-1.mp3",
+      "file": "Turbo Bard/Effects/door-creak-1.mp3",
+      "gain": 0.85,
+      "name": "Creaky Door",
+      "symbol": "door.left.hand.open",
+      "tags": [
+        "old",
+        "house",
+        "wooden",
+        "squeak",
+        "groan",
+        "cupboard"
+      ],
+      "variantDownloads": [
+        "https://storage.googleapis.com/turbo-bard.appspot.com/door-creak-2.mp3",
+        "https://storage.googleapis.com/turbo-bard.appspot.com/door-creak-3.mp3",
+        "https://storage.googleapis.com/turbo-bard.appspot.com/door-creak-4.mp3"
+      ],
+      "variants": [
+        "Turbo Bard/Effects/door-creak-2.mp3",
+        "Turbo Bard/Effects/door-creak-3.mp3",
+        "Turbo Bard/Effects/door-creak-4.mp3"
+      ]
+    },
+    {
+      "credit": "SoundBits",
+      "download": "https://storage.googleapis.com/turbo-bard.appspot.com/creaky-bridge-1.mp3",
+      "file": "Turbo Bard/Effects/creaky-bridge-1.mp3",
+      "gain": 0.85,
+      "name": "Creaky Rope Bridge",
+      "symbol": "drop",
+      "tags": [
+        "old",
+        "groan",
+        "wooden",
+        "straining"
+      ],
+      "variantDownloads": [
+        "https://storage.googleapis.com/turbo-bard.appspot.com/creaky-bridge-2.mp3",
+        "https://storage.googleapis.com/turbo-bard.appspot.com/creaky-bridge-3.mp3"
+      ],
+      "variants": [
+        "Turbo Bard/Effects/creaky-bridge-2.mp3",
+        "Turbo Bard/Effects/creaky-bridge-3.mp3"
+      ]
+    },
+    {
+      "credit": "bbc.co.uk, \u00a9 copyright 2018 BBC",
+      "download": "https://storage.googleapis.com/turbo-bard.appspot.com/crucible-quenching.mp3",
+      "file": "Turbo Bard/Effects/crucible-quenching.mp3",
+      "gain": 0.85,
+      "name": "Crucible Quenching",
+      "symbol": "wand.and.stars",
+      "tags": [
+        "spell",
+        "alchemy",
+        "blast",
+        "necromancer",
+        "dungeon",
+        "lava",
+        "witch",
+        "cauldron",
+        "smelting",
+        "forge",
+        "blacksmith"
+      ],
+      "variantDownloads": [],
+      "variants": []
+    },
+    {
+      "credit": "Joshua Reinhardt",
+      "download": "https://storage.googleapis.com/turbo-bard.appspot.com/crunch-munch.mp3",
+      "file": "Turbo Bard/Effects/crunch-munch.mp3",
+      "gain": 0.85,
+      "name": "Crunch Munch",
+      "symbol": "bird",
+      "tags": [
+        "food",
+        "chewing",
+        "chips",
+        "crackers",
+        "eating"
+      ],
+      "variantDownloads": [],
+      "variants": []
+    },
+    {
+      "credit": "bbc.co.uk, \u00a9 copyright 2018 BBC",
+      "download": "https://storage.googleapis.com/turbo-bard.appspot.com/cuckoo-clock-12.mp3",
+      "file": "Turbo Bard/Effects/cuckoo-clock-12.mp3",
+      "gain": 0.85,
+      "name": "Cuckoo Clock Strikes 12",
+      "symbol": "bolt.fill",
+      "tags": [
+        "spooky",
+        "comedic",
+        "ominous",
+        "funny",
+        "madness",
+        "chaos",
+        "shenanigans",
+        "critical"
+      ],
+      "variantDownloads": [],
+      "variants": []
+    },
+    {
+      "credit": "",
+      "download": "https://storage.googleapis.com/turbo-bard.appspot.com/dun-dun-dun.mp3",
+      "file": "Turbo Bard/Effects/dun-dun-dun.mp3",
+      "gain": 0.85,
+      "name": "Dun Dun DUNNNN!",
+      "symbol": "bolt.fill",
+      "tags": [
+        "comedic",
+        "dramatic",
+        "hamster",
+        "cinematic",
+        "meta",
+        "plot twist",
+        "shenanigans"
+      ],
+      "variantDownloads": [],
+      "variants": []
+    },
+    {
+      "credit": "SoundMorph",
+      "download": "https://storage.googleapis.com/turbo-bard.appspot.com/eldritch-blast.mp3",
+      "file": "Turbo Bard/Effects/eldritch-blast.mp3",
+      "gain": 0.85,
+      "name": "Eldritch Blast",
+      "symbol": "wand.and.stars",
+      "tags": [
+        "spell",
+        "magic",
+        "evocation",
+        "casting",
+        "electricity",
+        "pulse",
+        "curse"
+      ],
+      "variantDownloads": [],
+      "variants": []
+    },
+    {
+      "credit": "Sergey Eybog",
+      "download": "https://storage.googleapis.com/turbo-bard.appspot.com/energy-pulse.mp3",
+      "file": "Turbo Bard/Effects/energy-pulse.mp3",
+      "gain": 0.85,
+      "name": "Energy Pulse",
+      "symbol": "wand.and.stars",
+      "tags": [
+        "magic",
+        "spell",
+        "casting",
+        "conjuration",
+        "abjuration",
+        "protection",
+        "shield",
+        "telekinesis",
+        "aura"
+      ],
+      "variantDownloads": [],
+      "variants": []
+    },
+    {
+      "credit": "Raconteur Sound",
+      "download": "https://storage.googleapis.com/turbo-bard.appspot.com/fart-1.mp3",
+      "file": "Turbo Bard/Effects/fart-1.mp3",
+      "gain": 0.85,
+      "name": "Farts",
+      "symbol": "bolt.fill",
+      "tags": [
+        "gas",
+        "toots",
+        "rips",
+        "shenanigans",
+        ":)"
+      ],
+      "variantDownloads": [
+        "https://storage.googleapis.com/turbo-bard.appspot.com/fart-2.mp3",
+        "https://storage.googleapis.com/turbo-bard.appspot.com/fart-3.mp3",
+        "https://storage.googleapis.com/turbo-bard.appspot.com/fart-4.mp3"
+      ],
+      "variants": [
+        "Turbo Bard/Effects/fart-2.mp3",
+        "Turbo Bard/Effects/fart-3.mp3",
+        "Turbo Bard/Effects/fart-4.mp3"
+      ]
+    },
+    {
+      "credit": "bbc.co.uk, \u00a9 copyright 2018 BBC",
+      "download": "https://storage.googleapis.com/turbo-bard.appspot.com/feeble-applause.mp3",
+      "file": "Turbo Bard/Effects/feeble-applause.mp3",
+      "gain": 0.85,
+      "name": "Feeble Applause",
+      "symbol": "bolt.fill",
+      "tags": [
+        "small group",
+        "clapping",
+        "bard",
+        "village"
+      ],
+      "variantDownloads": [],
+      "variants": []
+    },
+    {
+      "credit": "Soundopolis",
+      "download": "https://storage.googleapis.com/turbo-bard.appspot.com/female-scream.mp3",
+      "file": "Turbo Bard/Effects/female-scream.mp3",
+      "gain": 0.85,
+      "name": "Female Scream",
+      "symbol": "figure.fencing",
+      "tags": [
+        "horror",
+        "yell",
+        "distressed"
+      ],
+      "variantDownloads": [],
+      "variants": []
+    },
+    {
+      "credit": "SoundBits",
+      "download": "https://storage.googleapis.com/turbo-bard.appspot.com/firebolt.mp3",
+      "file": "Turbo Bard/Effects/firebolt.mp3",
+      "gain": 0.85,
+      "name": "Firebolt",
+      "symbol": "wand.and.stars",
+      "tags": [
+        "magic",
+        "spell",
+        "casting",
+        "explosion",
+        "detonation",
+        "evocation",
+        "boom",
+        "snap"
+      ],
+      "variantDownloads": [],
+      "variants": []
+    },
+    {
+      "credit": "Collected Transients",
+      "download": "https://storage.googleapis.com/turbo-bard.appspot.com/firework-spell.mp3",
+      "file": "Turbo Bard/Effects/firework-spell.mp3",
+      "gain": 0.85,
+      "name": "Firework Spell",
+      "symbol": "wand.and.stars",
+      "tags": [
+        "magic",
+        "transmutation",
+        "conjuration",
+        "casting",
+        "whirring"
+      ],
+      "variantDownloads": [],
+      "variants": []
+    },
+    {
+      "credit": "Gamemaster Audio",
+      "download": "https://storage.googleapis.com/turbo-bard.appspot.com/punch-1.mp3",
+      "file": "Turbo Bard/Effects/punch-1.mp3",
+      "gain": 0.85,
+      "name": "Fistfight",
+      "symbol": "shield",
+      "tags": [
+        "punching",
+        "attack",
+        "hit",
+        "pugilist",
+        "monk"
+      ],
+      "variantDownloads": [
+        "https://storage.googleapis.com/turbo-bard.appspot.com/punch-2.mp3",
+        "https://storage.googleapis.com/turbo-bard.appspot.com/punch-3.mp3",
+        "https://storage.googleapis.com/turbo-bard.appspot.com/punch-4.mp3"
+      ],
+      "variants": [
+        "Turbo Bard/Effects/punch-2.mp3",
+        "Turbo Bard/Effects/punch-3.mp3",
+        "Turbo Bard/Effects/punch-4.mp3"
+      ]
+    },
+    {
+      "credit": "G4F SFX",
+      "download": "https://storage.googleapis.com/turbo-bard.appspot.com/horse-whinnying.mp3",
+      "file": "Turbo Bard/Effects/horse-whinnying.mp3",
+      "gain": 0.85,
+      "name": "Frantic Whinnying",
+      "symbol": "pawprint",
+      "tags": [
+        "horse",
+        "distant",
+        "stressed",
+        "frightened"
+      ],
+      "variantDownloads": [],
+      "variants": []
+    },
+    {
+      "credit": "bbc.co.uk, \u00a9 copyright 2018 BBC, Bracket Clock with Gong Strikes 12",
+      "download": "https://storage.googleapis.com/turbo-bard.appspot.com/grandfather-clock-12.mp3",
+      "file": "Turbo Bard/Effects/grandfather-clock-12.mp3",
+      "gain": 0.85,
+      "name": "Grandfather Clock Strikes 12",
+      "symbol": "wand.and.stars",
+      "tags": [
+        "mansion",
+        "midnight",
+        "house",
+        "castle",
+        "chamber",
+        "keep"
+      ],
+      "variantDownloads": [],
+      "variants": []
+    },
+    {
+      "credit": "Zero-G",
+      "download": "https://storage.googleapis.com/turbo-bard.appspot.com/horror-moment.mp3",
+      "file": "Turbo Bard/Effects/horror-moment.mp3",
+      "gain": 0.85,
+      "name": "Horror Moment",
+      "symbol": "bolt.fill",
+      "tags": [
+        "intense",
+        "suspenseful",
+        "stressful",
+        "meta",
+        "storytelling",
+        "dramatic"
+      ],
+      "variantDownloads": [],
+      "variants": []
+    },
+    {
+      "credit": "",
+      "download": "https://storage.googleapis.com/turbo-bard.appspot.com/horse-snort-1.mp3",
+      "file": "Turbo Bard/Effects/horse-snort-1.mp3",
+      "gain": 0.85,
+      "name": "Horse Snorts",
+      "symbol": "pawprint",
+      "tags": [
+        "noises",
+        "animal",
+        "farm",
+        "carriage",
+        "stallion",
+        "mare"
+      ],
+      "variantDownloads": [
+        "https://storage.googleapis.com/turbo-bard.appspot.com/horse-snort-2.mp3"
+      ],
+      "variants": [
+        "Turbo Bard/Effects/horse-snort-2.mp3"
+      ]
+    },
+    {
+      "credit": "Detunized",
+      "download": "https://storage.googleapis.com/turbo-bard.appspot.com/it-begins.mp3",
+      "file": "Turbo Bard/Effects/it-begins.mp3",
+      "gain": 0.85,
+      "name": "It Begins",
+      "symbol": "bolt.fill",
+      "tags": [
+        "dramatic",
+        "meta",
+        "story",
+        "plot",
+        "intense"
+      ],
+      "variantDownloads": [],
+      "variants": []
+    },
+    {
+      "credit": "Detunized",
+      "download": "https://storage.googleapis.com/turbo-bard.appspot.com/its-here.mp3",
+      "file": "Turbo Bard/Effects/its-here.mp3",
+      "gain": 0.85,
+      "name": "It's Here",
+      "symbol": "bolt.fill",
+      "tags": [
+        "dramatic",
+        "meta",
+        "story",
+        "horror",
+        "intense"
+      ],
+      "variantDownloads": [],
+      "variants": []
+    },
+    {
+      "credit": "bbc.co.uk, \u00a9 copyright 2018 BBC",
+      "download": "https://storage.googleapis.com/turbo-bard.appspot.com/kiss.mp3",
+      "file": "Turbo Bard/Effects/kiss.mp3",
+      "gain": 0.85,
+      "name": "Kiss",
+      "symbol": "bolt.fill",
+      "tags": [
+        "comedic",
+        "smooch",
+        "romance",
+        "juicy",
+        "funny",
+        "shenanigans",
+        "delicious",
+        "food"
+      ],
+      "variantDownloads": [],
+      "variants": []
+    },
+    {
+      "credit": "Gamemaster Audio",
+      "download": "https://storage.googleapis.com/turbo-bard.appspot.com/explosion-large.mp3",
+      "file": "Turbo Bard/Effects/explosion-large.mp3",
+      "gain": 0.85,
+      "name": "Large Explosion",
+      "symbol": "wand.and.stars",
+      "tags": [
+        "spell",
+        "magic",
+        "fireball",
+        "bomb",
+        "detonation"
+      ],
+      "variantDownloads": [],
+      "variants": []
+    },
+    {
+      "credit": "bbc.co.uk, \u00a9 copyright 2018 BBC",
+      "download": "https://storage.googleapis.com/turbo-bard.appspot.com/large-hall-applause.mp3",
+      "file": "Turbo Bard/Effects/large-hall-applause.mp3",
+      "gain": 0.85,
+      "name": "Large Hall Applause",
+      "symbol": "bird",
+      "tags": [
+        "clapping",
+        "whistling",
+        "enthusiastic",
+        "crowd",
+        "people",
+        "performance"
+      ],
+      "variantDownloads": [],
+      "variants": []
+    },
+    {
+      "credit": "",
+      "download": "https://storage.googleapis.com/turbo-bard.appspot.com/loose-arrow.mp3",
+      "file": "Turbo Bard/Effects/loose-arrow.mp3",
+      "gain": 0.85,
+      "name": "Loose Arrow",
+      "symbol": "shield",
+      "tags": [
+        "combat",
+        "battle",
+        "metal",
+        "bow",
+        "string",
+        "dart",
+        "throwing knife",
+        "handaxe",
+        "projectile"
+      ],
+      "variantDownloads": [],
+      "variants": []
+    },
+    {
+      "credit": "G4F SFX",
+      "download": "https://storage.googleapis.com/turbo-bard.appspot.com/magic-missile.mp3",
+      "file": "Turbo Bard/Effects/magic-missile.mp3",
+      "gain": 0.85,
+      "name": "Magic Missile",
+      "symbol": "wand.and.stars",
+      "tags": [
+        "spell",
+        "fast",
+        "bullet"
+      ],
+      "variantDownloads": [],
+      "variants": []
+    },
+    {
+      "credit": "Bluezone Corporation",
+      "download": "https://storage.googleapis.com/turbo-bard.appspot.com/massive-explosion.mp3",
+      "file": "Turbo Bard/Effects/massive-explosion.mp3",
+      "gain": 0.85,
+      "name": "Massive Explosion",
+      "symbol": "flame",
+      "tags": [
+        "bomb",
+        "fire",
+        "destruction",
+        "impact",
+        "shatter"
+      ],
+      "variantDownloads": [],
+      "variants": []
+    },
+    {
+      "credit": "MatiasMacSD",
+      "download": "https://storage.googleapis.com/turbo-bard.appspot.com/monster-attack.mp3",
+      "file": "Turbo Bard/Effects/monster-attack.mp3",
+      "gain": 0.85,
+      "name": "Monster Attack",
+      "symbol": "figure.fencing",
+      "tags": [
+        "scream",
+        "snarl",
+        "roar",
+        "enemy",
+        "wraith",
+        "aberration",
+        "beast",
+        "dragon",
+        "elemental",
+        "fiend",
+        "monstrosity",
+        "undead",
+        "death",
+        "defeated"
+      ],
+      "variantDownloads": [],
+      "variants": []
+    },
+    {
+      "credit": "MatiasMacSD",
+      "download": "https://storage.googleapis.com/turbo-bard.appspot.com/monster-pain.mp3",
+      "file": "Turbo Bard/Effects/monster-pain.mp3",
+      "gain": 0.85,
+      "name": "Monster Pain",
+      "symbol": "figure.fencing",
+      "tags": [
+        "scream",
+        "snarl",
+        "grunt",
+        "roar",
+        "enemy",
+        "wraith",
+        "aberration",
+        "beast",
+        "dragon",
+        "elemental",
+        "fiend",
+        "monstrosity",
+        "undead"
+      ],
+      "variantDownloads": [],
+      "variants": []
+    },
+    {
+      "credit": "",
+      "download": "https://storage.googleapis.com/turbo-bard.appspot.com/northern-windchimes.mp3",
+      "file": "Turbo Bard/Effects/northern-windchimes.mp3",
+      "gain": 0.85,
+      "name": "Northern Windchimes",
+      "symbol": "bell",
+      "tags": [
+        "fantasy",
+        "heaven",
+        "holy",
+        "fairy",
+        "happy",
+        "pleasant"
+      ],
+      "variantDownloads": [],
+      "variants": []
+    },
+    {
+      "credit": "bbc.co.uk, \u00a9 copyright 2018 BBC, Outdoor Classical Concert",
+      "download": "https://storage.googleapis.com/turbo-bard.appspot.com/outdoor-applause.mp3",
+      "file": "Turbo Bard/Effects/outdoor-applause.mp3",
+      "gain": 0.85,
+      "name": "Outdoor Applause",
+      "symbol": "door.left.hand.open",
+      "tags": [
+        "clapping",
+        "performance",
+        "voices",
+        "leaving",
+        "crowd",
+        "people"
+      ],
+      "variantDownloads": [],
+      "variants": []
+    },
+    {
+      "credit": "Ben Codrington",
+      "download": "https://storage.googleapis.com/turbo-bard.appspot.com/phanary1.mp3",
+      "file": "Turbo Bard/Effects/phanary1.mp3",
+      "gain": 0.85,
+      "name": "Phanary",
+      "symbol": "bird",
+      "tags": [
+        "bird",
+        "chirping",
+        "whistle"
+      ],
+      "variantDownloads": [
+        "https://storage.googleapis.com/turbo-bard.appspot.com/phanary2.mp3",
+        "https://storage.googleapis.com/turbo-bard.appspot.com/phanary3.mp3"
+      ],
+      "variants": [
+        "Turbo Bard/Effects/phanary2.mp3",
+        "Turbo Bard/Effects/phanary3.mp3"
+      ]
+    },
+    {
+      "credit": "Jack Powell",
+      "download": "https://storage.googleapis.com/turbo-bard.appspot.com/pony-noise-1.mp3",
+      "file": "Turbo Bard/Effects/pony-noise-1.mp3",
+      "gain": 0.85,
+      "name": "Pony Noises",
+      "symbol": "bird",
+      "tags": [
+        "horses",
+        "whinnying",
+        "snort",
+        "nicker",
+        "blowing",
+        "shetland",
+        "sounds"
+      ],
+      "variantDownloads": [
+        "https://storage.googleapis.com/turbo-bard.appspot.com/pony-noise-2.mp3",
+        "https://storage.googleapis.com/turbo-bard.appspot.com/pony-noise-3.mp3",
+        "https://storage.googleapis.com/turbo-bard.appspot.com/pony-noise-4.mp3"
+      ],
+      "variants": [
+        "Turbo Bard/Effects/pony-noise-2.mp3",
+        "Turbo Bard/Effects/pony-noise-3.mp3",
+        "Turbo Bard/Effects/pony-noise-4.mp3"
+      ]
+    },
+    {
+      "credit": "bbc.co.uk, \u00a9 copyright 2018 BBC",
+      "download": "https://storage.googleapis.com/turbo-bard.appspot.com/prison-cell-door.mp3",
+      "file": "Turbo Bard/Effects/prison-cell-door.mp3",
+      "gain": 0.85,
+      "name": "Prison Cell Door",
+      "symbol": "door.left.hand.open",
+      "tags": [
+        "jail",
+        "guard",
+        "key",
+        "lock",
+        "wood"
+      ],
+      "variantDownloads": [],
+      "variants": []
+    },
+    {
+      "credit": "bbc.co.uk, \u00a9 copyright 2018 BBC",
+      "download": "https://storage.googleapis.com/turbo-bard.appspot.com/prison-iron-gate.mp3",
+      "file": "Turbo Bard/Effects/prison-iron-gate.mp3",
+      "gain": 0.85,
+      "name": "Prison Iron Gate",
+      "symbol": "door.left.hand.open",
+      "tags": [
+        "dungeon",
+        "jail",
+        "lock",
+        "key",
+        "bars",
+        "captive"
+      ],
+      "variantDownloads": [],
+      "variants": []
+    },
+    {
+      "credit": "",
+      "download": "https://storage.googleapis.com/turbo-bard.appspot.com/razor-impact.mp3",
+      "file": "Turbo Bard/Effects/razor-impact.mp3",
+      "gain": 0.85,
+      "name": "Razor Impact",
+      "symbol": "bolt.fill",
+      "tags": [
+        "cinematic",
+        "dramatic",
+        "plot-twist",
+        "sting"
+      ],
+      "variantDownloads": [],
+      "variants": []
+    },
+    {
+      "credit": "Eiravaein Sound, The Soundcatcher",
+      "download": "https://storage.googleapis.com/turbo-bard.appspot.com/rough-draft-1.mp3",
+      "file": "Turbo Bard/Effects/rough-draft-1.mp3",
+      "gain": 0.85,
+      "name": "Rough Draft",
+      "symbol": "book.closed",
+      "tags": [
+        "writing",
+        "pages",
+        "parchment",
+        "quill",
+        "ink",
+        "charcoal",
+        "intro",
+        "recap"
+      ],
+      "variantDownloads": [
+        "https://storage.googleapis.com/turbo-bard.appspot.com/rough-draft-2.mp3",
+        "https://storage.googleapis.com/turbo-bard.appspot.com/rough-draft-3.mp3",
+        "https://storage.googleapis.com/turbo-bard.appspot.com/rough-draft-4.mp3",
+        "https://storage.googleapis.com/turbo-bard.appspot.com/rough-draft-5.mp3"
+      ],
+      "variants": [
+        "Turbo Bard/Effects/rough-draft-2.mp3",
+        "Turbo Bard/Effects/rough-draft-3.mp3",
+        "Turbo Bard/Effects/rough-draft-4.mp3",
+        "Turbo Bard/Effects/rough-draft-5.mp3"
+      ]
+    },
+    {
+      "credit": "bbc.co.uk, \u00a9 copyright 2018 BBC",
+      "download": "https://storage.googleapis.com/turbo-bard.appspot.com/shutting-drawer.mp3",
+      "file": "Turbo Bard/Effects/shutting-drawer.mp3",
+      "gain": 0.85,
+      "name": "Shutting Drawer",
+      "symbol": "bolt.fill",
+      "tags": [
+        "cash",
+        "register",
+        "desk",
+        "typewriter",
+        "mechanical"
+      ],
+      "variantDownloads": [],
+      "variants": []
+    },
+    {
+      "credit": "Zero-G",
+      "download": "https://storage.googleapis.com/turbo-bard.appspot.com/sinister-moment.mp3",
+      "file": "Turbo Bard/Effects/sinister-moment.mp3",
+      "gain": 0.85,
+      "name": "Sinister Moment",
+      "symbol": "bolt.fill",
+      "tags": [
+        "intense",
+        "suspenseful",
+        "ominous",
+        "meta",
+        "storytelling",
+        "dramatic"
+      ],
+      "variantDownloads": [],
+      "variants": []
+    },
+    {
+      "credit": "Eiravaein Sound",
+      "download": "https://storage.googleapis.com/turbo-bard.appspot.com/sombre-fiddle.mp3",
+      "file": "Turbo Bard/Effects/sombre-fiddle.mp3",
+      "gain": 0.85,
+      "name": "Sombre Fiddle",
+      "symbol": "bolt.fill",
+      "tags": [
+        "music",
+        "fiddle",
+        "bard",
+        "riff",
+        "somber"
+      ],
+      "variantDownloads": [],
+      "variants": []
+    },
+    {
+      "credit": "SoundMorph",
+      "download": "https://storage.googleapis.com/turbo-bard.appspot.com/stone-door.mp3",
+      "file": "Turbo Bard/Effects/stone-door.mp3",
+      "gain": 0.85,
+      "name": "Stone Door",
+      "symbol": "wand.and.stars",
+      "tags": [
+        "drawbridge",
+        "portcullis",
+        "medieval",
+        "open",
+        "close",
+        "roll",
+        "boulder",
+        "castle"
+      ],
+      "variantDownloads": [],
+      "variants": []
+    },
+    {
+      "credit": "bbc.co.uk, \u00a9 copyright 2018 BBC",
+      "download": "https://storage.googleapis.com/turbo-bard.appspot.com/stones-falling-1.mp3",
+      "file": "Turbo Bard/Effects/stones-falling-1.mp3",
+      "gain": 0.85,
+      "name": "Stones Falling",
+      "symbol": "bolt.fill",
+      "tags": [
+        "rocks",
+        "cave",
+        "underdark",
+        "echoing",
+        "dungeon",
+        "travel"
+      ],
+      "variantDownloads": [
+        "https://storage.googleapis.com/turbo-bard.appspot.com/stones-falling-2.mp3",
+        "https://storage.googleapis.com/turbo-bard.appspot.com/stones-falling-3.mp3",
+        "https://storage.googleapis.com/turbo-bard.appspot.com/stones-falling-4.mp3"
+      ],
+      "variants": [
+        "Turbo Bard/Effects/stones-falling-2.mp3",
+        "Turbo Bard/Effects/stones-falling-3.mp3",
+        "Turbo Bard/Effects/stones-falling-4.mp3"
+      ]
+    },
+    {
+      "credit": "MatiasMacSD",
+      "download": "https://storage.googleapis.com/turbo-bard.appspot.com/teleport.mp3",
+      "file": "Turbo Bard/Effects/teleport.mp3",
+      "gain": 0.85,
+      "name": "Teleport",
+      "symbol": "wand.and.stars",
+      "tags": [
+        "spell",
+        "magic",
+        "transition",
+        "dramatic",
+        "whoosh",
+        "casting",
+        "transmutation",
+        "divination",
+        "conjuration"
+      ],
+      "variantDownloads": [],
+      "variants": []
+    },
+    {
+      "credit": "",
+      "download": "https://storage.googleapis.com/turbo-bard.appspot.com/temporal-gate.mp3",
+      "file": "Turbo Bard/Effects/temporal-gate.mp3",
+      "gain": 0.85,
+      "name": "Temporal Gate",
+      "symbol": "wand.and.stars",
+      "tags": [
+        "spell",
+        "magic",
+        "casting",
+        "teleport",
+        "portal",
+        "dimensional",
+        "rift",
+        "shield",
+        "aura"
+      ],
+      "variantDownloads": [],
+      "variants": []
+    },
+    {
+      "credit": "Glitchedtones",
+      "download": "https://storage.googleapis.com/turbo-bard.appspot.com/terror-approaches.mp3",
+      "file": "Turbo Bard/Effects/terror-approaches.mp3",
+      "gain": 0.85,
+      "name": "Terror Approaches",
+      "symbol": "bolt.fill",
+      "tags": [
+        "long",
+        "horror",
+        "suspense",
+        "graveyard",
+        "mystery",
+        "intense"
+      ],
+      "variantDownloads": [],
+      "variants": []
+    },
+    {
+      "credit": "Gamemaster Audio",
+      "download": "https://storage.googleapis.com/turbo-bard.appspot.com/troll-noise-1.mp3",
+      "file": "Turbo Bard/Effects/troll-noise-1.mp3",
+      "gain": 0.85,
+      "name": "Troll Noises",
+      "symbol": "shield",
+      "tags": [
+        "battle",
+        "vocalizations",
+        "grunts",
+        "attack",
+        "monster",
+        "sounds"
+      ],
+      "variantDownloads": [
+        "https://storage.googleapis.com/turbo-bard.appspot.com/troll-noise-2.mp3",
+        "https://storage.googleapis.com/turbo-bard.appspot.com/troll-noise-3.mp3",
+        "https://storage.googleapis.com/turbo-bard.appspot.com/troll-noise-4.mp3"
+      ],
+      "variants": [
+        "Turbo Bard/Effects/troll-noise-2.mp3",
+        "Turbo Bard/Effects/troll-noise-3.mp3",
+        "Turbo Bard/Effects/troll-noise-4.mp3"
+      ]
+    },
+    {
+      "credit": "bbc.co.uk, \u00a9 copyright 2018 BBC",
+      "download": "https://storage.googleapis.com/turbo-bard.appspot.com/wall-collapsing.mp3",
+      "file": "Turbo Bard/Effects/wall-collapsing.mp3",
+      "gain": 0.85,
+      "name": "Wall Collapsing",
+      "symbol": "bolt.fill",
+      "tags": [
+        "demolition",
+        "destruction",
+        "dumping",
+        "dirt",
+        "debris",
+        "rock"
+      ],
+      "variantDownloads": [],
+      "variants": []
+    },
+    {
+      "credit": "",
+      "download": "https://storage.googleapis.com/turbo-bard.appspot.com/wilhelm-scream.mp3",
+      "file": "Turbo Bard/Effects/wilhelm-scream.mp3",
+      "gain": 0.85,
+      "name": "Wilhelm Scream",
+      "symbol": "figure.fencing",
+      "tags": [
+        "comedic",
+        "shenanigans",
+        "funny",
+        "death",
+        "defeated"
+      ],
+      "variantDownloads": [],
+      "variants": []
+    },
+    {
+      "credit": "Chris Skyes, Soundopolis",
+      "download": "https://storage.googleapis.com/turbo-bard.appspot.com/glass-1.mp3",
+      "file": "Turbo Bard/Effects/glass-1.mp3",
+      "gain": 0.85,
+      "name": "Window Smashes",
+      "symbol": "wind",
+      "tags": [
+        "destruction",
+        "glass",
+        "crack",
+        "break",
+        "crash",
+        "shards"
+      ],
+      "variantDownloads": [
+        "https://storage.googleapis.com/turbo-bard.appspot.com/glass-2.mp3",
+        "https://storage.googleapis.com/turbo-bard.appspot.com/glass-3.mp3",
+        "https://storage.googleapis.com/turbo-bard.appspot.com/glass-4.mp3"
+      ],
+      "variants": [
+        "Turbo Bard/Effects/glass-2.mp3",
+        "Turbo Bard/Effects/glass-3.mp3",
+        "Turbo Bard/Effects/glass-4.mp3"
+      ]
+    },
+    {
+      "credit": "SoundMorph",
+      "download": "https://storage.googleapis.com/turbo-bard.appspot.com/wooden-door.mp3",
+      "file": "Turbo Bard/Effects/wooden-door.mp3",
+      "gain": 0.85,
+      "name": "Wooden Door",
+      "symbol": "door.left.hand.open",
+      "tags": [
+        "house",
+        "wooden",
+        "medieval",
+        "squeak",
+        "groan",
+        "cupboard",
+        "open"
+      ],
+      "variantDownloads": [],
+      "variants": []
+    }
+  ]
+}

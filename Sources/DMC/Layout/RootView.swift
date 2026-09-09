@@ -49,7 +49,7 @@ struct RootView: View {
                         onDelete: { store.delete(target.scene) })
         }
         .sheet(isPresented: $router.showTemplates) {
-            TemplateBrowser(library: templates, store: store) {
+            TemplateBrowser(library: templates, store: store, effects: effects) {
                 Task { await library.scan() }
             }
         }

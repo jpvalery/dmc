@@ -1,12 +1,29 @@
 import Combine
 import Foundation
 
+/// Anything that ships as a recipe: it names the audio it needs and where to fetch it, so the
+/// same download-then-add flow serves both scenes and effects.
+protocol AudioTemplate: Identifiable, Hashable {
+    var name: String { get }
+    var symbol: String { get }
+    var tags: [String] { get }
+    /// Every vault-relative path this template needs, variants included.
+    var files: [String] { get }
+    func downloadURL(for path: String) -> URL?
+}
+
+extension AudioTemplate {
+    var missingFiles: [String] {
+        files.filter { !FileManager.default.fileExists(atPath: Vault.audio.appending(path: $0).path) }
+    }
+}
+
 /// A ready-made scene that can be added to any campaign, and re-added after deletion.
 ///
 /// Templates ship inside the app rather than living in a campaign, so deleting the scenes they
 /// produced never loses the recipe. Each layer carries a download URL, so a template can be
 /// used on a vault that has none of the audio yet.
-struct SceneTemplate: Codable, Identifiable, Hashable {
+struct SceneTemplate: Codable, AudioTemplate {
     struct Layer: Codable, Hashable {
         var file: String
         var download: String?
@@ -30,12 +47,7 @@ struct SceneTemplate: Codable, Identifiable, Hashable {
     var loopCount: Int { layers.filter { !$0.sporadic }.count }
     var sporadicCount: Int { layers.filter(\.sporadic).count }
 
-    /// Every vault-relative path this template needs, variants included.
     var files: [String] { layers.flatMap { [$0.file] + $0.variants } }
-
-    var missingFiles: [String] {
-        files.filter { !FileManager.default.fileExists(atPath: Vault.audio.appending(path: $0).path) }
-    }
 
     /// Fresh ids each time, so adding a template twice gives two independent scenes.
     func makeScene() -> SoundScene {
@@ -58,9 +70,39 @@ struct SceneTemplate: Codable, Identifiable, Hashable {
     }
 }
 
+/// A ready-made effect. Same contract as a scene template, one file plus optional extra takes.
+struct EffectTemplate: Codable, AudioTemplate {
+    var id: String { name }
+    var name: String
+    var symbol: String
+    var tags: [String] = []
+    var gain: Double = 0.85
+    var credit: String = ""
+    var file: String
+    var download: String?
+    var variants: [String] = []
+    var variantDownloads: [String] = []
+
+    var files: [String] { [file] + variants }
+    var takeCount: Int { files.count }
+
+    func makeEffect() -> SoundEffect {
+        SoundEffect(name: name, symbol: symbol, file: file, gain: gain, variants: variants)
+    }
+
+    func downloadURL(for path: String) -> URL? {
+        if path == file, let download { return URL(string: download) }
+        if let i = variants.firstIndex(of: path), i < variantDownloads.count {
+            return URL(string: variantDownloads[i])
+        }
+        return nil
+    }
+}
+
 @MainActor
 final class TemplateLibrary: ObservableObject {
     @Published private(set) var templates: [SceneTemplate] = []
+    @Published private(set) var effectTemplates: [EffectTemplate] = []
     @Published private(set) var note: String = ""
 
     private struct Document: Codable {
@@ -68,7 +110,32 @@ final class TemplateLibrary: ObservableObject {
         var templates: [SceneTemplate]
     }
 
-    init() { load() }
+    private struct EffectDocument: Codable {
+        var note: String?
+        var templates: [EffectTemplate]
+    }
+
+    init() {
+        load()
+        loadEffects()
+    }
+
+    private func loadEffects() {
+        let candidates = [
+            Vault.root.appending(path: "effect-templates.json"),
+            Bundle.main.url(forResource: "effect-templates", withExtension: "json"),
+        ].compactMap { $0 }
+        for url in candidates {
+            guard let data = try? Data(contentsOf: url),
+                  let doc = try? JSONDecoder().decode(EffectDocument.self, from: data),
+                  !doc.templates.isEmpty
+            else { continue }
+            effectTemplates = doc.templates.sorted {
+                $0.name.localizedStandardCompare($1.name) == .orderedAscending
+            }
+            return
+        }
+    }
 
     private func load() {
         // A copy in the vault wins, so templates can be edited without rebuilding the app.
