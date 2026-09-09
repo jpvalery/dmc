@@ -10,13 +10,13 @@ struct RootView: View {
     @ObservedObject var notes: NotesStore
     @ObservedObject var hotkeys: HotkeyManager
     @ObservedObject var effects: EffectStore
+    @ObservedObject var library: SoundLibrary
+    @ObservedObject var templates: TemplateLibrary
     @Binding var railCollapsed: Bool
     @Binding var notesHidden: Bool
 
-    @StateObject private var library = SoundLibrary()
     @StateObject private var catalogue = TabletopCatalogue()
     @StateObject private var downloader = TrackDownloader()
-    @StateObject private var templates = TemplateLibrary()
     @Environment(\.openWindow) private var openWindow
 
     var body: some View {
@@ -48,11 +48,6 @@ struct RootView: View {
                         engine: engine,
                         onSave: { store.upsert($0) },
                         onDelete: { store.delete(target.scene) })
-        }
-        .sheet(isPresented: $router.showTemplates) {
-            TemplateBrowser(library: templates, store: store, effects: effects) {
-                Task { await library.scan() }
-            }
         }
         .sheet(isPresented: $router.showTabletop) {
             TabletopBrowser(catalogue: catalogue, downloader: downloader)
@@ -88,6 +83,11 @@ struct RootView: View {
             guard wanted else { return }
             openWindow(id: PadMapperWindow.id)
             router.showHotkeys = false
+        }
+        .onChange(of: router.showTemplates) { _, wanted in
+            guard wanted else { return }
+            openWindow(id: TemplateWindow.id)
+            router.showTemplates = false
         }
         .onAppear {
             // New downloads are worthless until the local index sees them.

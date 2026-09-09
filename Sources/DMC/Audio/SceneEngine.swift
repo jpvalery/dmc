@@ -125,6 +125,29 @@ final class SceneEngine: ObservableObject {
 
     func isSounding(_ id: UUID) -> Bool { (soundingEffects[id] ?? 0) > 0 }
 
+    // MARK: - Preview
+
+    /// Auditioning a single file while building a scene. One shared tag, so starting a new
+    /// preview replaces the last rather than piling them up.
+    private let previewTag = UUID()
+    @Published private(set) var previewing: String?
+
+    func preview(_ relativePath: String, gain: Double = 0.9) {
+        if previewing == relativePath {
+            stopPreview()
+            return
+        }
+        stopPreview()
+        previewing = relativePath
+        playOneShot(url: Vault.audio.appending(path: relativePath),
+                    gain: gain, tag: previewTag, label: relativePath)
+    }
+
+    func stopPreview() {
+        stopEffect(previewTag)
+        previewing = nil
+    }
+
     private func startSporadicLayers(of scene: SoundScene) {
         stopSporadicLayers()
         for layer in scene.layers where layer.sporadic && layer.isBound {
@@ -172,7 +195,13 @@ final class SceneEngine: ObservableObject {
 
     private func release(_ id: UUID) {
         guard let count = soundingEffects[id] else { return }
-        if count <= 1 { soundingEffects[id] = nil } else { soundingEffects[id] = count - 1 }
+        if count <= 1 {
+            soundingEffects[id] = nil
+            // A preview that ran to its end should stop looking like it is still playing.
+            if id == previewTag { previewing = nil }
+        } else {
+            soundingEffects[id] = count - 1
+        }
     }
 
     /// Starting the engine for an effect must not clear the paused flag — the bed stays paused

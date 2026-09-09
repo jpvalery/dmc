@@ -95,10 +95,11 @@ struct EffectEditor: View {
             }
         }
         .padding(14)
-        .frame(width: 460, height: 360)
+        .frame(width: 480, height: 380)
+        .onDisappear { engine.stopPreview() }
         .sheet(isPresented: $showSymbols) { SymbolPicker(selection: $effect.symbol) }
         .sheet(isPresented: $showSounds) {
-            SoundPicker(library: library) { files in
+            SoundPicker(library: library, engine: engine) { files in
                 if let file = files.first {
                     effect.file = file.relativePath
                     if effect.name.trimmingCharacters(in: .whitespaces).isEmpty { effect.name = file.name }

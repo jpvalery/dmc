@@ -10,36 +10,39 @@ struct SceneEditor: View {
 
     @Environment(\.dismiss) private var dismiss
     @State private var showSymbols = false
-    @State private var showSounds = false
     @State private var bindingSlot: AudioLayer.ID?
+    @State private var isDropTargeted = false
 
     private var isAuditioning: Bool { engine.activeSceneID == scene.id }
 
     var body: some View {
-        VStack(spacing: 0) {
-            header
-            Divider()
-            layerList
-            Divider()
-            footer
-        }
-        .frame(width: 560, height: 540)
-        .sheet(isPresented: $showSymbols) { SymbolPicker(selection: $scene.symbol) }
-        .sheet(isPresented: $showSounds) {
-            SoundPicker(library: library) { files in
-                scene.layers.append(contentsOf: files.map { AudioLayer(file: $0.relativePath) })
-                engine.refreshIfPlaying(scene)
+        HSplitView {
+            VStack(spacing: 0) {
+                header
+                Divider()
+                layerList
+                Divider()
+                footer
             }
+            .frame(minWidth: 520, idealWidth: 620)
+
+            SoundLibraryList(library: library, engine: engine) { file in
+                append(file.relativePath)
+            }
+            .frame(minWidth: 260, idealWidth: 320)
         }
-        // Binding a single imported slot, keeping its level and loop setting.
+        .frame(minWidth: 860, minHeight: 560)
+        .frame(idealWidth: 1020, idealHeight: 680)
+        .sheet(isPresented: $showSymbols) { SymbolPicker(selection: $scene.symbol) }
         .sheet(item: $bindingSlot) { slotID in
-            SoundPicker(library: library) { files in
+            SoundPicker(library: library, engine: engine) { files in
                 guard let file = files.first,
                       let index = scene.layers.firstIndex(where: { $0.id == slotID }) else { return }
                 scene.layers[index].file = file.relativePath
                 engine.refreshIfPlaying(scene)
             }
         }
+        .onDisappear { engine.stopPreview() }
     }
 
     private var header: some View {
@@ -58,7 +61,7 @@ struct SceneEditor: View {
                 TextField("Scene name", text: $scene.name)
                     .textFieldStyle(.roundedBorder)
                     .font(.title3)
-                Text("\(scene.layers.count) sound\(scene.layers.count == 1 ? "" : "s")")
+                Text("\(scene.layers.count) layer\(scene.layers.count == 1 ? "" : "s")")
                     .font(.caption).foregroundStyle(.secondary)
             }
         }
@@ -72,9 +75,10 @@ struct SceneEditor: View {
                     Spacer()
                     Image(systemName: "square.stack.3d.up.slash")
                         .font(.largeTitle).foregroundStyle(.tertiary)
-                    Text("No sounds in this scene yet")
+                    Text("Drag sounds in from the right")
                         .font(.callout).foregroundStyle(.secondary)
-                    Button("Add sounds…") { showSounds = true }
+                    Text("Or press ▶ there to hear one first.")
+                        .font(.caption2).foregroundStyle(.tertiary)
                     Spacer()
                 }
                 .frame(maxWidth: .infinity)
@@ -95,6 +99,27 @@ struct SceneEditor: View {
                 .listStyle(.inset)
             }
         }
+        .overlay {
+            if isDropTargeted {
+                RoundedRectangle(cornerRadius: 8)
+                    .strokeBorder(Color.accentColor, lineWidth: 2)
+                    .padding(4)
+            }
+        }
+        .dropDestination(for: String.self) { items, _ in
+            let paths = items.compactMap { item -> String? in
+                guard item.hasPrefix(SoundLibraryList.dragPrefix) else { return nil }
+                return String(item.dropFirst(SoundLibraryList.dragPrefix.count))
+            }
+            guard !paths.isEmpty else { return false }
+            paths.forEach(append)
+            return true
+        } isTargeted: { isDropTargeted = $0 }
+    }
+
+    private func append(_ relativePath: String) {
+        scene.layers.append(AudioLayer(file: relativePath))
+        engine.refreshIfPlaying(scene)
     }
 
     private var footer: some View {
@@ -110,11 +135,10 @@ struct SceneEditor: View {
                           systemImage: isAuditioning ? "stop.fill" : "play.fill")
                 }
                 .disabled(scene.layers.isEmpty)
-                .help("Hear the scene while you set levels")
+                .help("Hear the whole scene while you set levels")
             }
 
             HStack {
-                Button("Add sounds…") { showSounds = true }
                 if !isNew {
                     Button(role: .destructive) {
                         engine.stopAll()
@@ -157,10 +181,21 @@ private struct LayerRow: View {
     private var isMissing: Bool {
         layer.isBound && !FileManager.default.fileExists(atPath: layer.url.path)
     }
+    private var isPreviewing: Bool { engine.previewing == layer.file }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
             HStack(spacing: 6) {
+                if layer.isBound {
+                    Button { engine.preview(layer.file, gain: layer.gain) } label: {
+                        Image(systemName: isPreviewing ? "stop.circle.fill" : "play.circle")
+                            .font(.system(size: 13))
+                            .foregroundStyle(isPreviewing ? Color.accentColor : Color.secondary)
+                    }
+                    .buttonStyle(.plain)
+                    .help(isPreviewing ? "Stop" : "Preview this layer alone")
+                }
+
                 if !layer.isBound {
                     Image(systemName: "questionmark.square.dashed")
                         .font(.caption).foregroundStyle(.secondary)
@@ -179,12 +214,10 @@ private struct LayerRow: View {
                 }
                 Spacer()
                 Toggle("Loop", isOn: $layer.loops)
-                    .toggleStyle(.checkbox)
-                    .font(.caption)
+                    .toggleStyle(.checkbox).font(.caption)
                     .disabled(layer.sporadic)
                 Toggle("Sporadic", isOn: $layer.sporadic)
-                    .toggleStyle(.checkbox)
-                    .font(.caption)
+                    .toggleStyle(.checkbox).font(.caption)
                     .help("Fire at random intervals instead of looping")
                 Button(role: .destructive, action: onRemove) {
                     Image(systemName: "minus.circle")
@@ -215,7 +248,7 @@ private struct LayerRow: View {
             HStack(spacing: 6) {
                 Image(systemName: "speaker.fill").font(.caption2).foregroundStyle(.secondary)
                 // Live: moving this while the scene sounds retunes the mix immediately, which
-                // is the only sane way to balance stems.
+                // is the only sane way to balance layers.
                 Slider(value: $layer.gain, in: 0...1) { editing in
                     if !editing { applyLive() }
                 }

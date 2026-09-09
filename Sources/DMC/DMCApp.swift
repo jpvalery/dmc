@@ -11,6 +11,8 @@ struct DMCApp: App {
     @StateObject private var notes = NotesStore()
     @StateObject private var hotkeys = HotkeyManager()
     @StateObject private var effects = EffectStore()
+    @StateObject private var library = SoundLibrary()
+    @StateObject private var templates = TemplateLibrary()
 
     @AppStorage("pane.railCollapsed") private var railCollapsed = false
     @AppStorage("pane.notesHidden") private var notesHidden = false
@@ -27,6 +29,8 @@ struct DMCApp: App {
                      notes: notes,
                      hotkeys: hotkeys,
                      effects: effects,
+                     library: library,
+                     templates: templates,
                      railCollapsed: $railCollapsed,
                      notesHidden: $notesHidden)
         }
@@ -37,6 +41,13 @@ struct DMCApp: App {
             PadMapper(hotkeys: hotkeys, store: store, effects: effects)
         }
         .defaultSize(width: 1000, height: 720)
+
+        Window("Scene & effect templates", id: TemplateWindow.id) {
+            TemplateBrowser(library: templates, store: store, effects: effects) {
+                Task { await library.scan() }
+            }
+        }
+        .defaultSize(width: 900, height: 680)
 
         .commands {
             CommandGroup(replacing: .newItem) {

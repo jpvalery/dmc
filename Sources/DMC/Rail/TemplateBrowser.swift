@@ -59,7 +59,6 @@ struct TemplateBrowser: View {
     private enum Kind: String, CaseIterable { case scenes = "Scenes", effects = "Effects" }
     @State private var kind: Kind = .scenes
 
-    @Environment(\.dismiss) private var dismiss
     @StateObject private var fetcher = TemplateFetcher()
     @State private var search = ""
     @State private var justAdded: Set<String> = []
@@ -88,16 +87,13 @@ struct TemplateBrowser: View {
             Divider()
             footer
         }
-        .frame(width: 560, height: 560)
+        .frame(minWidth: 720, minHeight: 560)
     }
 
     private var header: some View {
         VStack(spacing: 8) {
-            HStack {
-                Text("Templates").font(.headline)
-                Spacer()
-                Button("Done") { dismiss() }.keyboardShortcut(.defaultAction)
-            }
+            Text("Templates").font(.headline)
+                .frame(maxWidth: .infinity, alignment: .leading)
             Picker("", selection: $kind) {
                 ForEach(Kind.allCases, id: \.self) { Text($0.rawValue).tag($0) }
             }
@@ -235,4 +231,9 @@ struct TemplateBrowser: View {
         justAdded.insert("effect:" + template.name)
         onAdded()
     }
+}
+
+
+enum TemplateWindow {
+    static let id = "templates"
 }

@@ -3,6 +3,8 @@ import SwiftUI
 /// Multi-select over everything in the vault, grouped by folder.
 struct SoundPicker: View {
     @ObservedObject var library: SoundLibrary
+    /// Optional so the picker still works where no engine is at hand.
+    var engine: SceneEngine?
     let onAdd: ([SoundFile]) -> Void
 
     @Environment(\.dismiss) private var dismiss
@@ -68,7 +70,17 @@ struct SoundPicker: View {
                                         else { selected.remove(file.relativePath) }
                                     }
                                 )) {
-                                    HStack {
+                                    HStack(spacing: 6) {
+                                        if let engine {
+                                            Button { engine.preview(file.relativePath) } label: {
+                                                Image(systemName: engine.previewing == file.relativePath
+                                                      ? "stop.circle.fill" : "play.circle")
+                                                    .foregroundStyle(engine.previewing == file.relativePath
+                                                                     ? Color.accentColor : Color.secondary)
+                                            }
+                                            .buttonStyle(.plain)
+                                            .help("Preview")
+                                        }
                                         Text(file.name).lineLimit(1)
                                         Spacer()
                                         Text(file.durationText)
@@ -83,6 +95,7 @@ struct SoundPicker: View {
                 .listStyle(.inset)
             }
         }
-        .frame(width: 520, height: 480)
+        .frame(width: 560, height: 520)
+        .onDisappear { engine?.stopPreview() }
     }
 }
