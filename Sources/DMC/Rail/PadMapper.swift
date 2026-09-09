@@ -316,13 +316,13 @@ struct PadMapper: View {
 
             HStack(alignment: .top, spacing: 16) {
                 column(title: "SCENES", systemImage: "waveform",
-                       rows: store.scenes.prefix(9).enumerated().map {
+                       rows: store.scenes.enumerated().map {
                            ($0.offset + 1, $0.element.name, $0.element.symbol,
                             HotkeyAction.scene($0.element.id))
                        },
                        empty: "No scenes yet")
                 column(title: "EFFECTS", systemImage: "bolt.fill",
-                       rows: effects.effects.prefix(8).enumerated().map {
+                       rows: effects.effects.enumerated().map {
                            ($0.offset + 1, $0.element.name, $0.element.symbol,
                             HotkeyAction.effect($0.element.id))
                        },
@@ -341,7 +341,11 @@ struct PadMapper: View {
             if rows.isEmpty {
                 Text(empty).font(.caption2).foregroundStyle(.tertiary)
             } else {
-                ForEach(rows, id: \.0) { index, name, symbol, action in
+                // Scrolls once there are more than fit: truncating the list silently hid
+                // scenes 10 and up, which made the mapper look like it had lost them.
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 2) {
+                        ForEach(rows, id: \.0) { index, name, symbol, action in
                     HStack(spacing: 5) {
                         Text("\(index)")
                             .font(.system(size: 10, design: .monospaced))
@@ -364,7 +368,10 @@ struct PadMapper: View {
                             .padding(6)
                             .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 6))
                     }
+                        }
+                    }
                 }
+                .frame(maxHeight: 150)
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -488,14 +495,14 @@ struct ActionPicker: View {
             Text("New scene…").tag(HotkeyAction.newScene)
 
             Section("Scene by position") {
-                ForEach(1...16, id: \.self) { position in
+                ForEach(1...max(16, store.scenes.count), id: \.self) { position in
                     let name = store.scenes.indices.contains(position - 1)
                         ? store.scenes[position - 1].name : "empty"
                     Text("\(position) — \(name)").tag(HotkeyAction.sceneIndex(position))
                 }
             }
             Section("Effect by position") {
-                ForEach(1...8, id: \.self) { position in
+                ForEach(1...max(16, effects.effects.count), id: \.self) { position in
                     let name = effects.effects.indices.contains(position - 1)
                         ? effects.effects[position - 1].name : "empty"
                     Text("\(position) — \(name)").tag(HotkeyAction.effectIndex(position))
