@@ -8,15 +8,16 @@ struct RootView: View {
     @ObservedObject var router: UIRouter
     @ObservedObject var campaigns: CampaignStore
     @ObservedObject var notes: NotesStore
+    @ObservedObject var hotkeys: HotkeyManager
+    @ObservedObject var effects: EffectStore
     @Binding var railCollapsed: Bool
     @Binding var notesHidden: Bool
 
     @StateObject private var library = SoundLibrary()
     @StateObject private var catalogue = TabletopCatalogue()
     @StateObject private var downloader = TrackDownloader()
-    @StateObject private var hotkeys = HotkeyManager()
-    @StateObject private var effects = EffectStore()
     @StateObject private var templates = TemplateLibrary()
+    @Environment(\.openWindow) private var openWindow
 
     var body: some View {
         ThreePaneView(railCollapsed: railCollapsed, notesHidden: notesHidden) {
@@ -77,14 +78,16 @@ struct RootView: View {
         .sheet(item: $router.deleting) { campaign in
             DeleteCampaignSheet(campaign: campaign) { campaigns.delete(campaign.id) }
         }
-        .sheet(isPresented: $router.showHotkeys) {
-            PadMapper(hotkeys: hotkeys, store: store, effects: effects)
-        }
         .sheet(isPresented: $router.showPadImport) {
             PadImportView { scene in
                 store.upsert(scene)
                 router.edit(scene)
             }
+        }
+        .onChange(of: router.showHotkeys) { _, wanted in
+            guard wanted else { return }
+            openWindow(id: PadMapperWindow.id)
+            router.showHotkeys = false
         }
         .onAppear {
             // New downloads are worthless until the local index sees them.

@@ -1,3 +1,4 @@
+import AppKit
 import SwiftUI
 
 @main
@@ -8,6 +9,8 @@ struct DMCApp: App {
     @StateObject private var router = UIRouter()
     @StateObject private var campaigns = CampaignStore()
     @StateObject private var notes = NotesStore()
+    @StateObject private var hotkeys = HotkeyManager()
+    @StateObject private var effects = EffectStore()
 
     @AppStorage("pane.railCollapsed") private var railCollapsed = false
     @AppStorage("pane.notesHidden") private var notesHidden = false
@@ -22,9 +25,19 @@ struct DMCApp: App {
                      router: router,
                      campaigns: campaigns,
                      notes: notes,
+                     hotkeys: hotkeys,
+                     effects: effects,
                      railCollapsed: $railCollapsed,
                      notesHidden: $notesHidden)
         }
+
+        // Its own window rather than a sheet: the pad, its bindings and a searchable library do
+        // not fit a modal, and it is a thing you leave open while rearranging.
+        Window("Macropad", id: PadMapperWindow.id) {
+            PadMapper(hotkeys: hotkeys, store: store, effects: effects)
+        }
+        .defaultSize(width: 1000, height: 720)
+
         .commands {
             CommandGroup(replacing: .newItem) {
                 Button("New Tab") { tabs.newTab() }
@@ -92,7 +105,10 @@ struct DMCApp: App {
                     .disabled(!engine.isPlaying)
                 Button("Stop All Audio") { engine.stopAll() }
                     .disabled(!engine.isPlaying)
+                // Routed through the flag rather than opened here: `openWindow` comes from the
+                // environment, which a menu builder has no access to.
                 Button("Macropad & Hotkeys…") { router.showHotkeys = true }
+                    .keyboardShortcut("m", modifiers: [.command, .shift])
 
                 Menu("Switch Campaign") {
                     ForEach(campaigns.sorted) { campaign in
