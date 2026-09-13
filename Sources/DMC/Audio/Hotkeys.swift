@@ -111,13 +111,13 @@ final class HotkeyManager: ObservableObject {
         // Read down each column: the pad numbers its macros column-major, so M0/M1/M2 are the
         // first column top to bottom, M3/M4/M5 the second, and so on.
         //
-        //   col 1        col 2      col 3      col 4
-        //   previous     scene 1    scene 4    effect 2
-        //   next         scene 2    scene 5    effect 3
-        //   effect 1     scene 3    scene 6    effect 4
-        0: .previousScene,  1: .sceneIndex(1),  2: .sceneIndex(4),  3: .effectIndex(2),
-        8: .nextScene,      9: .sceneIndex(2), 10: .sceneIndex(5), 11: .effectIndex(3),
-       16: .effectIndex(1), 17: .sceneIndex(3), 18: .sceneIndex(6), 19: .effectIndex(4),
+        //   col 1        col 2        col 3       col 4
+        //   previous     short rest   long rest   dungeon
+        //   next         danger       surprise    quest
+        //   combat       death        treasure    coins
+        0: .previousScene,  1: .sceneIndex(1),  2: .sceneIndex(2),  3: .sceneIndex(3),
+        8: .nextScene,      9: .effectIndex(2), 10: .effectIndex(4), 11: .effectIndex(6),
+       16: .effectIndex(1), 17: .effectIndex(3), 18: .effectIndex(5), 19: .effectIndex(7),
 
         // The left knob drives DMC's own master volume rather than the system's: macOS routes
         // system volume to AirPods over AVRCP absolute volume, which coalesces rapid encoder

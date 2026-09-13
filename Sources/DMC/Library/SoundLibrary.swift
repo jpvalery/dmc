@@ -10,6 +10,10 @@ struct SoundFile: Identifiable, Hashable {
     let name: String
     let folder: String
     let duration: Double
+    /// What the sound is for — "Dungeon & Cave", "Combat" — rather than where it came from.
+    /// Folders record provenance, which matters for attribution and nothing else once you are
+    /// actually building a scene.
+    let category: String
 
     var displayFolder: String { folder.isEmpty ? "—" : folder }
 
@@ -44,9 +48,12 @@ final class SoundLibrary: ObservableObject {
         Task { await scan() }
     }
 
-    var folders: [String] {
-        Array(Set(files.map(\.folder))).sorted {
-            $0.localizedStandardCompare($1) == .orderedAscending
+    var categories: [String] {
+        Array(Set(files.map(\.category))).sorted {
+            // Unsorted last, everything else alphabetical.
+            if $0 == "Unsorted" { return false }
+            if $1 == "Unsorted" { return true }
+            return $0.localizedStandardCompare($1) == .orderedAscending
         }
     }
 
@@ -70,6 +77,15 @@ final class SoundLibrary: ObservableObject {
     ) -> ([SoundFile], [String], [String: CacheEntry]) {
         let fm = FileManager.default
         let base = Vault.audio
+
+        // Written by Tools/build-sound-library/categorize.py. Absent is fine — everything just
+        // lands in one group.
+        let categories: [String: String] = {
+            guard let data = try? Data(contentsOf: base.appending(path: "categories.json")),
+                  let decoded = try? JSONDecoder().decode([String: String].self, from: data)
+            else { return [:] }
+            return decoded
+        }()
         guard let walker = fm.enumerator(at: base,
                                          includingPropertiesForKeys: [.fileSizeKey, .contentModificationDateKey],
                                          options: [.skipsHiddenFiles]) else { return ([], [], cache) }
@@ -104,13 +120,14 @@ final class SoundLibrary: ObservableObject {
             found.append(SoundFile(relativePath: relative,
                                    name: url.deletingPathExtension().lastPathComponent,
                                    folder: folder,
-                                   duration: duration))
+                                   duration: duration,
+                                   category: categories[relative] ?? "Unsorted"))
         }
 
         found.sort {
-            $0.folder == $1.folder
+            $0.category == $1.category
                 ? $0.name.localizedStandardCompare($1.name) == .orderedAscending
-                : $0.folder.localizedStandardCompare($1.folder) == .orderedAscending
+                : $0.category.localizedStandardCompare($1.category) == .orderedAscending
         }
         return (found, bad, next)
     }

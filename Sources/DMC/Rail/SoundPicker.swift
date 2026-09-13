@@ -15,14 +15,20 @@ struct SoundPicker: View {
         let needle = search.trimmingCharacters(in: .whitespaces).lowercased()
         guard !needle.isEmpty else { return library.files }
         return library.files.filter {
-            $0.name.lowercased().contains(needle) || $0.folder.lowercased().contains(needle)
+            $0.name.lowercased().contains(needle)
+                || $0.category.lowercased().contains(needle)
+                || $0.folder.lowercased().contains(needle)
         }
     }
 
     private var grouped: [(folder: String, files: [SoundFile])] {
-        Dictionary(grouping: matches, by: \.displayFolder)
+        Dictionary(grouping: matches, by: \.category)
             .map { (folder: $0.key, files: $0.value) }
-            .sorted { $0.folder.localizedStandardCompare($1.folder) == .orderedAscending }
+            .sorted {
+                if $0.folder == "Unsorted" { return false }
+                if $1.folder == "Unsorted" { return true }
+                return $0.folder.localizedStandardCompare($1.folder) == .orderedAscending
+            }
     }
 
     var body: some View {
