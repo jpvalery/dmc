@@ -11,7 +11,7 @@ struct WebViewHost: NSViewRepresentable {
 }
 
 struct WebPane: View {
-    @ObservedObject var tabs: TabsModel
+    var tabs: TabsModel
     @Binding var railCollapsed: Bool
     @Binding var notesHidden: Bool
     @Binding var combatShown: Bool
@@ -49,7 +49,10 @@ struct WebPane: View {
     private func page(_ tab: WebTab) -> some View {
         WebViewHost(controller: tab.controller)
             .id(tab.id)
-            .onAppear { tab.controller.focusPage() }
+            .onAppear {
+                tab.controller.loadIfNeeded()
+                tab.controller.focusPage()
+            }
     }
 
     private func splitBody(primary: WebTab, secondary: WebTab) -> some View {
@@ -84,8 +87,8 @@ struct WebPane: View {
 /// A compact bar for the right-hand pane. The main nav bar drives the left pane; this keeps the
 /// two symmetrical enough to use without doubling the chrome.
 private struct SecondaryBar: View {
-    @ObservedObject var tab: WebTab
-    @ObservedObject var tabs: TabsModel
+    var tab: WebTab
+    var tabs: TabsModel
 
     var body: some View {
         HStack(spacing: 6) {

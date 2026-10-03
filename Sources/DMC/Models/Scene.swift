@@ -75,6 +75,28 @@ struct SoundScene: Codable, Identifiable, Hashable {
     var layers: [AudioLayer] = []
     var fadeIn: Double = 1.5
     var fadeOut: Double = 1.5
+
+    /// Decoded by hand, like `AudioLayer`, so a scene written before a field existed — or edited
+    /// by hand without one — still loads instead of being thrown out.
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        id = try c.decodeIfPresent(UUID.self, forKey: .id) ?? UUID()
+        name = try c.decodeIfPresent(String.self, forKey: .name) ?? "Untitled scene"
+        symbol = try c.decodeIfPresent(String.self, forKey: .symbol) ?? "waveform"
+        layers = try c.decodeIfPresent([AudioLayer].self, forKey: .layers) ?? []
+        fadeIn = try c.decodeIfPresent(Double.self, forKey: .fadeIn) ?? 1.5
+        fadeOut = try c.decodeIfPresent(Double.self, forKey: .fadeOut) ?? 1.5
+    }
+
+    init(id: UUID = UUID(), name: String, symbol: String = "waveform", layers: [AudioLayer] = [],
+         fadeIn: Double = 1.5, fadeOut: Double = 1.5) {
+        self.id = id
+        self.name = name
+        self.symbol = symbol
+        self.layers = layers
+        self.fadeIn = fadeIn
+        self.fadeOut = fadeOut
+    }
 }
 
 /// Formats `AVAudioFile` can open. Ogg Vorbis and Opus are deliberately absent — AVFoundation
@@ -88,29 +110,24 @@ enum AudioFormats {
 /// of `~/DMConsole/audio` becomes a scene and its files become equal-gain layers. That makes
 /// the app useful the moment files are dropped in, before any scene has been authored.
 enum SceneLibrary {
-    /// Set when a `scenes.json` exists but could not be read, so the UI can say so instead of
-    /// quietly showing folder-derived scenes that look like data loss.
-    private(set) nonisolated(unsafe) static var lastError: String?
-
+    /// A damaged `scenes.json` is copied aside by `JSONStore` before anything else happens, and
+    /// whatever scenes could still be read are kept. Only when nothing can be recovered do the
+    /// folder-derived scenes stand in — and by then the original is safe, so the next edit
+    /// cannot destroy it.
     static func load() -> [SoundScene] {
-        lastError = nil
-        guard let data = try? Data(contentsOf: Vault.scenesFile) else {
+        switch JSONStore.loadLossy(SoundScene.self, from: Vault.scenesFile) {
+        case .missing:
             return derivedFromFolders()
-        }
-        do {
-            let scenes = try JSONDecoder().decode([SoundScene].self, from: data)
+        case .ok(let scenes):
             return scenes.isEmpty ? derivedFromFolders() : scenes
-        } catch {
-            lastError = "scenes.json could not be read (\(error.localizedDescription)). "
-                      + "Showing folder-derived scenes; your file has not been changed."
+        case .damaged(let recovered, _, _):
+            if let recovered, !recovered.isEmpty { return recovered }
             return derivedFromFolders()
         }
     }
 
     static func save(_ scenes: [SoundScene]) {
-        let encoder = JSONEncoder()
-        encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
-        try? encoder.encode(scenes).write(to: Vault.scenesFile, options: .atomic)
+        JSONStore.save(scenes, to: Vault.scenesFile, snapshots: true)
     }
 
     /// Files whose extension we know AVFoundation cannot decode, so the UI can say so.

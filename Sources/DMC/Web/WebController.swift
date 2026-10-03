@@ -1,5 +1,5 @@
 import AppKit
-import Combine
+import Observation
 import WebKit
 
 /// A `WKWebView` that offers "Open Link in New Tab" in its context menu.
@@ -38,26 +38,31 @@ final class DMCWebView: WKWebView {
     }
 }
 
-/// Owns the one and only `WKWebView` for the session.
+/// Owns one tab's `WKWebView`.
 ///
-/// Held as a `@StateObject` above the pane so the view is created exactly once — rebuilding it
-/// from `updateNSView` would reload the VTT on every pane resize.
+/// Held by its `WebTab` so the view is created exactly once — rebuilding it from `updateNSView`
+/// would reload the VTT on every pane resize.
+///
+/// A tab restored from the last session is created *unloaded*: its address is remembered and
+/// shown, but the page is not fetched until the tab is first displayed. Loading every tab at
+/// launch started a web-content process per tab, each running D&D Beyond, before the DM had
+/// looked at any but the first.
 @MainActor
-final class WebController: NSObject, ObservableObject, WKUIDelegate, WKNavigationDelegate {
-    @Published var canGoBack = false
-    @Published var canGoForward = false
-    @Published var isLoading = false
-    @Published var urlText = ""
-    @Published var title = ""
+@Observable final class WebController: NSObject, WKUIDelegate, WKNavigationDelegate {
+    var canGoBack = false
+    var canGoForward = false
+    var isLoading = false
+    var urlText = ""
+    var title = ""
 
     let webView: WKWebView
     /// Set by `TabsModel`: (url, openInBackground).
-    var onOpenInNewTab: ((URL, Bool) -> Void)?
-    private let home: URL
+    @ObservationIgnored var onOpenInNewTab: ((URL, Bool) -> Void)?
+    /// Set while the tab has an address but has not been loaded yet.
+    @ObservationIgnored private var pendingURL: URL?
+    @ObservationIgnored private var observations: [NSKeyValueObservation] = []
 
-    init(home: URL) {
-        self.home = home
-
+    init(url: URL, loadNow: Bool = true) {
         let config = WKWebViewConfiguration()
         // Persistent store: the Wizards of the Coast login has to survive relaunches,
         // otherwise this is a daily-login tool instead of a one-time-login tool.
@@ -75,29 +80,61 @@ final class WebController: NSObject, ObservableObject, WKUIDelegate, WKNavigatio
         webView.uiDelegate = self
         webView.navigationDelegate = self
 
-        // Combine's KVO bridge rather than hand-rolled observers: it handles the delivery
-        // thread for us and the cancellables live as long as the published properties.
-        webView.publisher(for: \.canGoBack).receive(on: RunLoop.main).assign(to: &$canGoBack)
-        webView.publisher(for: \.canGoForward).receive(on: RunLoop.main).assign(to: &$canGoForward)
-        webView.publisher(for: \.isLoading).receive(on: RunLoop.main).assign(to: &$isLoading)
-        webView.publisher(for: \.url)
-            .map { $0?.absoluteString ?? "" }
-            .receive(on: RunLoop.main)
-            .assign(to: &$urlText)
-        webView.publisher(for: \.title)
-            .map { $0 ?? "" }
-            .receive(on: RunLoop.main)
-            .assign(to: &$title)
+        // KVO on the web view, hopped to the main queue so the observable properties are only
+        // ever written from the main actor.
+        observations = [
+            webView.observe(\.canGoBack) { [weak self] view, _ in
+                let value = view.canGoBack
+                Task { @MainActor in self?.canGoBack = value }
+            },
+            webView.observe(\.canGoForward) { [weak self] view, _ in
+                let value = view.canGoForward
+                Task { @MainActor in self?.canGoForward = value }
+            },
+            webView.observe(\.isLoading) { [weak self] view, _ in
+                let value = view.isLoading
+                Task { @MainActor in self?.isLoading = value }
+            },
+            webView.observe(\.url) { [weak self] view, _ in
+                let value = view.url?.absoluteString
+                // An unloaded tab keeps showing its remembered address.
+                Task { @MainActor in if let value { self?.urlText = value } }
+            },
+            webView.observe(\.title) { [weak self] view, _ in
+                let value = view.title ?? ""
+                Task { @MainActor in self?.title = value }
+            },
+        ]
 
-        load(home)
+        if loadNow {
+            load(url)
+        } else {
+            pendingURL = url
+            urlText = url.absoluteString
+        }
     }
+
+    /// Fetches the remembered page the first time the tab is shown. Does nothing afterwards.
+    func loadIfNeeded() {
+        guard let url = pendingURL else { return }
+        pendingURL = nil
+        load(url)
+    }
+
+    /// The address to remember across launches — the live one, or the one still waiting to load.
+    var persistedURL: String { pendingURL?.absoluteString ?? urlText }
 
     // MARK: - Navigation
 
-    func load(_ url: URL) { webView.load(URLRequest(url: url)) }
+    func load(_ url: URL) {
+        pendingURL = nil
+        webView.load(URLRequest(url: url))
+    }
     func goBack() { webView.goBack() }
     func goForward() { webView.goForward() }
-    func goHome() { load(home) }
+    /// The campaigns page — not whatever this tab was first opened on, which for a tab restored
+    /// from the last session is wherever it happened to be at quit.
+    func goHome() { load(Home.url()) }
 
     func reloadOrStop() {
         if isLoading { webView.stopLoading() } else { webView.reload() }

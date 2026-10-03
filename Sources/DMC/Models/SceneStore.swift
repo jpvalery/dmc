@@ -1,11 +1,11 @@
-import Combine
+import Observation
 import Foundation
 
 @MainActor
-final class SceneStore: ObservableObject {
-    @Published private(set) var scenes: [SoundScene] = []
+@Observable final class SceneStore {
+    private(set) var scenes: [SoundScene] = []
     /// Files present in the vault that macOS cannot decode, surfaced rather than skipped.
-    @Published private(set) var unplayable: [String] = []
+    private(set) var unplayable: [String] = []
 
     init() {
         Vault.bootstrap()
@@ -15,7 +15,6 @@ final class SceneStore: ObservableObject {
     func reload() {
         scenes = SceneLibrary.load()
         unplayable = SceneLibrary.unplayableFiles()
-        if let error = SceneLibrary.lastError { unplayable.insert(error, at: 0) }
     }
 
     func upsert(_ scene: SoundScene) {

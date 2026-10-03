@@ -2,8 +2,8 @@ import SwiftUI
 
 /// Browse and download the Tabletop Audio ambience catalogue into the vault.
 struct TabletopBrowser: View {
-    @ObservedObject var catalogue: TabletopCatalogue
-    @ObservedObject var downloader: TrackDownloader
+    var catalogue: TabletopCatalogue
+    var downloader: TrackDownloader
 
     @Environment(\.dismiss) private var dismiss
     @State private var search = ""
@@ -168,7 +168,7 @@ struct TabletopBrowser: View {
 
 private struct TrackRow: View {
     let track: TTATrack
-    @ObservedObject var downloader: TrackDownloader
+    var downloader: TrackDownloader
 
     var body: some View {
         HStack(alignment: .top, spacing: 10) {

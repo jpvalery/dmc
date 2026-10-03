@@ -20,18 +20,31 @@ enum FadeRamp {
             return
         }
 
-        let steps = max(2, Int(duration * 60))
-        let tick = Duration.milliseconds(1000 / 60)
-
-        for i in 1...steps {
-            if Task.isCancelled { return }
-            let t = Float(i) / Float(steps)
+        await glide(duration: duration) { t in
             switch curve {
             case .rising:  node.volume = to * sin(t * .pi / 2)
             case .falling: node.volume = from * cos(t * .pi / 2)
             }
-            try? await Task.sleep(for: tick)
         }
         if !Task.isCancelled { node.volume = to }
+    }
+
+    /// Calls `apply` with progress 0…1 until `duration` has elapsed on the clock.
+    ///
+    /// Progress comes from elapsed time rather than from counting steps. Each `Task.sleep`
+    /// overshoots a little, and counting steps added those overshoots up, so a 1.5 s fade
+    /// really took noticeably longer — and a fade that is meant to overlap another no longer
+    /// lines up with it. A late tick now just takes a bigger step.
+    static func glide(duration: TimeInterval, _ apply: (Float) -> Void) async {
+        let clock = ContinuousClock()
+        let start = clock.now
+        let total = Duration.seconds(duration)
+
+        while !Task.isCancelled {
+            let elapsed = clock.now - start
+            if elapsed >= total { return }
+            apply(Float(elapsed / total))
+            try? await Task.sleep(for: .milliseconds(16))
+        }
     }
 }

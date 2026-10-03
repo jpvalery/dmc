@@ -1,13 +1,15 @@
-import Combine
+import Observation
 import Foundation
 import SwiftUI
 
 @MainActor
-final class WebTab: Identifiable, ObservableObject {
+@Observable final class WebTab: Identifiable {
     let id = UUID()
     let controller: WebController
 
-    init(url: URL) { controller = WebController(home: url) }
+    init(url: URL, loadNow: Bool = true) {
+        controller = WebController(url: url, loadNow: loadNow)
+    }
 
     /// Prefer the page title; fall back to the host so a loading tab still reads sensibly.
     var label: String {
@@ -21,34 +23,38 @@ final class WebTab: Identifiable, ObservableObject {
 }
 
 @MainActor
-final class TabsModel: ObservableObject {
-    @Published private(set) var tabs: [WebTab] = []
-    @Published var selectedID: WebTab.ID?
+@Observable final class TabsModel {
+    private(set) var tabs: [WebTab] = []
+    var selectedID: WebTab.ID?
     /// When set, this tab is shown beside the selected one.
-    @Published var secondaryID: WebTab.ID?
+    var secondaryID: WebTab.ID?
 
     /// Every tab shares `WKWebsiteDataStore.default()`, so one sign-in covers all of them —
     /// including across campaigns, which is what you want: same account, different game.
     init() {
         Vault.bootstrap()
-        tabs = Self.savedURLs().map { makeTab($0) }
-        if tabs.isEmpty { tabs = [makeTab(Home.url())] }
-        selectedID = tabs.first?.id
+        restoreTabs()
     }
 
     private static func savedURLs() -> [URL] {
-        guard let data = try? Data(contentsOf: Vault.tabsFile),
-              let strings = try? JSONDecoder().decode([String].self, from: data)
+        guard case .ok(let strings) = JSONStore.load([String].self, from: Vault.tabsFile)
         else { return [] }
         return strings.compactMap(URL.init(string:))
     }
 
     /// Swap in another campaign's pages. The old tabs' web views go with them.
     func reloadForCampaign() {
-        tabs = Self.savedURLs().map { makeTab($0) }
+        restoreTabs()
+        secondaryID = nil
+    }
+
+    /// Only the first tab loads now. The rest show their remembered address and load when first
+    /// displayed, so a long session's worth of tabs does not all start at launch.
+    private func restoreTabs() {
+        let saved = Self.savedURLs()
+        tabs = saved.enumerated().map { index, url in makeTab(url, loadNow: index == 0) }
         if tabs.isEmpty { tabs = [makeTab(Home.url())] }
         selectedID = tabs.first?.id
-        secondaryID = nil
     }
 
     var selected: WebTab? {
@@ -86,8 +92,8 @@ final class TabsModel: ObservableObject {
 
     /// Every tab is built here so its "open in new tab" hook is wired — including tabs opened
     /// *by* another tab, which is why this is called recursively from inside the closure.
-    private func makeTab(_ url: URL) -> WebTab {
-        let tab = WebTab(url: url)
+    private func makeTab(_ url: URL, loadNow: Bool = true) -> WebTab {
+        let tab = WebTab(url: url, loadNow: loadNow)
         tab.controller.onOpenInNewTab = { [weak self] linkURL, inBackground in
             guard let self else { return }
             let opened = self.makeTab(linkURL)
@@ -136,14 +142,13 @@ final class TabsModel: ObservableObject {
     /// Remember which pages were open, so a relaunch mid-session doesn't lose the DM's place.
     /// Stored per campaign, next to that campaign's scenes.
     func persist() {
-        let urls = tabs.map(\.controller.urlText).filter { !$0.isEmpty }
-        guard let data = try? JSONEncoder().encode(urls) else { return }
-        try? data.write(to: Vault.tabsFile, options: .atomic)
+        let urls = tabs.map(\.controller.persistedURL).filter { !$0.isEmpty }
+        JSONStore.save(urls, to: Vault.tabsFile)
     }
 }
 
 struct TabBar: View {
-    @ObservedObject var model: TabsModel
+    var model: TabsModel
 
     var body: some View {
         HStack(spacing: 0) {
@@ -173,7 +178,7 @@ struct TabBar: View {
 }
 
 private struct TabChip: View {
-    @ObservedObject var tab: WebTab
+    var tab: WebTab
     let isSelected: Bool
     let isSecondary: Bool
     let canClose: Bool

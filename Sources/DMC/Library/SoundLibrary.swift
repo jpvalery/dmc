@@ -1,5 +1,5 @@
 import AVFoundation
-import Combine
+import Observation
 import Foundation
 
 /// One playable file in the vault.
@@ -30,17 +30,20 @@ struct SoundFile: Identifiable, Hashable {
 /// in `library.json` keyed by size and modification date — a rescan of an unchanged library
 /// costs no decoding at all.
 @MainActor
-final class SoundLibrary: ObservableObject {
-    @Published private(set) var files: [SoundFile] = []
-    @Published private(set) var unplayable: [String] = []
-    @Published private(set) var isScanning = false
+@Observable final class SoundLibrary {
+    private(set) var files: [SoundFile] = []
+    private(set) var unplayable: [String] = []
+    private(set) var isScanning = false
+    /// False until the first scan finishes, so nothing is called missing before it has looked.
+    private(set) var hasScanned = false
+    private var knownPaths: Set<String> = []
 
     private struct CacheEntry: Codable {
         let duration: Double
         let size: Int64
         let modified: Double
     }
-    private var cache: [String: CacheEntry] = [:]
+    @ObservationIgnored private var cache: [String: CacheEntry] = [:]
 
     init() {
         Vault.bootstrap()
@@ -66,9 +69,17 @@ final class SoundLibrary: ObservableObject {
         }.value
 
         files = found
+        knownPaths = Set(found.map(\.relativePath))
         unplayable = bad
+        hasScanned = true
         cache = newCache
         saveCache()
+    }
+
+    /// Whether a vault-relative path is absent from the library. Answered from the scan's index,
+    /// so a view can ask it on every redraw without touching the disk.
+    func isMissing(_ relativePath: String) -> Bool {
+        hasScanned && !relativePath.isEmpty && !knownPaths.contains(relativePath)
     }
 
     /// Runs off the main actor: touching hundreds of files and decoding headers.
@@ -140,7 +151,6 @@ final class SoundLibrary: ObservableObject {
     }
 
     private func saveCache() {
-        guard let data = try? JSONEncoder().encode(cache) else { return }
-        try? data.write(to: Vault.libraryFile, options: .atomic)
+        JSONStore.save(cache, to: Vault.libraryFile)
     }
 }

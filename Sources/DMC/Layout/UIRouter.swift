@@ -1,4 +1,4 @@
-import Combine
+import Observation
 import Foundation
 
 /// Sheet routing shared between the menu bar and the views.
@@ -6,7 +6,7 @@ import Foundation
 /// `.commands` is declared on the `App`, outside the view tree, so it cannot reach view-local
 /// `@State`. One small observable keeps a single source of truth for both.
 @MainActor
-final class UIRouter: ObservableObject {
+@Observable final class UIRouter {
     struct EditorTarget: Identifiable {
         let id = UUID()
         var scene: SoundScene
@@ -19,15 +19,16 @@ final class UIRouter: ObservableObject {
         var isNew: Bool
     }
 
-    @Published var editing: EditorTarget?
-    @Published var editingEffect: EffectTarget?
-    @Published var showTabletop = false
-    @Published var showTemplates = false
-    @Published var showPadImport = false
-    @Published var showHotkeys = false
-    @Published var showNewCampaign = false
-    @Published var renaming: Campaign?
-    @Published var deleting: Campaign?
+    var editing: EditorTarget?
+    var editingEffect: EffectTarget?
+    var showTabletop = false
+    var showTemplates = false
+    var showPadImport = false
+    var showHotkeys = false
+    var showNewCampaign = false
+    var showPalette = false
+    var renaming: Campaign?
+    var deleting: Campaign?
 
     func newScene() {
         editing = EditorTarget(scene: SoundScene(name: "New scene", symbol: "waveform"), isNew: true)

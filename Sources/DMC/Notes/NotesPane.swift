@@ -1,11 +1,16 @@
 import SwiftUI
 
 struct NotesPane: View {
-    @ObservedObject var notes: NotesStore
+    var notes: NotesStore
+    var store: SceneStore
+    var effects: EffectStore
+    let onTrigger: (NoteTrigger) -> Void
 
     @State private var renaming: SessionNote?
     @State private var draftTitle = ""
-    @FocusState private var editorFocused: Bool
+    /// Reading mode makes the page uneditable and turns a plain click on a cue into "run it" —
+    /// the way you want the notes while the table is playing, not while you are writing them.
+    @AppStorage("notes.readMode") private var readMode = false
 
     var body: some View {
         VStack(spacing: 0) {
@@ -66,12 +71,56 @@ struct NotesPane: View {
 
             statusLabel
 
+            linkMenu
+
+            Button { readMode.toggle() } label: {
+                Image(systemName: readMode ? "pencil" : "eye")
+            }
+            .buttonStyle(.borderless)
+            .help(readMode ? "Edit the notes" : "Read mode: a click on a cue runs it")
+
             Button { notes.openToday() } label: { Image(systemName: "plus") }
                 .buttonStyle(.borderless)
                 .help("Today's session  ⌘⌥N")
         }
         .padding(.horizontal, 10)
         .frame(height: 32)
+    }
+
+    /// Inserts a cue at the cursor, so a scene can be linked without typing its name out.
+    private var linkMenu: some View {
+        Menu {
+            if !store.scenes.isEmpty {
+                Section("Scene") {
+                    ForEach(store.scenes) { scene in
+                        Button(scene.name, systemImage: scene.symbol) {
+                            notes.insert(NoteTrigger.scene(scene.name).markup)
+                        }
+                    }
+                }
+            }
+            if !effects.effects.isEmpty {
+                Section("Effect") {
+                    ForEach(effects.effects) { effect in
+                        Button(effect.name, systemImage: effect.symbol) {
+                            notes.insert(NoteTrigger.effect(effect.name).markup)
+                        }
+                    }
+                }
+            }
+            Section("Control") {
+                Button("Stop all audio", systemImage: "stop.fill") {
+                    notes.insert(NoteTrigger.stopAll.markup)
+                }
+            }
+        } label: {
+            Image(systemName: "link.badge.plus")
+        }
+        .menuStyle(.borderlessButton)
+        .menuIndicator(.hidden)
+        .fixedSize()
+        .disabled(notes.selected == nil || readMode)
+        .help("Insert a cue that plays a scene or effect when clicked  (⌘-click while editing)")
     }
 
     @ViewBuilder
@@ -104,15 +153,17 @@ struct NotesPane: View {
                 Button("Start today's session") { notes.openToday() }
                 Text("Plain markdown in this campaign's notes folder.")
                     .font(.caption2).foregroundStyle(.tertiary)
+                Text("Write [[scene:Tavern]] to make a cue you can click.")
+                    .font(.caption2).foregroundStyle(.tertiary)
                 Spacer()
             }
             .frame(maxWidth: .infinity)
         } else {
-            TextEditor(text: $notes.text)
-                .font(.system(.body, design: .monospaced))
-                .scrollContentBackground(.hidden)
-                .padding(6)
-                .focused($editorFocused)
+            MarkdownEditor(notes: notes,
+                           readOnly: readMode,
+                           sceneNames: store.scenes.map(\.name),
+                           effectNames: effects.effects.map(\.name),
+                           onTrigger: onTrigger)
         }
     }
 }

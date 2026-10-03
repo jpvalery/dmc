@@ -25,18 +25,14 @@ enum CampaignArchive {
     static var indexFile: URL { Vault.root.appending(path: "campaigns.json") }
 
     static func load() -> CampaignIndex? {
-        guard let data = try? Data(contentsOf: indexFile),
-              let index = try? JSONDecoder().decode(CampaignIndex.self, from: data),
+        guard case .ok(let index) = JSONStore.load(CampaignIndex.self, from: indexFile),
               !index.campaigns.isEmpty
         else { return nil }
         return index
     }
 
     static func save(_ index: CampaignIndex) {
-        let encoder = JSONEncoder()
-        encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
-        guard let data = try? encoder.encode(index) else { return }
-        try? data.write(to: indexFile, options: .atomic)
+        JSONStore.save(index, to: indexFile)
     }
 
     /// Returns the campaign that should be active, creating the first one if needed.
@@ -53,12 +49,20 @@ enum CampaignArchive {
         // Scenes and notes from the flat pre-campaign vault.
         let legacyScenes = Vault.root.appending(path: "scenes.json")
         if fm.fileExists(atPath: legacyScenes.path) {
-            try? fm.moveItem(at: legacyScenes, to: campaign.directory.appending(path: "scenes.json"))
+            do {
+                try fm.moveItem(at: legacyScenes, to: campaign.directory.appending(path: "scenes.json"))
+            } catch {
+                reportIssue("Could not move your existing scenes into the first campaign: \(error.localizedDescription)")
+            }
         }
         let legacyNotes = Vault.root.appending(path: "notes", directoryHint: .isDirectory)
         if fm.fileExists(atPath: legacyNotes.path) {
-            try? fm.moveItem(at: legacyNotes,
-                             to: campaign.directory.appending(path: "notes", directoryHint: .isDirectory))
+            do {
+                try fm.moveItem(at: legacyNotes,
+                                to: campaign.directory.appending(path: "notes", directoryHint: .isDirectory))
+            } catch {
+                reportIssue("Could not move your existing notes into the first campaign: \(error.localizedDescription)")
+            }
         }
 
         // Tabs and hotkeys were app-wide defaults; they belong to that first campaign now.
@@ -79,9 +83,9 @@ enum CampaignArchive {
 }
 
 @MainActor
-final class CampaignStore: ObservableObject {
-    @Published private(set) var campaigns: [Campaign] = []
-    @Published private(set) var activeID: UUID = UUID()
+@Observable final class CampaignStore {
+    private(set) var campaigns: [Campaign] = []
+    private(set) var activeID: UUID = UUID()
 
     /// Flush the outgoing campaign's state before the switch, then reload after it.
     var onWillSwitch: (() -> Void)?
@@ -122,12 +126,23 @@ final class CampaignStore: ObservableObject {
         persist()
     }
 
-    /// Removes a campaign from the index and deletes its folder. The shared audio library is
-    /// untouched — only this campaign's scenes, notes, tabs and hotkeys go.
+    /// Removes a campaign from the index and moves its folder to the Trash. The shared audio
+    /// library is untouched — only this campaign's scenes, notes, tabs and hotkeys go, and they
+    /// can be put back from the Trash.
     func delete(_ id: UUID) {
         guard campaigns.count > 1, let campaign = campaigns.first(where: { $0.id == id }) else { return }
+        // Trash first: if that fails the campaign stays, rather than losing its index entry
+        // while the folder lingers unreachable.
+        if FileManager.default.fileExists(atPath: campaign.directory.path) {
+            do {
+                try FileManager.default.trashItem(at: campaign.directory, resultingItemURL: nil)
+            } catch {
+                Log.persistence.error("trash campaign: \(error.localizedDescription, privacy: .public)")
+                Diagnostics.shared.report("Could not move “\(campaign.name)” to the Trash: \(error.localizedDescription)")
+                return
+            }
+        }
         campaigns.removeAll { $0.id == id }
-        try? FileManager.default.removeItem(at: campaign.directory)
         if activeID == id, let next = campaigns.first {
             persist()
             activate(next.id)

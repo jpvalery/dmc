@@ -1,4 +1,4 @@
-import Combine
+import Observation
 import Foundation
 
 /// One 10-minute ambience from tabletopaudio.com's public catalogue.
@@ -86,11 +86,11 @@ enum TabletopAudio {
 }
 
 @MainActor
-final class TabletopCatalogue: ObservableObject {
+@Observable final class TabletopCatalogue {
 
-    @Published private(set) var tracks: [TTATrack] = []
-    @Published private(set) var isLoading = false
-    @Published private(set) var loadError: String?
+    private(set) var tracks: [TTATrack] = []
+    private(set) var isLoading = false
+    private(set) var loadError: String?
 
     private var cacheFile: URL { Vault.root.appending(path: "tabletop-catalogue.json") }
 

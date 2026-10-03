@@ -2,7 +2,7 @@ import SwiftUI
 
 /// Multi-select over everything in the vault, grouped by folder.
 struct SoundPicker: View {
-    @ObservedObject var library: SoundLibrary
+    var library: SoundLibrary
     /// Optional so the picker still works where no engine is at hand.
     var engine: SceneEngine?
     let onAdd: ([SoundFile]) -> Void

@@ -117,6 +117,173 @@ struct Probe {
         check("end combat keeps armor class and hp",
               end.combatants[0].armorClass == 16 && end.combatants[0].hp == 28)
 
+        // MARK: HP entry — a total, damage, or healing
+        check("HP text: a bare number is a total", HPEntry("23") == .set(23))
+        check("HP text: a minus is damage", HPEntry("-7") == .change(-7))
+        check("HP text: a plus is healing", HPEntry("+5") == .change(5))
+        check("HP text: the Unicode minus works too", HPEntry("−3") == .change(-3))
+        check("HP text: junk is not an entry", HPEntry("abc") == nil && HPEntry("") == nil && HPEntry("-") == nil)
+
+        let hpT = CombatTracker()
+        hpT.clearAll()
+        var events: [String] = []
+        hpT.onEvent = { events.append($0) }
+        hpT.add(name: "Orc", initiative: 10, armorClass: 13, hp: 20, isPlayer: false)
+        let orc = hpT.combatants[0].id
+        func orcNow() -> Combatant { hpT.combatants.first { $0.id == orc }! }
+        check("the HP typed at entry is also the maximum", orcNow().hp == 20 && orcNow().maxHP == 20)
+        hpT.enterHP(orc, "-7")
+        check("−7 is damage", orcNow().hp == 13)
+        hpT.enterHP(orc, "+100")
+        check("healing stops at the maximum", orcNow().hp == 20, "\(orcNow().hp ?? -1)")
+        hpT.enterHP(orc, "11")
+        check("a bare number sets the total", orcNow().hp == 11 && orcNow().isBloodied == false)
+        hpT.enterHP(orc, "10")
+        check("half HP or fewer is bloodied", orcNow().isBloodied)
+        hpT.enterHP(orc, "-50")
+        check("damage cannot go below zero", orcNow().hp == 0 && orcNow().isDown)
+        check("dropping to zero is reported", events.contains("Orc dropped to 0 HP"), events.joined(separator: "|"))
+        hpT.enterHP(orc, "30")
+        check("a bigger total raises the maximum", orcNow().hp == 30 && orcNow().maxHP == 30)
+
+        // MARK: Death saves
+        let pcT = CombatTracker()
+        pcT.clearAll()
+        var pcEvents: [String] = []
+        pcT.onEvent = { pcEvents.append($0) }
+        pcT.add(name: "Kaela", initiative: 14, armorClass: 15, hp: 30, isPlayer: true)
+        let kaela = pcT.combatants[0].id
+        func kaelaNow() -> Combatant { pcT.combatants.first { $0.id == kaela }! }
+        pcT.enterHP(kaela, "-40")
+        check("a player at 0 is down", kaelaNow().isDown)
+        pcT.setDeathSaves(kaela, successes: 2, failures: 1)
+        check("saves are recorded", kaelaNow().deathSuccesses == 2 && kaelaNow().deathFailures == 1)
+        pcT.setDeathSaves(kaela, successes: 2, failures: 9)
+        check("saves cap at three, and three failures is death",
+              kaelaNow().deathFailures == 3 && kaelaNow().isDead && pcEvents.contains("Kaela died"))
+        pcT.setDeathSaves(kaela, successes: 3, failures: 0)
+        check("three successes is stable", kaelaNow().isStable)
+        pcT.enterHP(kaela, "+4")
+        check("healing clears the death saves",
+              kaelaNow().hp == 4 && kaelaNow().deathSuccesses == 0 && kaelaNow().deathFailures == 0)
+
+        // MARK: Conditions count down as their owner's turn ends
+        let cond = CombatTracker()
+        cond.clearAll()
+        var condEvents: [String] = []
+        cond.onEvent = { condEvents.append($0) }
+        cond.add(name: "A", initiative: 15, armorClass: 10, isPlayer: false)
+        cond.add(name: "B", initiative: 10, armorClass: 10, isPlayer: false)
+        let aID = cond.combatants[0].id
+        cond.addCondition(aID, name: "Stunned", rounds: 2)
+        cond.addCondition(aID, name: "Concentrating", rounds: nil)
+        func a() -> Combatant { cond.combatants.first { $0.id == aID }! }
+        check("conditions are added", a().conditions.map(\.name) == ["Stunned", "Concentrating"])
+        cond.addCondition(aID, name: "stunned", rounds: 3)
+        check("re-applying replaces rather than stacks",
+              a().conditions.filter { $0.name.lowercased() == "stunned" }.count == 1
+                  && a().conditions.first { $0.name.lowercased() == "stunned" }?.rounds == 3)
+        cond.addCondition(aID, name: "Stunned", rounds: 2)
+        cond.next()                                    // A's turn begins
+        cond.next()                                    // A ends: 2 -> 1
+        check("a timed condition drops by one when its owner's turn ends",
+              a().conditions.first { $0.name == "Stunned" }?.rounds == 1)
+        cond.next()                                    // B ends, round 2
+        check("other creatures' turns do not tick it",
+              a().conditions.first { $0.name == "Stunned" }?.rounds == 1 && cond.round == 2)
+        cond.next()                                    // A ends again: gone
+        check("it falls off at zero and says so", a().conditions.map(\.name) == ["Concentrating"]
+                  && condEvents.contains("A is no longer stunned"), condEvents.joined(separator: "|"))
+        check("an untimed condition stays", a().conditions.contains { $0.name == "Concentrating" })
+        cond.endCombat()
+        check("conditions end with the fight", cond.combatants.allSatisfy { $0.conditions.isEmpty })
+
+        // MARK: Undo
+        let undoT = CombatTracker()
+        undoT.clearAll()
+        check("clearing the table is itself undoable", undoT.canUndo)
+        undoT.undo()
+        undoT.clearAll()
+        undoT.add(name: "Imp", initiative: 12, armorClass: 13, hp: 10, isPlayer: false)
+        undoT.add(name: "Mira", initiative: 9, armorClass: 16, hp: 28, isPlayer: true)
+        let imp = undoT.combatants[0].id
+        undoT.remove(imp)
+        check("removed", undoT.combatants.map(\.name) == ["Mira"])
+        undoT.undo()
+        check("undo brings back a removed combatant", Set(undoT.combatants.map(\.name)) == ["Imp", "Mira"])
+        undoT.next()
+        undoT.next()
+        undoT.endCombat()
+        check("end combat removed the NPC", undoT.combatants.map(\.name) == ["Mira"] && !undoT.isRunning)
+        undoT.undo()
+        check("undo reverses end combat, round and turn included",
+              undoT.combatants.count == 2 && undoT.isRunning && undoT.current?.name == "Mira",
+              "\(undoT.combatants.count), round \(undoT.round), \(undoT.current?.name ?? "none")")
+        undoT.undo()
+        check("undo reverses a turn", undoT.current?.name == "Imp")
+        undoT.clearAll()
+        undoT.undo()
+        check("undo reverses clearing the table", undoT.combatants.count == 2)
+
+        // MARK: Lair actions
+        let lair = CombatTracker()
+        lair.clearAll()
+        lair.add(name: "Dragon", initiative: 20, armorClass: 19, hp: 200, isPlayer: false)
+        lair.add(name: "Mira", initiative: 20, armorClass: 16, hp: 28, isPlayer: true)
+        lair.addLair()
+        lair.addLair()
+        check("only one lair entry", lair.combatants.filter(\.isLair).count == 1)
+        check("lair actions lose every tie at their initiative",
+              names(lair.order) == "Dragon, Mira, Lair actions", names(lair.order))
+        let lairID = lair.combatants.first { $0.isLair }!.id
+        check("a lair entry is never swapped", !lair.canSwapTie(lairID, direction: -1))
+        check("and no one swaps into it",
+              !lair.canSwapTie(lair.combatants.first { $0.name == "Mira" }!.id, direction: 1))
+        lair.rollNPCInitiative()
+        check("rolling NPCs leaves the lair alone", lair.combatants.first { $0.isLair }?.initiative == 20)
+
+        // MARK: Rolling initiative
+        let roll = CombatTracker()
+        roll.clearAll()
+        roll.add(name: "Bandit", initiative: nil, armorClass: 12, hp: 11, isPlayer: false,
+                 initiativeBonus: 2)
+        roll.add(name: "Rogue", initiative: nil, armorClass: 15, hp: 30, isPlayer: true)
+        check("unrolled NPCs are noticed", roll.hasUnrolledNPCs)
+        roll.rollNPCInitiative()
+        let bandit = roll.combatants.first { $0.name == "Bandit" }!
+        check("an NPC rolls d20 + its bonus", (bandit.initiative ?? 0) >= 3 && (bandit.initiative ?? 99) <= 22,
+              "\(bandit.initiative ?? -1)")
+        check("the party is left to call out its own",
+              roll.combatants.first { $0.name == "Rogue" }?.initiative == nil)
+        check("nothing left to roll", !roll.hasUnrolledNPCs)
+        var seen = Set<Int>()
+        for _ in 0..<200 { seen.insert(CombatTracker.rollD20()) }
+        check("d20 covers 1 through 20 and nothing else", seen.min() == 1 && seen.max() == 20 && seen.count == 20,
+              "\(seen.min() ?? 0)…\(seen.max() ?? 0), \(seen.count) values")
+
+        roll.clearAll()
+        roll.add(name: "Wolf", initiative: 17, armorClass: 13, hp: 11, isPlayer: false, count: 4,
+                 initiativeBonus: 2, groupInitiative: true)
+        check("a group shares one initiative by default", Set(roll.combatants.compactMap(\.initiative)) == [17])
+        roll.clearAll()
+        roll.add(name: "Wolf", initiative: 17, armorClass: 13, hp: 11, isPlayer: false, count: 12,
+                 initiativeBonus: 2, groupInitiative: false)
+        let rolled = roll.combatants.compactMap(\.initiative)
+        check("a group can roll for each member", rolled.count == 12 && rolled.allSatisfy { $0 >= 3 && $0 <= 22 }
+                  && Set(rolled).count > 1, "\(rolled)")
+
+        // MARK: The new fields survive a relaunch
+        let persisted = CombatTracker()
+        persisted.clearAll()
+        persisted.add(name: "Ghoul", initiative: 8, armorClass: 12, hp: 22, isPlayer: false, initiativeBonus: 2)
+        let ghoul = persisted.combatants[0].id
+        persisted.enterHP(ghoul, "-9")
+        persisted.addCondition(ghoul, name: "Poisoned", rounds: 3)
+        let again = CombatTracker().combatants.first { $0.id == ghoul }
+        check("max HP, bonus and conditions persist",
+              again?.hp == 13 && again?.maxHP == 22 && again?.initiativeBonus == 2
+                  && again?.conditions.first?.name == "Poisoned" && again?.conditions.first?.rounds == 3)
+
         // A file from before a field existed still loads.
         let old = #"{"combatants":[{"name":"Old"}],"round":0}"#
         try? old.write(to: Vault.combatFile, atomically: true, encoding: .utf8)

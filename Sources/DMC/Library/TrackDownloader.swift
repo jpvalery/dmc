@@ -1,4 +1,4 @@
-import Combine
+import Observation
 import Foundation
 
 /// Downloads chosen ambiences into the vault, one at a time.
@@ -7,11 +7,11 @@ import Foundation
 /// no reason to open a dozen connections at once. Attribution is written as tracks land, because
 /// the CC BY-NC-ND licence requires it.
 @MainActor
-final class TrackDownloader: ObservableObject {
-    @Published private(set) var pending: [TTATrack] = []
-    @Published private(set) var active: TTATrack?
-    @Published private(set) var completed = 0
-    @Published private(set) var failures: [Int: String] = [:]
+@Observable final class TrackDownloader {
+    private(set) var pending: [TTATrack] = []
+    private(set) var active: TTATrack?
+    private(set) var completed = 0
+    private(set) var failures: [Int: String] = [:]
 
     /// Set by the owner so a finished batch refreshes the local index.
     var onBatchFinished: (() -> Void)?
@@ -100,6 +100,12 @@ final class TrackDownloader: ObservableObject {
         let line = "- \(track.title) (#\(track.key)) — \(track.link)\n"
         guard !text.contains(line) else { return }
         text += line
-        try? text.write(to: file, atomically: true, encoding: .utf8)
+        do {
+            try text.write(to: file, atomically: true, encoding: .utf8)
+        } catch {
+            // The credit is a licence condition, so a failure to record it is worth saying.
+            Log.persistence.error("attribution: \(error.localizedDescription, privacy: .public)")
+            Diagnostics.shared.report("Could not record credit for “\(track.title)” in ATTRIBUTION.md: \(error.localizedDescription)")
+        }
     }
 }

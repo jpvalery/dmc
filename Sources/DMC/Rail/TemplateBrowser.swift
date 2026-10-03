@@ -1,13 +1,13 @@
-import Combine
+import Observation
 import SwiftUI
 
 /// Fetches the audio a template needs, one file at a time.
 @MainActor
-final class TemplateFetcher: ObservableObject {
-    @Published private(set) var active: String?
-    @Published private(set) var done = 0
-    @Published private(set) var total = 0
-    @Published private(set) var failures: [String] = []
+@Observable final class TemplateFetcher {
+    private(set) var active: String?
+    private(set) var done = 0
+    private(set) var total = 0
+    private(set) var failures: [String] = []
 
     var isBusy: Bool { active != nil }
 
@@ -51,15 +51,15 @@ final class TemplateFetcher: ObservableObject {
 }
 
 struct TemplateBrowser: View {
-    @ObservedObject var library: TemplateLibrary
-    @ObservedObject var store: SceneStore
-    @ObservedObject var effects: EffectStore
+    var library: TemplateLibrary
+    var store: SceneStore
+    var effects: EffectStore
     let onAdded: () -> Void
 
     private enum Kind: String, CaseIterable { case scenes = "Scenes", effects = "Effects" }
     @State private var kind: Kind = .scenes
 
-    @StateObject private var fetcher = TemplateFetcher()
+    @State private var fetcher = TemplateFetcher()
     @State private var search = ""
     @State private var justAdded: Set<String> = []
 

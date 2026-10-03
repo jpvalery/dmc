@@ -63,9 +63,9 @@ enum PadSpec {
 }
 
 struct PadMapper: View {
-    @ObservedObject var hotkeys: HotkeyManager
-    @ObservedObject var store: SceneStore
-    @ObservedObject var effects: EffectStore
+    var hotkeys: HotkeyManager
+    var store: SceneStore
+    var effects: EffectStore
 
     @State private var selectedSlot: Int?
     @State private var dropSlot: Int?
@@ -229,6 +229,15 @@ struct PadMapper: View {
         }
         .buttonStyle(.plain)
         .disabled(dead)
+        .overlay(alignment: .topTrailing) {
+            if let slot = key.slot, hotkeys.failedSlots[slot] != nil {
+                Image(systemName: "exclamationmark.triangle.fill")
+                    .font(.system(size: 11))
+                    .foregroundStyle(.orange)
+                    .padding(6)
+                    .help("macOS wouldn't let DMC claim this key — another app is probably using it")
+            }
+        }
         .modifier(SlotDropTarget(slot: key.slot, hovered: $dropSlot, assign: assign))
         .help(dead ? "\(key.via) — remap it in VIA to F20 to reach DMC"
                    : "\(key.via) — click to bind, or drop something here")
@@ -249,6 +258,12 @@ struct PadMapper: View {
                     Spacer()
                     Button("Clear") { hotkeys.setBinding(.none, for: padSlot) }
                         .disabled(hotkeys.binding(for: padSlot) == .none)
+                }
+                if hotkeys.failedSlots[slot] != nil {
+                    Label("macOS wouldn't let DMC claim this key — another app is probably using it.",
+                          systemImage: "exclamationmark.triangle.fill")
+                        .font(.caption)
+                        .foregroundStyle(.orange)
                 }
                 ActionPicker(selection: Binding(
                     get: { hotkeys.binding(for: padSlot) },
@@ -460,8 +475,8 @@ struct PadMapper: View {
 /// The action menu, used by the assignment panel.
 struct ActionPicker: View {
     @Binding var selection: HotkeyAction
-    @ObservedObject var store: SceneStore
-    @ObservedObject var effects: EffectStore
+    var store: SceneStore
+    var effects: EffectStore
 
     var body: some View {
         Picker("", selection: $selection) {

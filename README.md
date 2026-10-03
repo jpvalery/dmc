@@ -42,6 +42,8 @@ Both side panes collapse. The rail keeps its icons when collapsed so scenes stay
 | `⌘⇧H` | Campaigns home |
 | `⌘⌥1` / `⌘⌥2` | Collapse rail / hide notes |
 | `⌘N` | New scene |
+| `⌘K` | Command palette: scenes, effects, notes, campaigns, combatants, commands |
+| `⌘⌥Z` | Undo the last combat change (tracker only) |
 | `⌘⇧L` | Browse Tabletop Audio |
 
 `⌘\` is deliberately left unbound so 1Password's Universal Autofill reaches the focused field.
@@ -64,6 +66,17 @@ Everything lives in `~/DMConsole` (overridable with the `vault.path` user defaul
 Saving a scene creates `scenes.json`, which switches off the folder-per-scene convention.
 **Import Folders as Scenes** brings it back on demand.
 
+### If a file is damaged
+
+A `scenes.json`, `effects.json` or other file that won't read is **copied aside** as
+`scenes.corrupt-<time>.json` before anything else happens, and left where it is — an ordinary edit
+afterwards can no longer overwrite the only copy. One malformed scene or effect is skipped rather
+than taking the rest with it. The rail shows what happened; dismiss it once read.
+
+Good saves of scenes and effects also leave rolling snapshots in the campaign's `backups/` folder
+(at most one per ten minutes, the newest thirty kept), so a scene deleted by mistake is a file
+copy away. Deleting a note or a campaign moves it to the Trash.
+
 ## Audio
 
 Each scene is a set of layers mixed through one `AVAudioEngine`. Files under 60s loop from an
@@ -72,6 +85,22 @@ are equal-power, so layering doesn't dip through the transition. The engine rebu
 `AVAudioEngineConfigurationChange`, so switching output devices or waking from sleep recovers.
 
 The scene editor auditions while you edit: moving a gain slider retunes the live mix.
+
+Starting a scene returns at once: its loops are decoded on a background thread (and kept in a
+shared cache, so a layer two scenes have in common is decoded once), and the crossfade begins when
+they're ready — the outgoing scene keeps playing until then. The scenes either side of the one
+playing are decoded ahead of time. A random start offset plays the rest of the file once and then
+loops the whole of it, with no second copy of the audio. Fades are timed against the clock.
+
+**Ducking:** an effect can lower the scene's ambience while it sounds (edit the effect:
+*Lower the scene while this plays*), then ease it back. Scene layers play through their own
+submixer, so the effect itself and the master volume are untouched.
+
+**The knob:** *Next / Previous scene* only moves a dashed **cue** in the rail; the scene that is
+cued when the knob stops turning is the one that plays. Spinning past five scenes starts one.
+
+The audio engine stays warm for 45 seconds after the last sound, so the next effect doesn't wait
+for the output device to wake, then stops so the app isn't holding it all evening.
 
 ## Tabletop Audio
 
@@ -91,8 +120,10 @@ slot levels and loop flags come across, and each slot is then bound to a file yo
 tracker. The web pages stay loaded in their tabs, so closing the tracker returns to D&D Beyond
 exactly where it was left.
 
+It is meant for tables that run combat on paper or in their heads rather than in a VTT.
+
 One table, with the same columns from the heading down to the row where new combatants are
-entered: type (person or paw), name, HP, AC, initiative. The list sorts itself by initiative; ties
+entered: type (person or paw), name, HP, AC, Mod (initiative bonus), initiative. The list sorts itself by initiative; ties
 keep the order they were added in, and right-click → **Act Earlier / Later** breaks one by hand.
 A name, AC and initiative are required to add someone (HP is optional); trying without them
 outlines what's missing. A row whose initiative is cleared — as every player's is after End Combat
@@ -104,11 +135,42 @@ a new round when the order wraps. Removing whoever is up passes the turn on rath
 anyone. The `×N` stepper adds a numbered group ("Goblin 1–4") sharing one initiative, AC and
 starting HP; each row's HP then moves on its own.
 
+**HP** takes a total (`23`) or just the change: `-7` for damage, `+5` for healing, which stops at
+the maximum. The first number typed is the maximum, shown beside it (`13/20`); HP turns orange at
+half and red at zero. A player at 0 gets death-save pips (three successes is *stable*, three
+failures *dead*); healing clears them.
+
+**Conditions:** the tag button adds Stunned, Concentrating and the rest, optionally *ending after N
+turns*. A timed condition counts down as its owner's turn ends and drops off at zero.
+
+**Initiative:** the dice button rolls d20 + the Mod; **⋯ → Roll Initiative for NPCs** rolls every NPC
+who hasn't, leaving the party to call out its own. A group (`×N`) shares one initiative by default;
+toggle the group icon for each member to roll its own. **⋯ → Add Lair Actions** adds an entry on
+initiative 20 that loses every tie.
+
+The magnifier next to the name looks a monster up on [Open5e](https://open5e.com) (the SRD first)
+and fills in its name, HP, AC and initiative bonus. Needs a connection; typing the numbers works
+without one. **Undo** (header button, or `⌘⌥Z`) steps back through removals, End Combat, clearing,
+HP edits and turns.
+
 The person/paw toggle marks a row as a player character or an NPC. Player characters survive
 **End Combat** (the red button), which removes the NPCs and clears the party's initiative for the
 next fight; their HP and AC are kept. The trash icon clears everyone, and asks for a second
 click — it turns into **Confirm clearing** for a few seconds. State is saved per campaign in
 `combat.json`, so a relaunch mid-fight comes back to the same turn.
+
+## Notes
+
+Plain markdown, one file per session, lightly styled as you type (headings, **bold**, `code`,
+tasks). Write `[[scene:Tavern]]`, `[[effect:Door slam]]` or `[[stop]]` to make a **cue**: `⌘`-click
+it while editing, or switch to reading mode (the eye button) where a plain click runs it — so the
+prep for a session doubles as its run sheet. The link button inserts one for you. A cue naming
+nothing in this campaign is drawn red; a partial name works if it is unambiguous.
+
+Scene starts and combat moments (combat started, each new round, someone dropping to 0 HP, a
+condition ending) are appended under a `## Log` heading in today's session note as
+`- 20:14 Scene: Tavern`, giving you the recap for free. **View → Log Scenes and Combat to Session
+Notes** turns it off.
 
 ## Macropad
 
@@ -117,7 +179,8 @@ need no Accessibility permission. F13–F20 are the highest keys macOS has virtu
 reach is extended with modifier banks: bare, Shift, Control and Option — 32 slots.
 
 **Macropad & Hotkeys…** shows the VIA code for each slot and copies the whole mapping to the
-clipboard. In VIA, set each key to **Any** and paste the code.
+clipboard. In VIA, set each key to **Any** and paste the code. A key macOS won't let DMC claim —
+another app is using it — is marked with a warning there and noted in the rail.
 
 ## Licensing
 

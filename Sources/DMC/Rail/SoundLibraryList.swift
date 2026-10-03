@@ -5,8 +5,8 @@ import SwiftUI
 /// Shared by the scene editor and anywhere else that needs to pick sounds: rows drag out as
 /// vault-relative paths, and each can be auditioned in place rather than guessing from a filename.
 struct SoundLibraryList: View {
-    @ObservedObject var library: SoundLibrary
-    @ObservedObject var engine: SceneEngine
+    var library: SoundLibrary
+    var engine: SceneEngine
     var onPick: ((SoundFile) -> Void)?
 
     @State private var search = ""

@@ -1,4 +1,4 @@
-import Combine
+import Observation
 import Foundation
 
 /// A one-shot overlay: a door slam, a thunderclap, a scream.
@@ -14,6 +14,9 @@ struct SoundEffect: Codable, Identifiable, Hashable {
     var gain: Double = 0.9
     /// Alternate takes chosen at random per firing, so three knocks aren't three identical ones.
     var variants: [String] = []
+    /// How far to pull the scene bed down while this sounds, as a fraction: 0 leaves it alone,
+    /// 0.5 is about −6 dB. A thunderclap should not have to shout over the rain.
+    var duck: Double = 0
 
     var url: URL { Vault.audio.appending(path: file) }
     var isMissing: Bool { !FileManager.default.fileExists(atPath: url.path) }
@@ -35,36 +38,37 @@ struct SoundEffect: Codable, Identifiable, Hashable {
         file = try c.decodeIfPresent(String.self, forKey: .file) ?? ""
         gain = try c.decodeIfPresent(Double.self, forKey: .gain) ?? 0.9
         variants = try c.decodeIfPresent([String].self, forKey: .variants) ?? []
+        duck = try c.decodeIfPresent(Double.self, forKey: .duck) ?? 0
     }
 
     init(name: String, symbol: String = "bell", file: String, gain: Double = 0.9,
-         variants: [String] = []) {
+         variants: [String] = [], duck: Double = 0) {
         self.name = name
         self.symbol = symbol
         self.file = file
         self.gain = gain
         self.variants = variants
+        self.duck = duck
     }
 }
 
 enum EffectLibrary {
     static func load() -> [SoundEffect] {
-        guard let data = try? Data(contentsOf: Vault.effectsFile),
-              let effects = try? JSONDecoder().decode([SoundEffect].self, from: data)
-        else { return [] }
-        return effects
+        switch JSONStore.loadLossy(SoundEffect.self, from: Vault.effectsFile) {
+        case .missing: return []
+        case .ok(let effects): return effects
+        case .damaged(let recovered, _, _): return recovered ?? []
+        }
     }
 
     static func save(_ effects: [SoundEffect]) {
-        let encoder = JSONEncoder()
-        encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
-        try? encoder.encode(effects).write(to: Vault.effectsFile, options: .atomic)
+        JSONStore.save(effects, to: Vault.effectsFile, snapshots: true)
     }
 }
 
 @MainActor
-final class EffectStore: ObservableObject {
-    @Published private(set) var effects: [SoundEffect] = []
+@Observable final class EffectStore {
+    private(set) var effects: [SoundEffect] = []
 
     init() {
         Vault.bootstrap()

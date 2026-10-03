@@ -3,8 +3,8 @@ import SwiftUI
 struct SceneEditor: View {
     @State var scene: SoundScene
     let isNew: Bool
-    @ObservedObject var library: SoundLibrary
-    @ObservedObject var engine: SceneEngine
+    var library: SoundLibrary
+    var engine: SceneEngine
     let onSave: (SoundScene) -> Void
     let onDelete: () -> Void
 
@@ -173,7 +173,7 @@ struct SceneEditor: View {
 
 private struct LayerRow: View {
     @Binding var layer: AudioLayer
-    @ObservedObject var engine: SceneEngine
+    var engine: SceneEngine
     let isAuditioning: Bool
     let onBind: () -> Void
     let onRemove: () -> Void

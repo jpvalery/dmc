@@ -1,6 +1,6 @@
 import AppKit
 import Carbon.HIToolbox
-import Combine
+import Observation
 import Foundation
 
 enum HotkeyAction: Codable, Hashable {
@@ -68,19 +68,23 @@ struct HotkeySlot: Identifiable, Hashable {
 /// permission, and because it works while D&D Beyond has focus — which is the whole point of a
 /// macropad on the table.
 @MainActor
-final class HotkeyManager: ObservableObject {
-    @Published var bindings: [Int: HotkeyAction] = [:] {
+@Observable final class HotkeyManager {
+    var bindings: [Int: HotkeyAction] = [:] {
         didSet { persist(); register() }
     }
 
+    /// Slots macOS refused to register, with the status it gave. Almost always another app (or
+    /// the system) already owns that key.
+    private(set) var failedSlots: [Int: OSStatus] = [:]
+
     /// Dispatched on the main actor when a bound key fires.
-    var onAction: ((HotkeyAction) -> Void)?
+    @ObservationIgnored var onAction: ((HotkeyAction) -> Void)?
 
-    private static let signature = OSType(0x444D4321)  // 'DMC!'
-    private static weak var current: HotkeyManager?
+    @ObservationIgnored private static let signature = OSType(0x444D4321)  // 'DMC!'
+    @ObservationIgnored private static weak var current: HotkeyManager?
 
-    private var refs: [EventHotKeyRef] = []
-    private var handler: EventHandlerRef?
+    @ObservationIgnored private var refs: [EventHotKeyRef] = []
+    @ObservationIgnored private var handler: EventHandlerRef?
 
     init() {
         Vault.bootstrap()
@@ -91,8 +95,7 @@ final class HotkeyManager: ObservableObject {
 
     /// Bindings name scene ids, so they belong to the campaign those scenes live in.
     private static func saved() -> [Int: HotkeyAction]? {
-        guard let data = try? Data(contentsOf: Vault.hotkeysFile),
-              let decoded = try? JSONDecoder().decode([Int: HotkeyAction].self, from: data),
+        guard case .ok(let decoded) = JSONStore.load([Int: HotkeyAction].self, from: Vault.hotkeysFile),
               !decoded.isEmpty
         else { return nil }
         return decoded
@@ -152,6 +155,7 @@ final class HotkeyManager: ObservableObject {
         unregisterAll()
         installHandler()
 
+        var failures: [Int: OSStatus] = [:]
         for slot in HotkeySlot.all {
             let action = bindings[slot.index] ?? .none
             guard action != .none else { continue }
@@ -159,7 +163,22 @@ final class HotkeyManager: ObservableObject {
             let id = EventHotKeyID(signature: Self.signature, id: UInt32(slot.index))
             let status = RegisterEventHotKey(UInt32(slot.keyCode), slot.carbonModifiers, id,
                                              GetApplicationEventTarget(), 0, &ref)
-            if status == noErr, let ref { refs.append(ref) }
+            if status == noErr, let ref {
+                refs.append(ref)
+            } else {
+                failures[slot.index] = status
+                Log.hotkeys.error("could not register \(slot.label, privacy: .public): OSStatus \(status)")
+            }
+        }
+        failedSlots = failures
+
+        let prefix = "Macropad:"
+        if failures.isEmpty {
+            Diagnostics.shared.clear(matching: prefix)
+        } else {
+            let keys = failures.keys.sorted().map { HotkeySlot.all[$0].label }.joined(separator: ", ")
+            Diagnostics.shared.report("\(prefix) \(keys) couldn't be claimed — another app may be using "
+                                      + (failures.count == 1 ? "it." : "them."))
         }
     }
 
@@ -192,7 +211,6 @@ final class HotkeyManager: ObservableObject {
     }
 
     private func persist() {
-        guard let data = try? JSONEncoder().encode(bindings) else { return }
-        try? data.write(to: Vault.hotkeysFile, options: .atomic)
+        JSONStore.save(bindings, to: Vault.hotkeysFile)
     }
 }

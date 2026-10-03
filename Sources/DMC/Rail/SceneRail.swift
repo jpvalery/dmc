@@ -1,12 +1,14 @@
 import SwiftUI
 
 struct SceneRail: View {
-    @ObservedObject var engine: SceneEngine
-    @ObservedObject var store: SceneStore
+    @Bindable var engine: SceneEngine
+    var store: SceneStore
     let collapsed: Bool
-    @ObservedObject var campaigns: CampaignStore
-    @ObservedObject var router: UIRouter
-    @ObservedObject var effects: EffectStore
+    var campaigns: CampaignStore
+    var router: UIRouter
+    var effects: EffectStore
+    var library: SoundLibrary
+    var cue: SceneCue
     let onNew: () -> Void
     let onEdit: (SoundScene) -> Void
     let onNewEffect: () -> Void
@@ -99,6 +101,8 @@ struct SceneRail: View {
     private func effectRow(_ effect: SoundEffect) -> some View {
         let sounding = engine.isSounding(effect.id)
         let copies = engine.soundingEffects[effect.id] ?? 0
+        // From the library's index, not the disk: this runs on every redraw of the rail.
+        let missing = library.isMissing(effect.file)
 
         // Not a Button: the row needs its own stop button inside it, and SwiftUI will not nest
         // one button in another. A tap gesture on the fire area does the same job.
@@ -121,7 +125,7 @@ struct SceneRail: View {
                             .clipShape(Capsule())
                     }
                     Spacer(minLength: 0)
-                    if effect.isMissing {
+                    if missing {
                         Image(systemName: "exclamationmark.triangle.fill")
                             .font(.caption2).foregroundStyle(.orange)
                     }
@@ -158,7 +162,7 @@ struct SceneRail: View {
                      : (firedEffect == effect.id ? Color.accentColor.opacity(0.35) : Color.clear)
         )
         .clipShape(RoundedRectangle(cornerRadius: 6))
-        .opacity(effect.isMissing ? 0.5 : 1)
+        .opacity(missing ? 0.5 : 1)
         .help(sounding ? "\(effect.name) — playing, click to stop" : effect.name)
         .overlay(alignment: .top) { insertionLine(visible: effectDropTarget == effect.id) }
         .draggable(effect.id.uuidString) {
@@ -288,6 +292,13 @@ struct SceneRail: View {
             .foregroundStyle(isActive ? Color.accentColor : Color.primary)
             .background(isActive ? Color.accentColor.opacity(0.18) : .clear)
             .clipShape(RoundedRectangle(cornerRadius: 6))
+            // The scene a turning knob is pointing at: it will play when the knob settles.
+            .overlay {
+                if cue.cuedID == scene.id {
+                    RoundedRectangle(cornerRadius: 6)
+                        .strokeBorder(Color.accentColor, style: StrokeStyle(lineWidth: 1.5, dash: [4, 3]))
+                }
+            }
         }
         .buttonStyle(.plain)
         .help("\(scene.name) — \(scene.layers.count) sound\(scene.layers.count == 1 ? "" : "s")\(shortcut)")
@@ -332,27 +343,45 @@ struct SceneRail: View {
     }
 
     private var problemsSection: some View {
-        let messages = engine.problems + store.unplayable.map {
+        let playback = engine.problems + store.unplayable.map {
             "\($0) — can't be decoded by macOS; convert to .m4a, .flac or .wav."
         }
+        let issues = Diagnostics.shared.issues
         return Group {
-            if !messages.isEmpty {
+            if !playback.isEmpty || !issues.isEmpty {
                 Divider()
                 ScrollView {
                     VStack(alignment: .leading, spacing: 4) {
-                        ForEach(messages, id: \.self) { message in
-                            HStack(alignment: .top, spacing: 4) {
-                                Image(systemName: "exclamationmark.triangle.fill")
-                                    .font(.system(size: 9))
-                                    .foregroundStyle(.orange)
-                                Text(message).font(.caption2).foregroundStyle(.secondary)
-                            }
+                        ForEach(playback, id: \.self) { message in
+                            problemRow(message, dismiss: nil)
+                        }
+                        // Things that failed behind the scenes — a save, a damaged file — can
+                        // be dismissed once read.
+                        ForEach(issues, id: \.self) { message in
+                            problemRow(message) { Diagnostics.shared.dismiss(message) }
                         }
                     }
                     .padding(8)
                     .frame(maxWidth: .infinity, alignment: .leading)
                 }
-                .frame(maxHeight: 110)
+                .frame(maxHeight: 130)
+            }
+        }
+    }
+
+    private func problemRow(_ message: String, dismiss: (() -> Void)?) -> some View {
+        HStack(alignment: .top, spacing: 4) {
+            Image(systemName: "exclamationmark.triangle.fill")
+                .font(.system(size: 9))
+                .foregroundStyle(.orange)
+            Text(message).font(.caption2).foregroundStyle(.secondary)
+                .textSelection(.enabled)
+            if let dismiss {
+                Spacer(minLength: 0)
+                Button(action: dismiss) { Image(systemName: "xmark").font(.system(size: 8)) }
+                    .buttonStyle(.plain)
+                    .foregroundStyle(.tertiary)
+                    .help("Dismiss")
             }
         }
     }

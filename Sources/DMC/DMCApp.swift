@@ -3,21 +3,25 @@ import SwiftUI
 
 @main
 struct DMCApp: App {
-    @StateObject private var tabs = TabsModel()
-    @StateObject private var engine = SceneEngine()
-    @StateObject private var store = SceneStore()
-    @StateObject private var router = UIRouter()
-    @StateObject private var campaigns = CampaignStore()
-    @StateObject private var notes = NotesStore()
-    @StateObject private var hotkeys = HotkeyManager()
-    @StateObject private var effects = EffectStore()
-    @StateObject private var library = SoundLibrary()
-    @StateObject private var templates = TemplateLibrary()
-    @StateObject private var combat = CombatTracker()
+    @State private var tabs = TabsModel()
+    @State private var engine = SceneEngine()
+    @State private var store = SceneStore()
+    @State private var router = UIRouter()
+    @State private var campaigns = CampaignStore()
+    @State private var notes = NotesStore()
+    @State private var hotkeys = HotkeyManager()
+    @State private var effects = EffectStore()
+    @State private var library = SoundLibrary()
+    @State private var templates = TemplateLibrary()
+    @State private var combat = CombatTracker()
+    @State private var cue = SceneCue()
+    @State private var catalogue = TabletopCatalogue()
+    @State private var downloader = TrackDownloader()
 
     @AppStorage("pane.railCollapsed") private var railCollapsed = false
     @AppStorage("pane.notesHidden") private var notesHidden = false
     @AppStorage("pane.combatShown") private var combatShown = false
+    @AppStorage("log.enabled") private var logEnabled = true
 
     private var web: WebController? { tabs.selected?.controller }
 
@@ -34,6 +38,9 @@ struct DMCApp: App {
                      library: library,
                      templates: templates,
                      combat: combat,
+                     cue: cue,
+                     catalogue: catalogue,
+                     downloader: downloader,
                      railCollapsed: $railCollapsed,
                      notesHidden: $notesHidden,
                      combatShown: $combatShown)
@@ -81,6 +88,12 @@ struct DMCApp: App {
             // ⌘\ is deliberately left unbound so 1Password's Universal Autofill hotkey reaches
             // the focused field instead of being swallowed by the app.
             CommandGroup(after: .sidebar) {
+                // ⌘K reaches everything else; ⌘\ stays free for 1Password.
+                Button("Command Palette…") { router.showPalette.toggle() }
+                    .keyboardShortcut("k", modifiers: .command)
+
+                Divider()
+
                 Button(railCollapsed ? "Expand Scene Rail" : "Collapse Scene Rail") {
                     railCollapsed.toggle()
                 }
@@ -101,6 +114,10 @@ struct DMCApp: App {
                 Button("Previous Turn") { combat.previous() }
                     .keyboardShortcut(.return, modifiers: [.command, .shift])
                     .disabled(!combatShown || !combat.isRunning)
+                // Not ⌘Z, which belongs to whichever text field has focus.
+                Button("Undo Combat Change") { combat.undo() }
+                    .keyboardShortcut("z", modifiers: [.command, .option])
+                    .disabled(!combatShown || !combat.canUndo)
 
                 Divider()
 
@@ -146,6 +163,7 @@ struct DMCApp: App {
                 }
                 Button("Import Folders as Scenes") { store.importFolders() }
                 Button("Reload Scenes") { store.reload() }
+                Toggle("Log Scenes and Combat to Session Notes", isOn: $logEnabled)
                 Button("Save Notes") { notes.saveNow() }
                     .keyboardShortcut("s", modifiers: .command)
                 Button("Reveal Notes Folder") { Vault.reveal(Vault.notes) }

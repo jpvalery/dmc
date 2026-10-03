@@ -13,36 +13,88 @@ let audioDir = Vault.audio
 let shortA = audioDir.appending(path: "short_a.wav")
 let longFile = audioDir.appending(path: "long.wav")
 
-// ---------------------------------------------------------------- 1. buffer rotation
-// A wrong memcpy here would either crash or silently corrupt every short loop.
+// Two sines that do not share a period with the file, so a loop that starts at the wrong place
+// cannot pass by accident. Written once into the scratch vault.
+func writeTone(_ url: URL, seconds: Double, frequency: Double) throws {
+    let rate = 48000.0
+    let settings: [String: Any] = [
+        AVFormatIDKey: kAudioFormatLinearPCM, AVSampleRateKey: rate, AVNumberOfChannelsKey: 2,
+        AVLinearPCMBitDepthKey: 16, AVLinearPCMIsFloatKey: false,
+    ]
+    let out = try AVAudioFile(forWriting: url, settings: settings)
+    let frames = AVAudioFrameCount(seconds * rate)
+    let buffer = AVAudioPCMBuffer(pcmFormat: out.processingFormat, frameCapacity: frames)!
+    buffer.frameLength = frames
+    for ch in 0..<2 {
+        let data = buffer.floatChannelData![ch]
+        for i in 0..<Int(frames) {
+            let t = Double(i) / rate
+            data[i] = Float(0.5 * sin(2 * .pi * frequency * t) + 0.2 * sin(2 * .pi * 331 * t))
+        }
+    }
+    try out.write(from: buffer)
+}
+try FileManager.default.createDirectory(at: audioDir, withIntermediateDirectories: true)
+if !FileManager.default.fileExists(atPath: shortA.path) { try writeTone(shortA, seconds: 3, frequency: 220) }
+if !FileManager.default.fileExists(atPath: longFile.path) { try writeTone(longFile, seconds: 70, frequency: 110) }
+
+// ------------------------------------------- 1. random start: lead-in, then the loop
+// A random start used to rotate the buffer. Now the tail from the offset is queued to play once
+// and the whole buffer is queued behind it to loop. What comes out must be the file, read from
+// the offset and wrapping — sample for sample, across the join and across the wrap.
 do {
     let file = try AVAudioFile(forReading: shortA)
     let fmt = file.processingFormat
     let full = AVAudioPCMBuffer(pcmFormat: fmt, frameCapacity: AVAudioFrameCount(file.length))!
     try file.read(into: full)
+    let n = Int(full.frameLength)
+    let offset = 12345
 
-    let offset: AVAudioFrameCount = 12345
-    // Mirror LayerPlayer.rotate exactly.
-    let n = full.frameLength
-    let out = AVAudioPCMBuffer(pcmFormat: fmt, frameCapacity: n)!
-    let src = full.floatChannelData!, dst = out.floatChannelData!
-    let tail = Int(n - offset), head = Int(offset), size = MemoryLayout<Float>.size
-    for ch in 0..<Int(fmt.channelCount) {
-        memcpy(dst[ch], src[ch] + head, tail * size)
-        memcpy(dst[ch] + tail, src[ch], head * size)
+    let lead = LayerPlayer.slice(full, from: AVAudioFrameCount(offset))
+    check("slice has the tail's length", lead.map { Int($0.frameLength) } == n - offset)
+    check("slice starts at the offset",
+          lead.map { $0.floatChannelData![0][0] == full.floatChannelData![0][offset] } ?? false)
+    check("slice ends where the file ends",
+          lead.map { $0.floatChannelData![0][n - offset - 1] == full.floatChannelData![0][n - 1] } ?? false)
+
+    let engine = AVAudioEngine()
+    let node = AVAudioPlayerNode()
+    engine.attach(node)
+    engine.connect(node, to: engine.mainMixerNode, format: fmt)
+    let renderFormat = AVAudioFormat(standardFormatWithSampleRate: fmt.sampleRate, channels: 2)!
+    try engine.enableManualRenderingMode(.offline, format: renderFormat, maximumFrameCount: 4096)
+
+    node.scheduleBuffer(lead!, at: nil, options: [], completionHandler: nil)
+    node.scheduleBuffer(full, at: nil, options: .loops, completionHandler: nil)
+    node.volume = 1
+    try engine.start()
+    node.play()
+
+    // Two and a bit passes: through the lead-in, over the join, and across the wrap.
+    let total = n * 2 + 5000
+    var out: [Float] = []
+    out.reserveCapacity(total)
+    let scratch = AVAudioPCMBuffer(pcmFormat: renderFormat, frameCapacity: 4096)!
+    while out.count < total {
+        let status = try engine.renderOffline(AVAudioFrameCount(min(4096, total - out.count)), to: scratch)
+        guard status == .success else { break }
+        let ch = scratch.floatChannelData![0]
+        out.append(contentsOf: UnsafeBufferPointer(start: ch, count: Int(scratch.frameLength)))
     }
-    out.frameLength = n
+    engine.stop()
 
-    check("rotation preserves length", out.frameLength == full.frameLength)
-    let a = dst[0][0] == src[0][head]
-    let b = dst[0][tail] == src[0][0]
-    let c = dst[0][tail - 1] == src[0][Int(n) - 1]
-    check("rotation seams line up", a && b && c,
-          "start=\(a) wrap=\(b) end=\(c)")
-    var maxJump: Float = 0
-    for i in 1..<Int(n) { maxJump = max(maxJump, abs(dst[0][i] - dst[0][i-1])) }
-    // One discontinuity at the wrap is inherent to any loop; assert it is not garbage-level.
-    check("rotated audio has no garbage samples", maxJump < 1.2, "max sample jump \(maxJump)")
+    // The player may start a render block or two late; align on the first non-silent sample.
+    let start = out.firstIndex { abs($0) > 1e-4 } ?? 0
+    let source = full.floatChannelData![0]
+    var wrong = 0
+    var checked = 0
+    for k in 0..<(total - start - 2048) {
+        let expected = source[(offset + k) % n]
+        if abs(out[start + k] - expected) > 2e-3 { wrong += 1 }
+        checked += 1
+    }
+    check("lead-in + loop reproduces the file from the offset, wrapping gaplessly", wrong == 0 && checked > n,
+          "\(wrong) of \(checked) samples differ")
 }
 
 // ------------------------------------------------- 2. streaming looper wraps past EOF
@@ -170,6 +222,91 @@ do {
     }
     engine.stop()
     check("60 attach/play/detach cycles under render", survived == 60, "\(survived)/60")
+}
+
+// -------------------------------------------------- 6. the buffer cache
+do {
+    let cache = BufferCache()
+    let first = try await cache.buffer(for: shortA)
+    let second = try await cache.buffer(for: shortA)
+    check("a short loop is decoded", first != nil && first!.frameLength > 0)
+    check("the second request is the cached buffer", first != nil && first === second)
+
+    let direct = try BufferCache.decode(shortA)
+    check("synchronous decode matches", direct?.frameLength == first?.frameLength)
+
+    let longLength = try AVAudioFile(forReading: longFile).length
+    let seconds = Double(longLength) / 48000
+    let long = try await cache.buffer(for: longFile)
+    check("a file over the limit is left to stream", seconds > BufferCache.inMemoryLimitSeconds && long == nil,
+          String(format: "%.0f s", seconds))
+
+    // Concurrent requests for one file share a single decode.
+    let burst = try await withThrowingTaskGroup(of: AVAudioPCMBuffer?.self) { group -> [AVAudioPCMBuffer?] in
+        let fresh = BufferCache()
+        for _ in 0..<6 { group.addTask { try await fresh.buffer(for: shortA) } }
+        var all: [AVAudioPCMBuffer?] = []
+        for try await buffer in group { all.append(buffer) }
+        return all
+    }
+    check("concurrent requests agree", burst.allSatisfy { $0 != nil && $0!.frameLength == first!.frameLength })
+}
+
+// ------------------------------------------------------- 7. fades follow the clock
+// Counting 60 Hz steps made a fade run long, because every sleep overshoots a little.
+do {
+    let node = AVAudioPlayerNode()
+    let duration = 1.0
+    let clock = ContinuousClock()
+    let began = clock.now
+    await FadeRamp.run(node: node, from: 0, to: 1, curve: .rising, duration: duration)
+    let took = Double((clock.now - began).components.seconds)
+        + Double((clock.now - began).components.attoseconds) / 1e18
+    check("a 1.0 s fade takes 1.0 s", abs(took - duration) < 0.06, String(format: "%.3f s", took))
+    check("and ends at its target", node.volume == 1)
+}
+
+// ------------------------------------------------------------- 8. the bed fader ducks the scene
+do {
+    let engine = AVAudioEngine()
+    let bed = AVAudioMixerNode()
+    let node = AVAudioPlayerNode()
+    let file = try AVAudioFile(forReading: shortA)
+    let fmt = file.processingFormat
+    engine.attach(bed)
+    engine.attach(node)
+    engine.connect(node, to: bed, format: fmt)
+    engine.connect(bed, to: engine.mainMixerNode, format: nil)
+    let renderFormat = AVAudioFormat(standardFormatWithSampleRate: fmt.sampleRate, channels: 2)!
+    try engine.enableManualRenderingMode(.offline, format: renderFormat, maximumFrameCount: 4096)
+
+    let full = AVAudioPCMBuffer(pcmFormat: fmt, frameCapacity: AVAudioFrameCount(file.length))!
+    try file.read(into: full)
+    node.scheduleBuffer(full, at: nil, options: .loops, completionHandler: nil)
+    try engine.start()
+    node.play()
+
+    func rms(frames: Int) throws -> Float {
+        let scratch = AVAudioPCMBuffer(pcmFormat: renderFormat, frameCapacity: 4096)!
+        var acc: Float = 0, count = 0
+        while count < frames {
+            _ = try engine.renderOffline(4096, to: scratch)
+            let ch = scratch.floatChannelData![0]
+            for i in 0..<Int(scratch.frameLength) { acc += ch[i] * ch[i] }
+            count += Int(scratch.frameLength)
+        }
+        return sqrt(acc / Float(count))
+    }
+
+    bed.outputVolume = 1
+    _ = try rms(frames: 8192)                 // settle
+    let open = try rms(frames: 48000)
+    bed.outputVolume = 0.5
+    _ = try rms(frames: 8192)
+    let ducked = try rms(frames: 48000)
+    engine.stop()
+    check("ducking the bed halves the scene's level", abs(ducked / open - 0.5) < 0.05,
+          String(format: "%.3f → %.3f (ratio %.2f)", open, ducked, ducked / open))
 }
 
 print(failures == 0 ? "\nall checks passed" : "\n\(failures) check(s) failed")

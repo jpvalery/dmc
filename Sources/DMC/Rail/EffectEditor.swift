@@ -3,8 +3,8 @@ import SwiftUI
 struct EffectEditor: View {
     @State var effect: SoundEffect
     let isNew: Bool
-    @ObservedObject var library: SoundLibrary
-    @ObservedObject var engine: SceneEngine
+    var library: SoundLibrary
+    var engine: SceneEngine
     let onSave: (SoundEffect) -> Void
     let onDelete: () -> Void
 
@@ -67,6 +67,26 @@ struct EffectEditor: View {
                 }
             }
 
+            VStack(alignment: .leading, spacing: 4) {
+                Toggle("Lower the scene while this plays", isOn: Binding(
+                    get: { effect.duck > 0 },
+                    set: { effect.duck = $0 ? 0.5 : 0 }
+                ))
+                .toggleStyle(.checkbox)
+                .help("Pulls the scene's ambience down under the effect, then eases it back")
+
+                if effect.duck > 0 {
+                    Picker("", selection: $effect.duck) {
+                        Text("Slightly").tag(0.3)
+                        Text("Clearly").tag(0.5)
+                        Text("Heavily").tag(0.75)
+                    }
+                    .pickerStyle(.segmented)
+                    .labelsHidden()
+                    .frame(maxWidth: 260)
+                }
+            }
+
             // Effects are short, so auditioning is just firing it — no transport needed.
             Button {
                 engine.fire(effect)
@@ -95,7 +115,7 @@ struct EffectEditor: View {
             }
         }
         .padding(14)
-        .frame(width: 480, height: 380)
+        .frame(width: 480, height: 440)
         .onDisappear { engine.stopPreview() }
         .sheet(isPresented: $showSymbols) { SymbolPicker(selection: $effect.symbol) }
         .sheet(isPresented: $showSounds) {

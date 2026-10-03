@@ -2,8 +2,8 @@ import SwiftUI
 
 /// Campaign switcher for the rail header. Collapses to a single icon along with the rail.
 struct CampaignMenu: View {
-    @ObservedObject var campaigns: CampaignStore
-    @ObservedObject var router: UIRouter
+    var campaigns: CampaignStore
+    var router: UIRouter
     let collapsed: Bool
 
     var body: some View {
@@ -101,7 +101,7 @@ struct DeleteCampaignSheet: View {
             Label("Delete “\(campaign.name)”?", systemImage: "exclamationmark.triangle.fill")
                 .font(.headline)
                 .foregroundStyle(.orange)
-            Text("This removes that campaign's scenes, notes, tabs and macropad bindings. "
+            Text("This moves that campaign's scenes, notes, tabs and macropad bindings to the Trash. "
                  + "Your audio library is shared and stays untouched.")
                 .font(.caption)
                 .foregroundStyle(.secondary)

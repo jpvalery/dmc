@@ -1,8 +1,8 @@
 import SwiftUI
 
 struct WebNavBar: View {
-    @ObservedObject var controller: WebController
-    @ObservedObject var tabs: TabsModel
+    var controller: WebController
+    var tabs: TabsModel
     @Binding var railCollapsed: Bool
     @Binding var notesHidden: Bool
     @Binding var combatShown: Bool

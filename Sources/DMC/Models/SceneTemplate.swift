@@ -1,4 +1,4 @@
-import Combine
+import Observation
 import Foundation
 
 /// Anything that ships as a recipe: it names the audio it needs and where to fetch it, so the
@@ -100,10 +100,10 @@ struct EffectTemplate: Codable, AudioTemplate {
 }
 
 @MainActor
-final class TemplateLibrary: ObservableObject {
-    @Published private(set) var templates: [SceneTemplate] = []
-    @Published private(set) var effectTemplates: [EffectTemplate] = []
-    @Published private(set) var note: String = ""
+@Observable final class TemplateLibrary {
+    private(set) var templates: [SceneTemplate] = []
+    private(set) var effectTemplates: [EffectTemplate] = []
+    private(set) var note: String = ""
 
     private struct Document: Codable {
         var note: String?
