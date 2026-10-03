@@ -43,6 +43,7 @@ enum Vault {
     static var effectsFile: URL { campaignDir.appending(path: "effects.json") }
     static var tabsFile: URL { campaignDir.appending(path: "tabs.json") }
     static var hotkeysFile: URL { campaignDir.appending(path: "hotkeys.json") }
+    static var combatFile: URL { campaignDir.appending(path: "combat.json") }
 
     /// Lazily-once directory creation. A `static let` rather than a method call from
     /// `DMCApp.init`, because stored-property initializers run *before* an init body — so a

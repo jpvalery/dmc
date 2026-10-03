@@ -36,6 +36,8 @@ Both side panes collapse. The rail keeps its icons when collapsed so scenes stay
 | `⌘T` / `⌘W` | New tab / close tab |
 | `⌃Tab` / `⌃⇧Tab` | Next / previous tab |
 | `⌘⌥S` | Split side by side |
+| `⌘⌥C` | Swap the browser for the combat tracker, and back |
+| `⌘⏎` / `⌘⇧⏎` | Start combat / next turn, and previous turn (tracker only) |
 | `⌘[` / `⌘]` / `⌘R` | Back / forward / reload |
 | `⌘⇧H` | Campaigns home |
 | `⌘⌥1` / `⌘⌥2` | Collapse rail / hide notes |
@@ -82,6 +84,31 @@ Only the 10-minute ambiences are fetched — those are CC BY-NC-ND 4.0, and cred
 
 A saved SoundPad *layout* can still be imported, from either its JSON or a `ttaud.io` share link:
 slot levels and loop flags come across, and each slot is then bound to a file you hold.
+
+## Combat tracker
+
+`⌘⌥C`, or the fencer button in the browser's bar, swaps the centre pane for an initiative
+tracker. The web pages stay loaded in their tabs, so closing the tracker returns to D&D Beyond
+exactly where it was left.
+
+One table, with the same columns from the heading down to the row where new combatants are
+entered: type (person or paw), name, HP, AC, initiative. The list sorts itself by initiative; ties
+keep the order they were added in, and right-click → **Act Earlier / Later** breaks one by hand.
+A name, AC and initiative are required to add someone (HP is optional); trying without them
+outlines what's missing. A row whose initiative is cleared — as every player's is after End Combat
+— is listed at the bottom and takes no turns until it's filled in. HP, AC and initiative commit
+on Return or when the field loses focus, not per keystroke, so the list doesn't re-sort mid-edit.
+
+**Start Combat** opens round 1 on the highest initiative; **Next Turn** (`⌘⏎`) advances and opens
+a new round when the order wraps. Removing whoever is up passes the turn on rather than skipping
+anyone. The `×N` stepper adds a numbered group ("Goblin 1–4") sharing one initiative, AC and
+starting HP; each row's HP then moves on its own.
+
+The person/paw toggle marks a row as a player character or an NPC. Player characters survive
+**End Combat** (the red button), which removes the NPCs and clears the party's initiative for the
+next fight; their HP and AC are kept. The trash icon clears everyone, and asks for a second
+click — it turns into **Confirm clearing** for a few seconds. State is saved per campaign in
+`combat.json`, so a relaunch mid-fight comes back to the same turn.
 
 ## Macropad
 

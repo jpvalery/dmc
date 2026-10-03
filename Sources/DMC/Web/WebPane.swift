@@ -14,6 +14,7 @@ struct WebPane: View {
     @ObservedObject var tabs: TabsModel
     @Binding var railCollapsed: Bool
     @Binding var notesHidden: Bool
+    @Binding var combatShown: Bool
 
     @AppStorage("web.splitFraction") private var splitFraction: Double = 0.5
     @State private var dragBase: Double?
@@ -29,7 +30,8 @@ struct WebPane: View {
                 WebNavBar(controller: primary.controller,
                           tabs: tabs,
                           railCollapsed: $railCollapsed,
-                          notesHidden: $notesHidden)
+                          notesHidden: $notesHidden,
+                          combatShown: $combatShown)
                 Divider()
 
                 if let secondary = tabs.secondary {

@@ -12,8 +12,10 @@ struct RootView: View {
     @ObservedObject var effects: EffectStore
     @ObservedObject var library: SoundLibrary
     @ObservedObject var templates: TemplateLibrary
+    @ObservedObject var combat: CombatTracker
     @Binding var railCollapsed: Bool
     @Binding var notesHidden: Bool
+    @Binding var combatShown: Bool
 
     @StateObject private var catalogue = TabletopCatalogue()
     @StateObject private var downloader = TrackDownloader()
@@ -33,9 +35,19 @@ struct RootView: View {
                       onEditEffect: router.edit,
                       onBrowse: { router.showTabletop = true })
         } web: {
-            WebPane(tabs: tabs,
-                    railCollapsed: $railCollapsed,
-                    notesHidden: $notesHidden)
+            // A swap, not an overlay. The pages live in their tabs' controllers, so they are
+            // still loaded when the browser comes back.
+            if combatShown {
+                CombatPane(combat: combat,
+                           railCollapsed: $railCollapsed,
+                           notesHidden: $notesHidden,
+                           combatShown: $combatShown)
+            } else {
+                WebPane(tabs: tabs,
+                        railCollapsed: $railCollapsed,
+                        notesHidden: $notesHidden,
+                        combatShown: $combatShown)
+            }
         } notes: {
             NotesPane(notes: notes)
         }
@@ -137,6 +149,7 @@ struct RootView: View {
             campaigns.onDidSwitch = {
                 store.reload()
                 effects.reload()
+                combat.reload()
                 notes.reload()
                 tabs.reloadForCampaign()
                 hotkeys.reloadForCampaign()

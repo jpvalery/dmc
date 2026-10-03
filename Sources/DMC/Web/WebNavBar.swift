@@ -5,6 +5,7 @@ struct WebNavBar: View {
     @ObservedObject var tabs: TabsModel
     @Binding var railCollapsed: Bool
     @Binding var notesHidden: Bool
+    @Binding var combatShown: Bool
 
     var body: some View {
         HStack(spacing: 6) {
@@ -42,6 +43,9 @@ struct WebNavBar: View {
             if controller.isLoading {
                 ProgressView().controlSize(.small)
             }
+
+            Button { combatShown = true } label: { Image(systemName: "figure.fencing") }
+                .help("Combat tracker, in place of the browser  ⌘⌥C")
 
             Button { tabs.toggleSplit() } label: {
                 Image(systemName: tabs.isSplit ? "rectangle.split.2x1.fill" : "rectangle.split.2x1")

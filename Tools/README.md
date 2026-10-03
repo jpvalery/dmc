@@ -54,6 +54,21 @@ swiftc -O -parse-as-library -swift-version 5 -o /tmp/nv/run /tmp/nv/main.swift \
 /tmp/nv/run /tmp/nv/vault
 ```
 
+## `verify-combat` — combat tracker
+
+Initiative order and tie-breaking, HP and AC, round and turn advancement, removing or
+un-rolling whoever is up, ending a fight while keeping the party, and persistence across a
+simulated relaunch — including a sparse file and one whose turn points at nobody.
+
+```sh
+mkdir -p /tmp/cv && cp Tools/verify-combat/main.swift /tmp/cv/
+swiftc -O -parse-as-library -swift-version 5 -o /tmp/cv/run /tmp/cv/main.swift \
+  Sources/DMC/Models/Vault.swift Sources/DMC/Models/Campaign.swift \
+  Sources/DMC/Models/Combat.swift \
+  -target arm64-apple-macos15 -framework AppKit
+/tmp/cv/run /tmp/cv/vault
+```
+
 ## `verify-padimport` — SoundPad import
 
 Parses a saved pad (JSON or share link) and confirms levels, loop flags and slot ids survive a

@@ -13,9 +13,11 @@ struct DMCApp: App {
     @StateObject private var effects = EffectStore()
     @StateObject private var library = SoundLibrary()
     @StateObject private var templates = TemplateLibrary()
+    @StateObject private var combat = CombatTracker()
 
     @AppStorage("pane.railCollapsed") private var railCollapsed = false
     @AppStorage("pane.notesHidden") private var notesHidden = false
+    @AppStorage("pane.combatShown") private var combatShown = false
 
     private var web: WebController? { tabs.selected?.controller }
 
@@ -31,8 +33,10 @@ struct DMCApp: App {
                      effects: effects,
                      library: library,
                      templates: templates,
+                     combat: combat,
                      railCollapsed: $railCollapsed,
-                     notesHidden: $notesHidden)
+                     notesHidden: $notesHidden,
+                     combatShown: $combatShown)
         }
 
         // Its own window rather than a sheet: the pad, its bindings and a searchable library do
@@ -84,6 +88,19 @@ struct DMCApp: App {
 
                 Button(notesHidden ? "Show Notes" : "Hide Notes") { notesHidden.toggle() }
                     .keyboardShortcut("2", modifiers: [.command, .option])
+
+                Divider()
+
+                Button(combatShown ? "Show Browser" : "Show Combat Tracker") { combatShown.toggle() }
+                    .keyboardShortcut("c", modifiers: [.command, .option])
+                // ⌘⏎ is only live while the tracker is up, so it can never swallow the same
+                // chord from a D&D Beyond chat box.
+                Button(combat.isRunning ? "Next Turn" : "Start Combat") { combat.next() }
+                    .keyboardShortcut(.return, modifiers: .command)
+                    .disabled(!combatShown || combat.turnOrder.isEmpty)
+                Button("Previous Turn") { combat.previous() }
+                    .keyboardShortcut(.return, modifiers: [.command, .shift])
+                    .disabled(!combatShown || !combat.isRunning)
 
                 Divider()
 

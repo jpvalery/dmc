@@ -238,10 +238,6 @@ struct SceneRail: View {
 
     private var header: some View {
         HStack(spacing: 4) {
-            if !collapsed {
-                Text("Scenes").font(.caption.weight(.semibold)).foregroundStyle(.secondary)
-                Spacer()
-            }
             CampaignMenu(campaigns: campaigns, router: router, collapsed: collapsed)
             if !collapsed { Spacer(minLength: 0) }
             Button(action: onNew) { Image(systemName: "plus") }
