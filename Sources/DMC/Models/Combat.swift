@@ -26,6 +26,59 @@ struct Condition: Codable, Identifiable, Hashable {
     static let common = ["Blinded", "Charmed", "Concentrating", "Deafened", "Frightened", "Grappled",
                          "Incapacitated", "Invisible", "Paralyzed", "Petrified", "Poisoned", "Prone",
                          "Restrained", "Stunned", "Unconscious", "Hasted", "Blessed"]
+
+    /// The SF Symbol for a condition, by name. The SRD ones are matched exactly, and a custom name
+    /// is matched on a keyword, so "On fire" and "Burning" both get the flame.
+    static func symbol(for name: String) -> String {
+        let key = name.lowercased().trimmingCharacters(in: .whitespaces)
+        if let exact = symbols[key] { return exact }
+        return keywordSymbols.first { key.contains($0.keyword) }?.symbol ?? "tag.fill"
+    }
+
+    var symbol: String { Self.symbol(for: name) }
+
+    private static let symbols: [String: String] = [
+        "blinded": "eye.slash",
+        "charmed": "heart.fill",
+        "concentrating": "brain.head.profile",
+        "deafened": "speaker.slash.fill",
+        "frightened": "exclamationmark.triangle.fill",
+        "grappled": "hand.raised.fill",
+        "incapacitated": "nosign",
+        "invisible": "circle.dotted",
+        "paralyzed": "bolt.fill",
+        "petrified": "mountain.2.fill",
+        "poisoned": "drop.triangle.fill",
+        "prone": "arrow.down.to.line",
+        "restrained": "link",
+        "stunned": "bolt.circle.fill",
+        "unconscious": "moon.zzz.fill",
+        "hasted": "hare.fill",
+        "blessed": "sparkles",
+    ]
+
+    private static let keywordSymbols: [(keyword: String, symbol: String)] = [
+        ("exhaust", "battery.25percent"),
+        ("fire", "flame.fill"), ("burn", "flame.fill"),
+        ("bleed", "drop.fill"),
+        ("slow", "tortoise.fill"),
+        ("frozen", "snowflake"), ("cold", "snowflake"),
+        ("shield", "shield.fill"), ("dodg", "shield.fill"),
+        ("sleep", "moon.zzz.fill"),
+        ("bane", "exclamationmark.triangle.fill"),
+        ("hex", "eye.trianglebadge.exclamationmark"),
+        ("curse", "eye.trianglebadge.exclamationmark"),
+        ("mark", "scope"),
+        ("silenc", "speaker.slash.fill"),
+        ("heal", "cross.vial.fill"), ("regen", "cross.vial.fill"),
+    ]
+}
+
+/// Where a combatant stands, from untouched to down. The bloodied step is the half-HP line.
+enum Health: Int, Comparable {
+    case down, critical, bloodied, hurt, healthy
+
+    static func < (a: Health, b: Health) -> Bool { a.rawValue < b.rawValue }
 }
 
 /// One participant in a fight.
@@ -57,6 +110,19 @@ struct Combatant: Codable, Identifiable, Hashable {
     var isBloodied: Bool {
         guard let hp, let maxHP, hp > 0, maxHP > 0 else { return false }
         return hp * 2 <= maxHP
+    }
+    /// How hurt, in four steps by the share of maximum HP left. `nil` when either number is not
+    /// known, so there is nothing to colour.
+    var health: Health? {
+        guard !isLair, let hp, let maxHP, maxHP > 0 else { return nil }
+        if hp <= 0 { return .down }
+        let share = Double(hp) / Double(maxHP)
+        switch share {
+        case _ where share > 0.75: return .healthy
+        case _ where share > 0.5: return .hurt
+        case _ where share > 0.25: return .bloodied
+        default: return .critical
+        }
     }
     var isStable: Bool { deathSuccesses >= 3 }
     var isDead: Bool { deathFailures >= 3 }
@@ -92,16 +158,84 @@ struct Combatant: Codable, Identifiable, Hashable {
     }
 }
 
+/// A monster, or a group of them, prepared ahead of a fight. Turned into combatants when the
+/// encounter is loaded onto the table.
+struct PlannedMonster: Codable, Identifiable, Hashable {
+    var id: UUID = UUID()
+    var name: String
+    /// More than one is numbered — "Goblin 1", "Goblin 2" — each with its own copy of the HP.
+    var count: Int = 1
+    var armorClass: Int?
+    var hp: Int?
+    var initiativeBonus: Int?
+
+    init(name: String, count: Int = 1, armorClass: Int? = nil, hp: Int? = nil,
+         initiativeBonus: Int? = nil) {
+        self.name = name
+        self.count = count
+        self.armorClass = armorClass
+        self.hp = hp
+        self.initiativeBonus = initiativeBonus
+    }
+
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        id = try c.decodeIfPresent(UUID.self, forKey: .id) ?? UUID()
+        name = try c.decodeIfPresent(String.self, forKey: .name) ?? "Monster"
+        count = try c.decodeIfPresent(Int.self, forKey: .count) ?? 1
+        armorClass = try c.decodeIfPresent(Int.self, forKey: .armorClass)
+        hp = try c.decodeIfPresent(Int.self, forKey: .hp)
+        initiativeBonus = try c.decodeIfPresent(Int.self, forKey: .initiativeBonus)
+    }
+}
+
+/// One fight of the session, prepared in advance: who is in it and which sound scene plays when
+/// it starts. The party is not part of an encounter — it is the same table all the way through,
+/// so the characters carry their HP from one fight to the next.
+struct Encounter: Codable, Identifiable, Hashable {
+    var id: UUID = UUID()
+    var name: String
+    var monsters: [PlannedMonster] = []
+    /// Started when combat starts, unless it is already playing.
+    var sceneID: UUID?
+    /// Set when the fight is ended, so a list of them shows how far the session has got.
+    var done: Bool = false
+
+    init(name: String, monsters: [PlannedMonster] = [], sceneID: UUID? = nil) {
+        self.name = name
+        self.monsters = monsters
+        self.sceneID = sceneID
+    }
+
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        id = try c.decodeIfPresent(UUID.self, forKey: .id) ?? UUID()
+        name = try c.decodeIfPresent(String.self, forKey: .name) ?? "Encounter"
+        monsters = try c.decodeIfPresent([PlannedMonster].self, forKey: .monsters) ?? []
+        sceneID = try c.decodeIfPresent(UUID.self, forKey: .sceneID)
+        done = try c.decodeIfPresent(Bool.self, forKey: .done) ?? false
+    }
+
+    /// Monsters in the encounter, counting each member of a group.
+    var headcount: Int { monsters.reduce(0) { $0 + max($1.count, 1) } }
+}
+
 /// What `combat.json` holds. `round == 0` means the fight has not started.
 struct CombatSnapshot: Codable {
     var combatants: [Combatant] = []
     var round: Int = 0
     var currentID: UUID?
+    var encounters: [Encounter] = []
+    /// The encounter whose monsters are on the table.
+    var activeEncounterID: UUID?
 
-    init(combatants: [Combatant] = [], round: Int = 0, currentID: UUID? = nil) {
+    init(combatants: [Combatant] = [], round: Int = 0, currentID: UUID? = nil,
+         encounters: [Encounter] = [], activeEncounterID: UUID? = nil) {
         self.combatants = combatants
         self.round = round
         self.currentID = currentID
+        self.encounters = encounters
+        self.activeEncounterID = activeEncounterID
     }
 
     init(from decoder: Decoder) throws {
@@ -109,6 +243,8 @@ struct CombatSnapshot: Codable {
         combatants = try c.decodeIfPresent([Combatant].self, forKey: .combatants) ?? []
         round = try c.decodeIfPresent(Int.self, forKey: .round) ?? 0
         currentID = try c.decodeIfPresent(UUID.self, forKey: .currentID)
+        encounters = try c.decodeIfPresent([Encounter].self, forKey: .encounters) ?? []
+        activeEncounterID = try c.decodeIfPresent(UUID.self, forKey: .activeEncounterID)
     }
 }
 
@@ -158,11 +294,15 @@ final class CombatTracker {
     private(set) var combatants: [Combatant] = []
     private(set) var round = 0
     private(set) var currentID: UUID?
+    private(set) var encounters: [Encounter] = []
+    private(set) var activeEncounterID: UUID?
     /// Snapshots from before each change, newest last, so a stray click is not a disaster.
     private(set) var undoStack: [CombatSnapshot] = []
 
     /// Notable moments, phrased for a session log: "Round 3", "Kaela dropped to 0 HP".
     @ObservationIgnored var onEvent: ((String) -> Void)?
+    /// Called as the first turn begins, with the encounter on the table if there is one.
+    @ObservationIgnored var onStart: ((Encounter?) -> Void)?
 
     @ObservationIgnored private static let undoLimit = 60
 
@@ -197,11 +337,16 @@ final class CombatTracker {
 
     var hasLair: Bool { combatants.contains { $0.isLair } }
 
+    /// `nil` once the encounter has been deleted, even if the id is still on file.
+    var activeEncounter: Encounter? { encounters.first { $0.id == activeEncounterID } }
+
     func reload() {
         let snapshot = CombatArchive.load()
         combatants = snapshot.combatants
         round = snapshot.round
         currentID = snapshot.currentID
+        encounters = snapshot.encounters
+        activeEncounterID = snapshot.activeEncounterID
         undoStack = []
 
         // A file edited by hand, or an older one, can leave the turn pointing at nobody.
@@ -213,7 +358,8 @@ final class CombatTracker {
     // MARK: Undo
 
     private var snapshot: CombatSnapshot {
-        CombatSnapshot(combatants: combatants, round: round, currentID: currentID)
+        CombatSnapshot(combatants: combatants, round: round, currentID: currentID,
+                       encounters: encounters, activeEncounterID: activeEncounterID)
     }
 
     private func checkpoint() {
@@ -221,12 +367,19 @@ final class CombatTracker {
         if undoStack.count > Self.undoLimit { undoStack.removeFirst(undoStack.count - Self.undoLimit) }
     }
 
-    /// Puts the table back as it was before the last change.
+    /// Puts the table back as it was before the last change. Encounters are prepared outside the
+    /// fight, so what is written into them stays — only which one is loaded, and which are done,
+    /// goes back.
     func undo() {
         guard let previous = undoStack.popLast() else { return }
         combatants = previous.combatants
         round = previous.round
         currentID = previous.currentID
+        activeEncounterID = previous.activeEncounterID
+        let wasDone = Dictionary(uniqueKeysWithValues: previous.encounters.map { ($0.id, $0.done) })
+        for i in encounters.indices {
+            if let done = wasDone[encounters[i].id] { encounters[i].done = done }
+        }
         persist()
     }
 
@@ -395,6 +548,9 @@ final class CombatTracker {
         checkpoint()
         let wasRunning = isRunning
         let finalRound = round
+        let finished = activeEncounter
+        if let finished { updateEncounterSilently(finished.id) { $0.done = true } }
+        activeEncounterID = nil
         combatants.removeAll { !$0.isPlayer }
         for i in combatants.indices {
             combatants[i].initiative = nil
@@ -402,14 +558,73 @@ final class CombatTracker {
         }
         stop()
         persist()
-        if wasRunning { onEvent?("Combat ended after \(finalRound) round\(finalRound == 1 ? "" : "s")") }
+        if wasRunning {
+            let name = finished.map { " — \($0.name)" } ?? ""
+            onEvent?("Combat ended after \(finalRound) round\(finalRound == 1 ? "" : "s")\(name)")
+        }
     }
 
     func clearAll() {
         checkpoint()
         combatants = []
+        activeEncounterID = nil
         stop()
         persist()
+    }
+
+    // MARK: Encounters
+
+    @discardableResult
+    func addEncounter(name: String) -> UUID {
+        let clean = name.trimmingCharacters(in: .whitespaces)
+        let encounter = Encounter(name: clean.isEmpty ? "Encounter \(encounters.count + 1)" : clean)
+        encounters.append(encounter)
+        persist()
+        return encounter.id
+    }
+
+    /// Editing a prepared encounter is not part of the fight, so it is not undoable.
+    func updateEncounter(_ id: UUID, _ change: (inout Encounter) -> Void) {
+        guard let i = encounters.firstIndex(where: { $0.id == id }) else { return }
+        change(&encounters[i])
+        persist()
+    }
+
+    func removeEncounter(_ id: UUID) {
+        encounters.removeAll { $0.id == id }
+        // Its monsters stay on the table as ordinary combatants.
+        if activeEncounterID == id { activeEncounterID = nil }
+        persist()
+    }
+
+    /// Puts an encounter's monsters on the table in place of the last fight's. The party stays as
+    /// it is — HP and all. If a fight is running it stops, and the party's initiative and
+    /// conditions are cleared for the new one; before the first turn they are left alone, since
+    /// the players may already have called out their rolls.
+    func load(_ id: UUID) {
+        guard let encounter = encounters.first(where: { $0.id == id }) else { return }
+        checkpoint()
+        if isRunning {
+            for i in combatants.indices {
+                combatants[i].initiative = nil
+                combatants[i].conditions = []
+            }
+            stop()
+        }
+        combatants.removeAll { !$0.isPlayer }
+        for planned in encounter.monsters {
+            let n = min(max(planned.count, 1), 30)
+            for i in 1...n {
+                combatants.append(Combatant(name: n > 1 ? "\(planned.name) \(i)" : planned.name,
+                                            armorClass: planned.armorClass,
+                                            hp: planned.hp,
+                                            isPlayer: false,
+                                            initiativeBonus: planned.initiativeBonus))
+            }
+        }
+        activeEncounterID = id
+        persist()
+        onEvent?("Encounter: \(encounter.name)")
     }
 
     // MARK: Turns
@@ -427,7 +642,9 @@ final class CombatTracker {
             round = max(round, 1)
             currentID = order[0].id
             persist()
-            onEvent?("Combat started — \(order.count) in the order")
+            let name = activeEncounter.map { "\($0.name): " } ?? ""
+            onEvent?("Combat started — \(name)\(order.count) in the order")
+            onStart?(activeEncounter)
             return
         }
 
@@ -500,6 +717,12 @@ final class CombatTracker {
             round += 1
             currentID = order[0].id
         }
+    }
+
+    /// `updateEncounter` without the write, for a caller that persists once at the end.
+    private func updateEncounterSilently(_ id: UUID, _ change: (inout Encounter) -> Void) {
+        guard let i = encounters.firstIndex(where: { $0.id == id }) else { return }
+        change(&encounters[i])
     }
 
     private func stop() {

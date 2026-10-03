@@ -6,11 +6,15 @@ import SwiftUI
 /// This is for tables that run combat on paper or in their heads rather than in a VTT.
 struct CombatPane: View {
     var combat: CombatTracker
+    var scenes: SceneStore
     @Binding var railCollapsed: Bool
     @Binding var notesHidden: Bool
     @Binding var combatShown: Bool
 
     @State private var confirmingEnd = false
+    @State private var showEncounters = false
+    /// Loading an encounter mid-fight stops that fight, so it asks first.
+    @State private var pendingLoad: UUID?
     /// Clearing confirms in place: the trash icon turns into a red button that disarms itself,
     /// so wiping the table is two deliberate clicks without a modal in the way.
     @State private var armedClear = false
@@ -21,12 +25,28 @@ struct CombatPane: View {
             Divider()
             CombatTable(combat: combat)
                 .padding(10)
+                .confirmationDialog("Switch encounter?",
+                                    isPresented: Binding(get: { pendingLoad != nil },
+                                                         set: { if !$0 { pendingLoad = nil } }),
+                                    presenting: pendingLoad) { id in
+                    Button("Switch Encounter", role: .destructive) { combat.load(id) }
+                } message: { _ in
+                    Text("The fight in progress stops and its monsters are replaced. Undo brings it back.")
+                }
+        }
+        .sheet(isPresented: $showEncounters) {
+            EncounterEditor(combat: combat, scenes: scenes) { id in
+                showEncounters = false
+                requestLoad(id)
+            }
         }
         .background(Color(nsColor: .windowBackgroundColor))
         .confirmationDialog("End this combat?", isPresented: $confirmingEnd) {
             Button("End Combat", role: .destructive) { combat.endCombat() }
         } message: {
-            Text("Removes the NPCs and clears the party's initiative and conditions, ready for the next fight. Undo brings it back.")
+            Text("Removes the NPCs and clears the party's initiative and conditions, ready for the next fight."
+                 + (combat.activeEncounter == nil ? "" : " The encounter is marked done.")
+                 + " Undo brings it back.")
         }
     }
 
@@ -60,6 +80,8 @@ struct CombatPane: View {
                 }
             }
             .frame(maxWidth: .infinity, alignment: .leading)
+
+            encounterMenu
 
             Button { combat.undo() } label: { Image(systemName: "arrow.uturn.backward") }
                 .disabled(!combat.canUndo)
@@ -101,6 +123,37 @@ struct CombatPane: View {
         .buttonStyle(.borderless)
         .padding(.horizontal, 8)
         .frame(height: 32)
+    }
+
+    private func requestLoad(_ id: UUID) {
+        if combat.isRunning { pendingLoad = id } else { combat.load(id) }
+    }
+
+    /// The fights prepared for the session, in order. Picking one puts its monsters on the table
+    /// beside the party, who carry on from whatever HP they have.
+    private var encounterMenu: some View {
+        Menu {
+            ForEach(combat.encounters) { encounter in
+                Button { requestLoad(encounter.id) } label: {
+                    Label(encounter.name,
+                          systemImage: encounter.id == combat.activeEncounterID ? "play.circle.fill"
+                              : (encounter.done ? "checkmark.circle" : "circle"))
+                }
+            }
+            if !combat.encounters.isEmpty { Divider() }
+            Button("Edit Encounters…", systemImage: "square.and.pencil") { showEncounters = true }
+        } label: {
+            HStack(spacing: 4) {
+                Image(systemName: "list.bullet.rectangle")
+                Text(combat.activeEncounter?.name ?? "Encounters")
+                    .font(.caption)
+                    .lineLimit(1)
+            }
+            .frame(maxWidth: 140)
+        }
+        .menuStyle(.borderlessButton)
+        .fixedSize()
+        .help("Prepared encounters — pick one to put its monsters on the table")
     }
 
     private var moreMenu: some View {
@@ -163,7 +216,7 @@ private enum Col {
 
 /// Keeps digits, and one leading sign where a sign means something (a negative initiative bonus,
 /// "-7" damage). The Unicode minus some keyboards produce is turned into a plain one.
-private func digitsOnly(_ text: String, signed: Bool) -> String {
+func digitsOnly(_ text: String, signed: Bool) -> String {
     String(text.enumerated().compactMap { offset, ch -> Character? in
         if ch.isASCII && ch.isNumber { return ch }
         if signed && offset == 0 {
@@ -247,7 +300,7 @@ private struct CombatTable: View {
                 .foregroundStyle(.tertiary)
             Text("No combatants yet")
                 .font(.headline)
-            Text("Add the party and the NPCs below — look a monster up, or type its numbers — then roll or enter initiative and start combat.")
+            Text("Add the party and the NPCs below — look a monster up, or type its numbers — then roll or enter initiative and start combat. Or prepare the session's fights ahead under Encounters.")
                 .font(.caption)
                 .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)
@@ -283,8 +336,7 @@ private struct CombatRow: View {
                 Text("—").foregroundStyle(.tertiary).frame(width: Col.number, height: Col.line)
                 Text("—").foregroundStyle(.tertiary).frame(width: Col.number, height: Col.line)
             } else {
-                HPField(hp: combatant.hp, maxHP: combatant.maxHP,
-                        bloodied: combatant.isBloodied, down: combatant.isDown) { text in
+                HPField(hp: combatant.hp, maxHP: combatant.maxHP, health: combatant.health) { text in
                     combat.enterHP(combatant.id, text)
                 }
                 .frame(width: Col.hp, height: Col.line)
@@ -312,7 +364,13 @@ private struct CombatRow: View {
         .padding(.horizontal, Col.inset)
         .padding(.vertical, 4)
         .frame(minHeight: 30)
-        .background(isCurrent ? Color.accentColor.opacity(0.16) : Color.clear)
+        // A faint red wash marks the enemies; the current turn's highlight sits over it.
+        .background {
+            ZStack {
+                if !combatant.isPlayer && !combatant.isLair { Color.red.opacity(0.07) }
+                if isCurrent { Color.accentColor.opacity(0.16) }
+            }
+        }
         // The turn marker is a bar on the table's edge rather than a column of its own, so the
         // columns stay exactly the ones in the heading.
         .overlay(alignment: .leading) {
@@ -459,10 +517,26 @@ private struct TypeToggle: View {
     }
 }
 
+extension Health {
+    /// Green through yellow and orange to red as HP drains. The yellow is deepened in light mode,
+    /// where the system one is too pale to read as text.
+    var color: Color {
+        switch self {
+        case .healthy: return .green
+        case .hurt: return Color(nsColor: NSColor(name: nil) { appearance in
+            appearance.bestMatch(from: [.darkAqua, .aqua]) == .darkAqua
+                ? .systemYellow : NSColor(red: 0.74, green: 0.55, blue: 0, alpha: 1)
+        })
+        case .bloodied: return .orange
+        case .critical, .down: return .red
+        }
+    }
+}
+
 // MARK: Fields
 
 /// What a field accepts.
-private enum FieldKind {
+enum FieldKind {
     case text, number
     /// Digits with an optional leading + or −: an initiative bonus, or a negative initiative.
     case signed
@@ -472,7 +546,7 @@ private enum FieldKind {
 ///
 /// This is what lets an initiative be typed into a live roster: committing "1" on the way to
 /// "15" would re-sort the list mid-edit and carry the row out from under the cursor.
-private struct CommitField: View {
+struct CommitField: View {
     let value: String
     var prompt: String
     var kind: FieldKind
@@ -514,16 +588,13 @@ private struct CommitField: View {
 private struct HPField: View {
     let hp: Int?
     let maxHP: Int?
-    let bloodied: Bool
-    let down: Bool
+    let health: Health?
     let onEnter: (String) -> Void
 
     @State private var draft = ""
     @FocusState private var focused: Bool
 
-    private var tint: Color {
-        down ? .red : (bloodied ? .orange : .primary)
-    }
+    private var tint: Color { health?.color ?? .primary }
 
     var body: some View {
         HStack(spacing: 2) {
@@ -538,13 +609,20 @@ private struct HPField: View {
                         if filtered != new { draft = filtered }
                     }
                     .onChange(of: focused) { _, now in if !now { commit() } }
-                    .onSubmit { commit() }
+                    .onSubmit {
+                        commit()
+                        // Done with this one: leave the field instead of sitting in it, so the
+                        // next keystroke is not typed into a character's HP.
+                        focused = false
+                        NSApp.keyWindow?.makeFirstResponder(nil)
+                    }
 
                 // The shown value is an overlay, so a field being typed into is not fighting a
                 // number that is already in it.
                 if draft.isEmpty {
                     Text(hp.map(String.init) ?? "—")
                         .monospacedDigit()
+                        .fontWeight(health == nil ? .regular : .semibold)
                         .foregroundStyle(hp == nil ? Color.secondary : tint)
                         .opacity(focused ? 0.35 : 1)
                         .allowsHitTesting(false)
@@ -575,6 +653,7 @@ private struct ConditionChip: View {
 
     var body: some View {
         HStack(spacing: 3) {
+            Image(systemName: condition.symbol).font(.system(size: 9))
             Text(condition.name)
             if let rounds = condition.rounds {
                 Text("· \(rounds)").foregroundStyle(.secondary).monospacedDigit()
@@ -619,7 +698,9 @@ private struct ConditionPicker: View {
 
             FlowLayout(spacing: 5, lineSpacing: 5) {
                 ForEach(Condition.common, id: \.self) { condition in
-                    Button(condition) { apply(condition) }
+                    Button { apply(condition) } label: {
+                        Label(condition, systemImage: Condition.symbol(for: condition))
+                    }
                         .buttonStyle(.bordered)
                         .controlSize(.small)
                 }
@@ -878,7 +959,7 @@ private struct AddRow: View {
     }
 }
 
-private struct MissingOutline: ViewModifier {
+struct MissingOutline: ViewModifier {
     let show: Bool
 
     func body(content: Content) -> some View {
@@ -891,7 +972,7 @@ private struct MissingOutline: ViewModifier {
 // MARK: Monster lookup
 
 /// Searches Open5e as you type and hands back the chosen monster.
-private struct MonsterSearch: View {
+struct MonsterSearch: View {
     let onPick: (Open5eMonster) -> Void
 
     @State private var query: String

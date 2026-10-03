@@ -1,3 +1,4 @@
+import AppKit
 import Foundation
 
 @main
@@ -271,6 +272,132 @@ struct Probe {
         let rolled = roll.combatants.compactMap(\.initiative)
         check("a group can roll for each member", rolled.count == 12 && rolled.allSatisfy { $0 >= 3 && $0 <= 22 }
                   && Set(rolled).count > 1, "\(rolled)")
+
+        // MARK: Health scale
+        func level(_ hp: Int?, _ max: Int?, lair: Bool = false) -> Health? {
+            var c = Combatant(name: "x", hp: max, isLair: lair)
+            c.hp = hp
+            return c.health
+        }
+        check("full HP is healthy", level(20, 20) == .healthy)
+        check("above three quarters is still healthy", level(16, 20) == .healthy)
+        check("three quarters or fewer is hurt", level(15, 20) == .hurt && level(11, 20) == .hurt)
+        check("half or fewer is bloodied", level(10, 20) == .bloodied && level(6, 20) == .bloodied)
+        check("a quarter or fewer is critical", level(5, 20) == .critical && level(1, 20) == .critical)
+        check("zero is down", level(0, 20) == .down)
+        check("no maximum, nothing to scale", level(7, nil) == nil && level(nil, 20) == nil)
+        check("lair actions have no health", level(nil, nil, lair: true) == nil)
+        check("bloodied agrees with the half-HP line",
+              [Int](0...20).allSatisfy { hp in
+                  let c = { () -> Combatant in var c = Combatant(name: "x", hp: 20); c.hp = hp; return c }()
+                  return c.isBloodied == (hp > 0 && (level(hp, 20) == .bloodied || level(hp, 20) == .critical))
+              })
+
+        // MARK: Condition icons
+        check("every common condition has its own icon",
+              Condition.common.allSatisfy { Condition.symbol(for: $0) != "tag.fill" })
+        check("matching ignores case", Condition.symbol(for: "STUNNED") == Condition.symbol(for: "stunned"))
+        check("a custom name is matched on a keyword",
+              Condition.symbol(for: "On fire") == "flame.fill" && Condition.symbol(for: "Slowed") == "tortoise.fill")
+        check("anything else gets the tag", Condition.symbol(for: "Wibbly") == "tag.fill")
+        let allSymbols = Set(Condition.common.map { Condition.symbol(for: $0) }
+                             + ["On fire", "Exhaustion", "Bleeding", "Slowed", "Frozen", "Dodging", "Asleep",
+                                "Bane", "Hexed", "Marked", "Silenced", "Regenerating", "Wibbly"].map {
+                                    Condition.symbol(for: $0) })
+        let missing = allSymbols.filter { NSImage(systemSymbolName: $0, accessibilityDescription: nil) == nil }
+        check("every condition icon exists in this macOS", missing.isEmpty, missing.sorted().joined(separator: ", "))
+
+        // MARK: Encounters
+        let enc = CombatTracker()
+        enc.clearAll()
+        enc.add(name: "Mira", initiative: nil, armorClass: 16, hp: 28, isPlayer: true)
+        let mira = enc.combatants[0].id
+        enc.enterHP(mira, "-10")
+        let sceneA = UUID()
+        let ambush = enc.addEncounter(name: "  Ambush  ")
+        let second = enc.addEncounter(name: "")
+        check("an encounter takes a trimmed name, or a numbered one",
+              enc.encounters.map(\.name) == ["Ambush", "Encounter 2"], enc.encounters.map(\.name).joined(separator: "|"))
+        enc.updateEncounter(ambush) {
+            $0.sceneID = sceneA
+            $0.monsters = [PlannedMonster(name: "Goblin", count: 3, armorClass: 15, hp: 7, initiativeBonus: 2),
+                           PlannedMonster(name: "Boss", armorClass: 17, hp: 21)]
+        }
+        check("headcount counts every member of a group", enc.encounters[0].headcount == 4)
+        var startedWith: [Encounter?] = []
+        enc.onStart = { startedWith.append($0) }
+        var encEvents: [String] = []
+        enc.onEvent = { encEvents.append($0) }
+
+        enc.load(ambush)
+        check("loading adds the monsters, numbering a group",
+              names(enc.combatants) == "Mira, Goblin 1, Goblin 2, Goblin 3, Boss", names(enc.combatants))
+        check("loaded monsters carry their numbers, unrolled",
+              enc.combatants.filter { !$0.isPlayer }.allSatisfy { $0.initiative == nil }
+                  && enc.combatants.first { $0.name == "Goblin 2" }?.hp == 7
+                  && enc.combatants.first { $0.name == "Goblin 2" }?.armorClass == 15
+                  && enc.combatants.first { $0.name == "Goblin 2" }?.initiativeBonus == 2)
+        check("the party keeps its HP", enc.combatants.first { $0.id == mira }?.hp == 18)
+        check("the loaded encounter is the active one", enc.activeEncounter?.name == "Ambush")
+        check("loading is logged", encEvents.contains("Encounter: Ambush"), encEvents.joined(separator: "|"))
+
+        enc.update(enc.combatants.first { $0.name == "Goblin 1" }!.id) { $0.hp = 1 }
+        enc.load(ambush)
+        check("loading again resets the monsters, not the party",
+              enc.combatants.first { $0.name == "Goblin 1" }?.hp == 7
+                  && enc.combatants.first { $0.id == mira }?.hp == 18 && enc.combatants.count == 5)
+
+        enc.update(mira) { $0.initiative = 12 }
+        enc.rollNPCInitiative()
+        enc.load(ambush)
+        check("before the first turn, loading leaves the party's initiative alone",
+              enc.combatants.first { $0.id == mira }?.initiative == 12)
+
+        enc.next()
+        check("starting the fight hands the encounter to onStart",
+              startedWith.count == 1 && startedWith[0]?.sceneID == sceneA)
+        check("the start is logged with the encounter",
+              encEvents.contains { $0.hasPrefix("Combat started — Ambush: ") }, encEvents.joined(separator: "|"))
+        enc.next()
+        check("only the first turn starts the fight", startedWith.count == 1)
+        enc.addCondition(mira, name: "Blessed", rounds: nil)
+
+        enc.load(second)
+        check("loading mid-fight stops it and clears the party for the next",
+              !enc.isRunning && enc.combatants.map(\.name) == ["Mira"]
+                  && enc.combatants[0].initiative == nil && enc.combatants[0].conditions.isEmpty
+                  && enc.activeEncounter?.name == "Encounter 2")
+        enc.undo()
+        check("undo reverses a load, fight and all",
+              enc.isRunning && enc.activeEncounter?.name == "Ambush" && enc.combatants.count == 5)
+
+        enc.updateEncounter(ambush) { $0.name = "Roadside ambush" }
+        enc.undo()
+        check("undo leaves what was written into an encounter",
+              enc.encounters[0].name == "Roadside ambush" && enc.encounters[0].monsters.count == 2)
+
+        enc.endCombat()
+        check("ending marks the encounter done and unloads it",
+              enc.encounters[0].done && enc.activeEncounter == nil && !enc.encounters[1].done)
+        check("ending logs the encounter",
+              encEvents.contains { $0.hasPrefix("Combat ended after ") && $0.hasSuffix("— Roadside ambush") },
+              encEvents.joined(separator: "|"))
+        enc.undo()
+        check("undo reverses ending, the done mark too",
+              !enc.encounters[0].done && enc.activeEncounter?.name == "Roadside ambush")
+
+        let reopened = CombatTracker()
+        check("encounters persist, with their scene, monsters and active one",
+              reopened.encounters.count == 2 && reopened.encounters[0].sceneID == sceneA
+                  && reopened.encounters[0].monsters.first?.count == 3
+                  && reopened.activeEncounter?.name == "Roadside ambush")
+
+        reopened.removeEncounter(ambush)
+        check("deleting the loaded encounter leaves its monsters as ordinary combatants",
+              reopened.activeEncounter == nil && reopened.combatants.contains { $0.name == "Boss" }
+                  && reopened.encounters.count == 1)
+        reopened.clearAll()
+        check("clearing the table unloads the encounter", reopened.activeEncounter == nil)
 
         // MARK: The new fields survive a relaunch
         let persisted = CombatTracker()

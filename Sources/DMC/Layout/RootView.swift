@@ -42,6 +42,7 @@ struct RootView: View {
             // still loaded when the browser comes back.
             if combatShown {
                 CombatPane(combat: combat,
+                           scenes: store,
                            railCollapsed: $railCollapsed,
                            notesHidden: $notesHidden,
                            combatShown: $combatShown)
@@ -154,6 +155,13 @@ struct RootView: View {
                 prewarmNeighbours(of: scene)
             }
             combat.onEvent = { logEvent($0) }
+            // An encounter's scene starts with its fight, unless it is already what's playing.
+            combat.onStart = { encounter in
+                guard let id = encounter?.sceneID,
+                      let scene = store.scenes.first(where: { $0.id == id }),
+                      engine.activeSceneID != scene.id else { return }
+                engine.play(scene)
+            }
 
             // Switching campaigns swaps scenes, notes, tabs and macropad bindings together.
             // Audio stops first: the scenes it is playing are about to be replaced.
@@ -264,6 +272,10 @@ struct RootView: View {
             command("turn", combat.isRunning ? "Next turn" : "Start combat", "forward.fill") { combat.next() }
             command("roll", "Roll initiative for NPCs", "dice") { combat.rollNPCInitiative() }
             command("undo", "Undo combat change", "arrow.uturn.backward") { combat.undo() }
+            for encounter in combat.encounters {
+                command("encounter.\(encounter.id)", "Load encounter: \(encounter.name)",
+                        "list.bullet.rectangle") { combat.load(encounter.id) }
+            }
         }
         command("newscene", "New scene…", "plus") { router.newScene() }
         command("neweffect", "New effect…", "bolt.fill") { router.newEffect() }

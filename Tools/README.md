@@ -67,6 +67,9 @@ un-rolling whoever is up, ending a fight while keeping the party, and persistenc
 simulated relaunch — including a sparse file and one whose turn points at nobody. Also `-7` / `+5`
 HP entry with a maximum and bloodied state, death saves, conditions counting down as their
 owner's turn ends, undo, lair actions losing ties, and rolling initiative singly and per group.
+Also the four-step health scale, condition icons (checked against the installed SF Symbols), and
+prepared encounters: loading one beside the party, the start hook that carries its scene, marking
+it done on ending, undo, and persistence.
 
 ```sh
 mkdir -p /tmp/cv && cp Tools/verify-combat/main.swift /tmp/cv/
