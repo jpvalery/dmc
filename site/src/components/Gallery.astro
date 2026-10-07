@@ -1,0 +1,34 @@
+---
+import { Image } from 'astro:assets';
+import Section from './Section.astro';
+import Sketch from './Sketch.astro';
+import { shots } from '../data/content';
+import { screenshot, sketchFor } from '../lib/screenshots';
+
+const available = shots
+  .map((shot) => ({ ...shot, image: screenshot(shot.file), sketch: sketchFor[shot.file] }))
+  .filter((shot) => shot.image || shot.sketch);
+// Full rows of three only, so no shot sits alone.
+const shown = available.slice(0, available.length - (available.length % 3) || available.length);
+---
+
+<Section eyebrow="Screenshots" title="Backstage">
+  <div class="mt-8 grid gap-7 min-[860px]:grid-cols-3">
+    {
+      shown.map((shot) => (
+        <figure>
+          {shot.image ? (
+            <a href={shot.image.src} class="block border-[6px] border-bone bg-ground-2">
+              <Image src={shot.image} alt={shot.caption} widths={[480, 720, 1080]} sizes="(min-width: 860px) 340px, calc(100vw - 32px)" class="block h-auto w-full" />
+            </a>
+          ) : (
+            <div class="border-[6px] border-bone bg-ground-2">
+              <Sketch kind={shot.sketch!} />
+            </div>
+          )}
+          <figcaption class="mt-2.5 font-mono text-[0.74rem] tracking-[0.04em] text-muted">{shot.caption}</figcaption>
+        </figure>
+      ))
+    }
+  </div>
+</Section>

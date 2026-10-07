@@ -1,0 +1,27 @@
+---
+import type { HTMLAttributes } from 'astro/types';
+
+interface Props extends HTMLAttributes<'a'> {
+  href: string;
+  variant?: 'brass' | 'ghost' | 'dark';
+}
+
+const { href, variant = 'brass', class: className, ...rest } = Astro.props;
+
+const variants = {
+  brass:
+    'border-brass bg-brass text-ground shadow-[4px_4px_0_var(--color-blood)] motion-safe:hover:-translate-0.5 hover:shadow-[6px_6px_0_var(--color-blood)]',
+  ghost: 'border-bone bg-transparent text-bone hover:bg-bone hover:text-ground',
+  dark: 'border-ground bg-ground text-bone shadow-[4px_4px_0_var(--color-blood)] motion-safe:hover:-translate-0.5 hover:shadow-[6px_6px_0_var(--color-blood)]',
+};
+---
+
+<a
+  href={href}
+  class:list={[
+    'inline-block border-2 px-[1.3em] py-[0.95em] font-mono text-[0.82rem] font-medium uppercase tracking-[0.08em] no-underline transition',
+    variants[variant],
+    className,
+  ]}
+  {...rest}><slot /></a
+>

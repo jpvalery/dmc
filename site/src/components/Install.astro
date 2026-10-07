@@ -1,0 +1,104 @@
+---
+import { Image } from 'astro:assets';
+import Button from './Button.astro';
+import Section from './Section.astro';
+import icon from '../assets/icon.png';
+import { checksumUrl, downloadUrl, releasesUrl, type Release } from '../lib/release';
+
+interface Props {
+  release: Release;
+}
+
+const { release } = Astro.props;
+const ticketMeta = [release.version && `v${release.version}`, 'macOS 15+', 'Apple Silicon', release.sizeMB && `${release.sizeMB} MB`]
+  .filter(Boolean)
+  .join(' · ');
+
+const steps = [
+  'Open <b>DMC.dmg</b> and drag DMC into Applications.',
+  'Open DMC. macOS says it can’t verify the app. Click <b>Done</b>.',
+  'Go to <b>System Settings → Privacy &amp; Security</b>, scroll down, and click <b>Open Anyway</b> next to DMC. Confirm with your password.',
+];
+---
+
+<Section id="install" eyebrow="Install" title="Get in">
+  <div class="mt-8 grid items-start gap-[clamp(32px,5vw,64px)] min-[900px]:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)]">
+    <!-- The ticket: the stub is torn off along the dashed line. -->
+    <div
+      class="relative mx-1.5 grid -rotate-[1.2deg] grid-cols-[minmax(0,1fr)_64px] bg-bone text-ground before:absolute before:-top-3 before:right-[52px] before:size-6 before:rounded-full before:bg-ground before:content-[''] after:absolute after:-bottom-3 after:right-[52px] after:size-6 after:rounded-full after:bg-ground after:content-['']"
+    >
+      <div class="grid min-w-0 gap-2.5 px-6 pt-[22px] pb-6">
+        <span class="font-mono text-[0.72rem] uppercase tracking-[0.3em] text-blood">Admit one</span>
+        <span class="flex items-center gap-4">
+          <Image src={icon} alt="" width={64} height={64} densities={[1, 2]} class="size-16 rounded-xl" />
+          <span class="font-display text-[3.8rem] leading-[0.85]">DMC</span>
+        </span>
+        <span class="font-display text-[1.25rem] leading-[1.1]">Dungeon Master of Ceremonies</span>
+        <span class="font-mono text-[0.74rem] tracking-[0.04em]">{ticketMeta}</span>
+        <Button href={downloadUrl} variant="dark" class="justify-self-start">Download DMC.dmg</Button>
+      </div>
+      <div class="flex items-center justify-center border-l-2 border-dashed border-ground">
+        <span class="rotate-180 font-mono text-[0.78rem] uppercase tracking-[0.3em] [writing-mode:vertical-rl]">Free</span>
+      </div>
+    </div>
+
+    <div>
+      <p class="mb-5">
+        DMC is free and open source. Apple charges $99 a year to notarize an app, so DMC isn’t notarized, and macOS warns
+        you once per version.
+      </p>
+      <ol class="grid gap-[18px]">
+        {
+          steps.map((step, i) => (
+            <li class="grid grid-cols-[2.4rem_minmax(0,1fr)] gap-3">
+              <span class="font-display text-[2.4rem] leading-[0.9] text-brass">{i + 1}</span>
+              <span set:html={step} />
+            </li>
+          ))
+        }
+      </ol>
+      <p class="mt-6 text-[1.05rem] text-muted">Comfortable in Terminal? This does the same as steps 2 and 3:</p>
+      <div class="mt-2 flex border border-line bg-ground-2">
+        <code id="unquarantine" class="min-w-0 flex-1 overflow-x-auto whitespace-nowrap px-3.5 py-3 text-[0.82rem]"
+          >xattr -dr com.apple.quarantine /Applications/DMC.app</code
+        >
+        <button
+          type="button"
+          data-copy="unquarantine"
+          class="cursor-pointer border-l border-line px-3.5 font-mono text-[0.72rem] uppercase tracking-[0.12em] text-brass transition-colors hover:bg-ground-3"
+          >Copy</button
+        >
+      </div>
+      <p class="mt-4 font-mono text-[0.74rem] leading-relaxed text-muted">
+        <a href={checksumUrl}>SHA-256 checksum</a> · <a href={release.notesUrl}>Release notes</a> · <a href={releasesUrl}>All versions</a>
+      </p>
+    </div>
+  </div>
+</Section>
+
+<script>
+  // Copy the Terminal command; if the clipboard is refused, select the text instead.
+  for (const button of document.querySelectorAll<HTMLButtonElement>('[data-copy]')) {
+    button.addEventListener('click', async () => {
+      const target = document.getElementById(button.dataset.copy!);
+      if (!target) return;
+      try {
+        await navigator.clipboard.writeText(target.textContent ?? '');
+        button.textContent = 'Copied';
+        setTimeout(() => (button.textContent = 'Copy'), 1600);
+      } catch {
+        const range = document.createRange();
+        range.selectNodeContents(target);
+        getSelection()?.removeAllRanges();
+        getSelection()?.addRange(range);
+      }
+    });
+  }
+
+  // The hero's download link starts the download and brings the install steps into view.
+  for (const link of document.querySelectorAll<HTMLAnchorElement>('[data-download]')) {
+    link.addEventListener('click', () => {
+      setTimeout(() => document.getElementById('install')?.scrollIntoView(), 150);
+    });
+  }
+</script>

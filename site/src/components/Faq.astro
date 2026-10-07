@@ -1,0 +1,17 @@
+---
+import Section from './Section.astro';
+import { faq } from '../data/content';
+---
+
+<Section eyebrow="Before the show" title="Questions">
+  <dl class="mt-7 grid gap-x-12 min-[820px]:grid-cols-2">
+    {
+      faq.map(([q, a]) => (
+        <div class="border-t border-line py-3.5">
+          <dt class="text-[1.25rem] leading-[1.25] font-bold" set:html={q} />
+          <dd class="mt-1.5 text-muted" set:html={a} />
+        </div>
+      ))
+    }
+  </dl>
+</Section>

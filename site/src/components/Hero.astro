@@ -1,0 +1,59 @@
+---
+import { Image } from 'astro:assets';
+import Button from './Button.astro';
+import Sketch from './Sketch.astro';
+import { downloadUrl, repoUrl, type Release } from '../lib/release';
+import { screenshot } from '../lib/screenshots';
+
+interface Props {
+  release: Release;
+}
+
+const { release } = Astro.props;
+const meta = [release.version && `v${release.version}`, 'Free', 'macOS 15 or later', 'Apple Silicon'].filter(Boolean).join(' · ');
+const main = screenshot('main');
+---
+
+<!-- The lettering sizes its own column, so it can never run into the copy beside it. -->
+<section class="wrap relative grid items-end gap-[clamp(24px,4vw,64px)] pt-[clamp(40px,7vw,88px)] pb-[clamp(32px,5vw,56px)] min-[860px]:grid-cols-[auto_minmax(0,1fr)]">
+  <div aria-hidden="true" class="halftone pointer-events-none absolute inset-y-0 left-0 w-[72%] opacity-25"></div>
+  <h1 class="misprint relative font-display text-[clamp(7rem,25vw,10rem)] leading-[0.8] min-[860px]:text-[clamp(8rem,16vw,14.5rem)]">DMC</h1>
+  <div class="relative grid min-w-0 gap-[18px]">
+    <p class="font-display text-[clamp(1.7rem,3.3vw,2.5rem)] leading-[1.02] text-balance text-brass">Dungeon Master of Ceremonies</p>
+    <p class="max-w-[32ch] text-[clamp(1.25rem,1.8vw,1.45rem)] leading-[1.4]">
+      Run the whole table from one window. Soundscapes, D&amp;D Beyond, combat and notes, side by side.
+    </p>
+    <div class="flex flex-wrap gap-3.5">
+      <Button href={downloadUrl} data-download>Download for Mac</Button>
+      <Button href={repoUrl} variant="ghost">Source on GitHub</Button>
+    </div>
+    <p class="font-mono text-[0.76rem] tracking-[0.06em] text-muted">{meta}</p>
+    <p class="mt-1.5 border-t border-line pt-3.5">
+      <span class="mb-1 block font-mono text-[0.7rem] uppercase tracking-[0.2em] text-brass">With special guests</span>
+      <span class="font-display text-[1.4rem]">Tabletop Audio · Turbo Bard · Open5e</span>
+    </p>
+  </div>
+</section>
+
+<figure class="wrap pt-2 pb-[72px]">
+  <div class="-rotate-[0.5deg] border-[clamp(6px,1vw,12px)] border-bone bg-ground-2 shadow-[6px_6px_0_var(--color-blood)] sm:shadow-[12px_12px_0_var(--color-blood)]">
+    {
+      main ? (
+        <Image
+          src={main}
+          alt="The DMC window during a session: scenes on the left, a D&D Beyond monster page in the middle, the session's notes on the right"
+          widths={[800, 1200, 1600, 2200]}
+          sizes="(min-width: 1160px) 1056px, calc(100vw - 48px)"
+          loading="eager"
+          fetchpriority="high"
+          class="block h-auto w-full"
+        />
+      ) : (
+        <Sketch kind="app" />
+      )
+    }
+  </div>
+  <figcaption class="mt-6 font-mono text-[0.74rem] tracking-[0.08em] text-muted">
+    The main window: scenes on the left, D&amp;D Beyond in the middle, the session’s notes on the right.
+  </figcaption>
+</figure>

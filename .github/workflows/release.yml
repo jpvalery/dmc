@@ -1,0 +1,57 @@
+name: Release
+
+# Push a tag like v0.2.0 to build DMC.dmg and publish it as a GitHub release. The site links to
+# releases/latest/download/DMC.dmg, so the newest release is what people download.
+# Run it by hand (Actions → Release → Run workflow) to build the image without releasing it.
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: macos-15
+    env:
+      # Optional: a Vercel deploy hook URL, so the site picks up the new version and size.
+      VERCEL_DEPLOY_HOOK: ${{ secrets.VERCEL_DEPLOY_HOOK }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # the build number is the commit count
+
+      - uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: latest-stable
+
+      - name: Build DMC.dmg
+        run: |
+          swift --version
+          if [[ "$GITHUB_REF_TYPE" == "tag" ]]; then
+            make dmg VERSION="${GITHUB_REF_NAME#v}"
+          else
+            make dmg
+          fi
+
+      - name: Keep the image (manual runs)
+        if: github.ref_type != 'tag'
+        uses: actions/upload-artifact@v4
+        with:
+          name: DMC
+          path: |
+            app/build/DMC.dmg
+            app/build/DMC.dmg.sha256
+
+      - name: Publish the release
+        if: github.ref_type == 'tag'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" app/build/DMC.dmg app/build/DMC.dmg.sha256 \
+            --title "DMC ${GITHUB_REF_NAME#v}" --generate-notes --verify-tag
+
+      - name: Redeploy the site
+        if: github.ref_type == 'tag' && env.VERCEL_DEPLOY_HOOK != ''
+        run: curl -fsS -X POST "$VERCEL_DEPLOY_HOOK" > /dev/null

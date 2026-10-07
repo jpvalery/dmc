@@ -1,0 +1,39 @@
+<!doctype html>
+<!--
+  Source for public/og.png, the 1200×630 link preview. Not part of the published site.
+  Render: serve the site folder (python3 -m http.server -d site 8000), open
+  http://localhost:8000/og/og.html at 1200×630, and save the capture as public/og.png.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<style>
+  @font-face { font-family: 'New Rocker'; src: url('../node_modules/@fontsource/new-rocker/files/new-rocker-latin-400-normal.woff2') format('woff2'); }
+  @font-face { font-family: 'DM Mono'; src: url('../node_modules/@fontsource/dm-mono/files/dm-mono-latin-400-normal.woff2') format('woff2'); }
+  :root { --ground: #151017; --bone: #efe4cc; --brass: #e2a93b; --blood: #c8352c; --muted: #ab9d8c; }
+  * { box-sizing: border-box; margin: 0; }
+  html, body { width: 1200px; height: 630px; overflow: hidden; background: var(--ground); color: var(--bone); }
+  .band { height: 44px; background: var(--blood); font: 15px/44px 'DM Mono', monospace; letter-spacing: .28em; text-transform: uppercase; padding-left: 64px; }
+  .stage { position: relative; height: 586px; display: grid; grid-template-columns: auto 1fr; align-items: center; gap: 56px; padding: 0 64px; }
+  .stage::before { content: ''; position: absolute; inset: 0 40% 0 0; opacity: .26;
+    background-image: radial-gradient(var(--brass) 1.4px, transparent 1.8px); background-size: 11px 11px;
+    mask-image: radial-gradient(circle at 34% 50%, #000 0, transparent 64%); }
+  .type { position: relative; }
+  h1 { font: 280px/.78 'New Rocker', serif; text-shadow: .04em .028em 0 var(--blood); }
+  .kicker { margin-top: 30px; font: 52px/1 'New Rocker', serif; color: var(--brass); }
+  .line { margin-top: 26px; font: 19px/1.4 'DM Mono', monospace; letter-spacing: .06em; color: var(--muted); }
+  .icon { position: relative; justify-self: end; width: 300px; height: 300px; border: 12px solid var(--bone); box-shadow: 14px 14px 0 var(--blood); transform: rotate(2.5deg); background: #000 url('../src/assets/icon.png') center / cover; }
+</style>
+</head>
+<body>
+  <div class="band">Live at your table ★ Every session ★ Free entry</div>
+  <div class="stage">
+    <div class="type">
+      <h1>DMC</h1>
+      <p class="kicker">Dungeon Master of Ceremonies</p>
+      <p class="line">Soundscapes · D&amp;D Beyond · Combat · Notes<br>Free for macOS</p>
+    </div>
+    <div class="icon" role="img" aria-label="The DMC icon: a dragon over an open book and a red d20"></div>
+  </div>
+</body>
+</html>

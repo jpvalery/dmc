@@ -1,36 +1,13 @@
-APP       := DMC
-BUNDLE    := build/$(APP).app
-BIN       := .build/arm64-apple-macosx/release/$(APP)
-CONFIG    := release
+# The macOS app lives in app/ and the website in site/. App targets forward to app/Makefile,
+# so `make run` and `make dmg` work from the repository root.
 
-.PHONY: all build bundle run install clean
+.PHONY: all build bundle run install dmg clean site site-dev
 
-all: bundle
+all build bundle run install dmg clean:
+	@$(MAKE) -C app $@
 
-build:
-	swift build -c $(CONFIG) --arch arm64
+site:
+	cd site && npm run build
 
-bundle: build
-	@rm -rf "$(BUNDLE)"
-	@mkdir -p "$(BUNDLE)/Contents/MacOS" "$(BUNDLE)/Contents/Resources"
-	@cp "$(BIN)" "$(BUNDLE)/Contents/MacOS/$(APP)"
-	@cp Resources/Info.plist "$(BUNDLE)/Contents/Info.plist"
-	@cp Resources/AppIcon.icns "$(BUNDLE)/Contents/Resources/AppIcon.icns"
-	@cp Resources/tta_data.json "$(BUNDLE)/Contents/Resources/tta_data.json"
-	@cp Resources/scene-templates.json "$(BUNDLE)/Contents/Resources/scene-templates.json"
-	@cp Resources/effect-templates.json "$(BUNDLE)/Contents/Resources/effect-templates.json"
-	@printf 'APPL????' > "$(BUNDLE)/Contents/PkgInfo"
-	@codesign --force --sign - "$(BUNDLE)" 2>/dev/null
-	@echo "built $(BUNDLE)"
-
-run: bundle
-	@pkill -x $(APP) 2>/dev/null || true
-	@open "$(BUNDLE)"
-
-install: bundle
-	@rm -rf "/Applications/$(APP).app"
-	@cp -R "$(BUNDLE)" /Applications/
-	@echo "installed /Applications/$(APP).app"
-
-clean:
-	@rm -rf .build build
+site-dev:
+	cd site && npm run dev

@@ -1,0 +1,20 @@
+---
+// A page section: an eyebrow, a New Rocker heading, then whatever the slot holds.
+interface Props {
+  id?: string;
+  eyebrow: string;
+  title: string;
+  class?: string;
+}
+
+const { id, eyebrow, title, class: className } = Astro.props;
+---
+
+<section id={id} class:list={['wrap scroll-mt-4 border-t border-line py-[clamp(48px,7vw,88px)]', className]}>
+  <div>
+    <p class="mb-2.5 font-mono text-[0.74rem] uppercase tracking-[0.22em] text-brass">{eyebrow}</p>
+    <h2 class="mb-3.5 font-display text-[clamp(2.4rem,5.5vw,4.2rem)] leading-[0.98] text-balance">{title}</h2>
+    <slot name="intro" />
+  </div>
+  <slot />
+</section>

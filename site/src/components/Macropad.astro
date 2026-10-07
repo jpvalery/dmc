@@ -1,0 +1,15 @@
+---
+import Section from './Section.astro';
+import PadBlueprint from './PadBlueprint.astro';
+import { repoUrl } from '../lib/release';
+---
+
+<Section eyebrow="Macropad" title="Put it on a knob" class="grid items-start gap-9 min-[900px]:grid-cols-[minmax(0,1fr)_minmax(0,2.1fr)]">
+  <p slot="intro" class="max-w-[60ch]">
+    Every hotkey is global, so the pad keeps working while D&amp;D Beyond has focus. Any keyboard or pad that can send
+    F13–F20 will do. This is the Winry315 DMC was built with. Its <a href={`${repoUrl}/tree/main/macropad`}>QMK config</a> is in the repo.
+  </p>
+  <div class="overflow-x-auto border border-line">
+    <PadBlueprint />
+  </div>
+</Section>

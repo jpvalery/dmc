@@ -1,0 +1,30 @@
+---
+import Section from './Section.astro';
+import { sides } from '../data/content';
+---
+
+<Section id="features" eyebrow="Features" title="Two sides, one session">
+  <div class="mt-9 grid gap-[clamp(28px,5vw,64px)] min-[820px]:grid-cols-2">
+    {
+      sides.map(({ side, label, tracks }) => (
+        <div>
+          <div class="flex items-baseline gap-3.5 border-b-2 border-bone pb-2.5">
+            <span class="font-display text-[2.4rem] leading-none text-brass">Side {side}</span>
+            <span class="font-mono text-[0.76rem] uppercase tracking-[0.2em]">{label}</span>
+          </div>
+          <ul>
+            {tracks.map(([title, text], i) => (
+              <li class="grid grid-cols-[2.8rem_minmax(0,1fr)] gap-3 border-b border-line py-3.5">
+                <span class="pt-[0.3em] font-mono text-[0.82rem] text-brass">{`${side}${i + 1}`}</span>
+                <div>
+                  <h3 class="text-[1.25rem] leading-[1.2] font-bold">{title}</h3>
+                  <p class="mt-0.5 text-muted" set:html={text} />
+                </div>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ))
+    }
+  </div>
+</Section>

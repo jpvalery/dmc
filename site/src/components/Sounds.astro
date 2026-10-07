@@ -1,0 +1,56 @@
+---
+import Section from './Section.astro';
+import { sounds } from '../data/content';
+---
+
+<Section id="sounds" eyebrow="Support acts" title="Bring your own sounds">
+  <p slot="intro" class="max-w-[60ch]">
+    DMC ships silent. The Tabletop Audio browser and the scene templates download what you pick, straight from their
+    creators. Or drop any folder of audio into <code>~/DMConsole/audio</code>, and each subfolder becomes a scene.
+  </p>
+
+  <!-- Phones get a stacked list; the table needs room for four columns. -->
+  <ul class="mt-7 border-t-2 border-bone sm:hidden">
+    {
+      sounds.map((s) => (
+        <li class="border-b border-line py-3.5">
+          <a href={s.url} class="font-bold underline decoration-brass/70 underline-offset-3">{s.name}</a>
+          <p>{s.what}</p>
+          <p class="text-muted">{s.licence}</p>
+          <p class="mt-1 font-mono text-[0.78rem] text-brass">{s.how}</p>
+        </li>
+      ))
+    }
+  </ul>
+
+  <div class="mt-7 hidden overflow-x-auto sm:block">
+    <table class="w-full min-w-[640px] border-collapse text-left">
+      <thead>
+        <tr class="border-b-2 border-bone font-mono text-[0.7rem] uppercase tracking-[0.16em] text-brass">
+          <th scope="col" class="py-2.5 pr-3.5 font-normal">Source</th>
+          <th scope="col" class="py-2.5 pr-3.5 font-normal">What you get</th>
+          <th scope="col" class="py-2.5 pr-3.5 font-normal">Licence</th>
+          <th scope="col" class="py-2.5 font-normal">How</th>
+        </tr>
+      </thead>
+      <tbody>
+        {
+          sounds.map((s) => (
+            <tr class="border-b border-line align-top">
+              <td class="py-3.5 pr-3.5 font-bold">
+                <a href={s.url}>{s.name}</a>
+              </td>
+              <td class="py-3.5 pr-3.5">{s.what}</td>
+              <td class="py-3.5 pr-3.5">{s.licence}</td>
+              <td class="py-3.5 font-mono text-[0.78rem] text-brass">{s.how}</td>
+            </tr>
+          ))
+        }
+      </tbody>
+    </table>
+  </div>
+  <p class="mt-[18px] max-w-[62ch] text-[1.05rem] text-muted">
+    Credit the creators, and keep it non-commercial where the licence says so. If a library carries your table, support
+    the people who made it.
+  </p>
+</Section>

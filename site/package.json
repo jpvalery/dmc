@@ -1,0 +1,21 @@
+{
+  "name": "dmc-site",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview"
+  },
+  "dependencies": {
+    "@fontsource/dm-mono": "5.3.0",
+    "@fontsource/grenze": "5.3.0",
+    "@fontsource/new-rocker": "5.3.0",
+    "@tailwindcss/vite": "4.3.3",
+    "astro": "7.3.4",
+    "tailwindcss": "4.3.3"
+  }
+}

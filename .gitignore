@@ -7,3 +7,9 @@ build/
 
 # macOS
 .DS_Store
+
+# Site
+node_modules/
+site/dist/
+site/.astro/
+.vercel/

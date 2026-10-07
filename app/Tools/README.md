@@ -5,6 +5,8 @@ Tools toolchain has no `Testing` or `XCTest` module, so verification here is don
 executables compiled against the app's sources rather than a test target. Installing Xcode would
 allow a real test target instead.
 
+The commands below use paths relative to `app/`, so run them from there.
+
 ## `mkicon.swift` — app icon
 
 Applies Apple's icon grid (824pt body on a 1024pt canvas, superelliptical corners, contact

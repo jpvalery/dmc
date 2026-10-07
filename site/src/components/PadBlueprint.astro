@@ -1,0 +1,114 @@
+---
+// The Winry315 that DMC was built with, drawn as a blueprint. The key labels are an example
+// layout, not anyone's real one; the fifth column is left free.
+const keys = [
+  [['F13', 'PREV'], ['F14', 'TAVERN'], ['F15', 'ROAD'], ['F16', 'DUNGEON'], ['', 'FREE']],
+  [['⇧F13', 'NEXT'], ['⇧F14', 'DOOR'], ['⇧F15', 'THUNDER'], ['⇧F16', 'ROAR'], ['', 'FREE']],
+  [['⌃F13', 'SWORDS'], ['⌃F14', 'DICE'], ['⌃F15', 'SCREAM'], ['⌃F16', 'COINS'], ['', 'FREE']],
+].flatMap((row, r) => row.map(([code, label], c) => ({ code, label, x: 280 + c * 70, y: 222 + r * 70, free: c === 4 })));
+
+const knobs = [310, 450, 590].map((cx) => {
+  const cy = 160;
+  let knurl = '';
+  for (let a = 0; a < 24; a++) {
+    const t = (a * Math.PI) / 12;
+    knurl += `M${(cx + Math.cos(t) * 23).toFixed(1)} ${(cy + Math.sin(t) * 23).toFixed(1)}L${(cx + Math.cos(t) * 28).toFixed(1)} ${(cy + Math.sin(t) * 28).toFixed(1)}`;
+  }
+  return { cx, cy, knurl };
+});
+
+const callouts = [
+  { x: 36, y: 96, lines: ['MASTER VOLUME', 'turn · DMC’s own volume', 'press · pause / resume'], d: 'M204 92H236L288 140', dot: [288, 140] },
+  { x: 36, y: 236, lines: ['SCENE KEYS', 'press · fade in, again out', 'PREV · NEXT move the cue'], d: 'M216 232H244L280 252', dot: [280, 252] },
+  { x: 36, y: 376, lines: ['EFFECT KEYS', 'one-shots over the scene', 'several takes each'], d: 'M216 372H244L280 392', dot: [280, 392] },
+  { x: 680, y: 60, lines: ['SCROLL', 'turn · scroll notes or pages', 'press · middle-click'], d: 'M672 56H450V130', dot: [450, 130] },
+  { x: 680, y: 154, lines: ['LIGHTS', 'turn · RGB brightness', 'press · next lighting mode'], d: 'M672 150H646L620 160', dot: [620, 160] },
+  { x: 680, y: 300, lines: ['SPARE KEYS', 'bind in Macropad & Hotkeys…', 'to any scene or effect'], d: 'M672 296H646L620 322', dot: [620, 322] },
+];
+---
+
+<svg viewBox="0 0 900 560" class="block h-auto w-full min-w-[660px] font-mono" role="img" aria-labelledby="pad-title pad-desc">
+  <title id="pad-title">Blueprint of the Winry315 macropad</title>
+  <desc id="pad-desc">
+    Three knobs above fifteen keys. The left knob sets DMC's master volume, the keys start scenes and effects, and any
+    pad that sends F13 to F20 works.
+  </desc>
+  <defs>
+    <pattern id="pad-grid" width="20" height="20" patternUnits="userSpaceOnUse">
+      <path d="M20 0H0V20" class="fill-none stroke-bone/6" stroke-width="1"></path>
+    </pattern>
+  </defs>
+  <rect width="900" height="560" class="fill-ground-2"></rect>
+  <rect width="900" height="560" fill="url(#pad-grid)"></rect>
+  <rect x="14" y="14" width="872" height="532" class="fill-none stroke-bone" stroke-width="1.5"></rect>
+  <text x="36" y="46" class="fill-brass" font-size="13" font-weight="500" letter-spacing="2">DMC · MACROPAD</text>
+
+  <rect x="250" y="96" width="400" height="344" rx="20" class="fill-none stroke-bone" stroke-width="2.5"></rect>
+  <rect x="262" y="108" width="376" height="320" rx="12" class="fill-none stroke-bone" stroke-width="1" stroke-dasharray="6 5" opacity=".45"></rect>
+
+  {
+    knobs.map(({ cx, cy, knurl }) => (
+      <g class="fill-none stroke-bone">
+        <path d={`M${cx - 44} ${cy}H${cx + 44}M${cx} ${cy - 44}V${cy + 44}`} stroke-width=".8" stroke-dasharray="8 4 2 4" opacity=".6" />
+        <circle cx={cx} cy={cy} r="30" stroke-width="2" />
+        <circle cx={cx} cy={cy} r="21" stroke-width="1.4" />
+        <path d={knurl} stroke-width="1" opacity=".7" />
+        <path d={`M${cx} ${cy - 17}V${cy - 8}`} stroke-width="2.5" stroke-linecap="round" />
+      </g>
+    ))
+  }
+
+  {
+    keys.map((k) => (
+      <g>
+        <rect x={k.x} y={k.y} width="60" height="60" rx="7" class="fill-none stroke-bone" stroke-width="1.8" stroke-dasharray={k.free ? '5 4' : undefined} />
+        {!k.free && <rect x={k.x + 6} y={k.y + 5} width="48" height="46" rx="5" class="fill-none stroke-bone" stroke-width="1" opacity=".5" />}
+        {k.code && (
+          <text x={k.x + 10} y={k.y + 19} class="fill-bone" font-size="9.5" opacity=".75">
+            {k.code}
+          </text>
+        )}
+        <text x={k.x + 30} y={k.y + 42} class="fill-bone" font-size="10.5" font-weight="500" text-anchor="middle" opacity={k.free ? '.6' : undefined}>
+          {k.label}
+        </text>
+      </g>
+    ))
+  }
+
+  {
+    callouts.map((call) => (
+      <g>
+        {call.lines.map((line, i) =>
+          i === 0 ? (
+            <text x={call.x} y={call.y} class="fill-brass" font-size="12" font-weight="500" letter-spacing="1.5">
+              {line}
+            </text>
+          ) : (
+            <text x={call.x} y={call.y + i * 18} class="fill-bone" font-size="11">
+              {line}
+            </text>
+          ),
+        )}
+        <path d={call.d} class="fill-none stroke-brass" stroke-width="1.2" />
+        <circle cx={call.dot[0]} cy={call.dot[1]} r="3.5" class="fill-brass" />
+      </g>
+    ))
+  }
+
+  <!-- one key pitch -->
+  <path d="M280 428V482M350 428V482" class="fill-none stroke-bone" stroke-width=".8" opacity=".7"></path>
+  <path d="M280 472H350M275 477L285 467M345 477L355 467" class="fill-none stroke-brass" stroke-width="1.2"></path>
+  <text x="315" y="463" class="fill-brass" font-size="11" text-anchor="middle">19.05</text>
+  <text x="315" y="496" class="fill-bone" font-size="10" text-anchor="middle" opacity=".7">1u</text>
+
+  <text x="36" y="504" class="fill-brass" font-size="11" font-weight="500" letter-spacing="1.5">NOTE</text>
+  <text x="36" y="520" class="fill-bone" font-size="11">Any pad that sends F13–F20 works.</text>
+  <text x="36" y="536" class="fill-bone" font-size="11">8 keys × 4 banks (none ⇧ ⌃ ⌥) = 32 slots.</text>
+
+  <rect x="590" y="468" width="282" height="64" class="fill-none stroke-bone" stroke-width="1.2"></rect>
+  <path d="M590 490H872M590 511H872M780 468V490" class="fill-none stroke-bone" stroke-width=".8"></path>
+  <text x="600" y="484" class="fill-brass" font-size="11" font-weight="500" letter-spacing="1">DMC · PAD-01</text>
+  <text x="790" y="484" class="fill-bone" font-size="10">SHEET 1/1</text>
+  <text x="600" y="505" class="fill-bone" font-size="10.5">Winry315 macropad · QMK + VIA</text>
+  <text x="600" y="526" class="fill-bone" font-size="10.5">15 keys · 3 knobs · example · NTS</text>
+</svg>

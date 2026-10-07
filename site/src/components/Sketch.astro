@@ -1,0 +1,161 @@
+---
+// Line drawings of the app, shown wherever a real screenshot is not in src/assets/screenshots yet.
+interface Props {
+  kind: 'app' | 'scene' | 'combat' | 'notes';
+}
+
+const { kind } = Astro.props;
+
+const c = {
+  bg: 'fill-ground-2',
+  panel: 'fill-ground-3',
+  soft: 'fill-bone/10',
+  acc: 'fill-brass',
+  mark: 'fill-blood',
+  ink: 'fill-bone',
+  ink2: 'fill-muted',
+  none: 'fill-none',
+  line: 'stroke-line',
+  sAcc: 'stroke-brass',
+  sInk2: 'stroke-muted',
+};
+
+const T = (x: number, y: number, str: string, cls: string, extra = '') =>
+  `<text x="${x}" y="${y}" class="${cls}" ${extra}>${str}</text>`;
+const frame = (w: number, h: number, label: string) =>
+  `<svg viewBox="0 0 ${w} ${h}" class="block h-auto w-full font-mono" role="img" aria-label="${label}">` +
+  `<rect x="1" y="1" width="${w - 2}" height="${h - 2}" rx="10" class="${c.bg} ${c.line}" stroke-width="2"/>`;
+
+function app() {
+  let s = frame(1200, 720, 'Sketch of the DMC window: scenes on the left, D&amp;D Beyond in the middle, notes on the right');
+  s += `<path d="M2 45H150V718H16Q2 718 2 704Z" class="${c.panel}"/>`;
+  s += `<path d="M2 44H1198M150 44V718M750 44V718" class="${c.line} ${c.none}" stroke-width="2"/>`;
+  [26, 48, 70].forEach((x) => (s += `<circle cx="${x}" cy="22" r="6.5" class="${c.soft}"/>`));
+  s += T(600, 28, 'DMC · The Salt Road', c.ink2, 'text-anchor="middle" font-size="15"');
+  for (let i = 0; i < 8; i++) {
+    const cy = 100 + i * 66;
+    if (i === 1) s += `<circle cx="75" cy="${cy}" r="28" class="${c.none} ${c.sAcc}" stroke-width="3"/><circle cx="75" cy="${cy}" r="20" class="${c.acc}"/>`;
+    else if (i === 3) s += `<circle cx="75" cy="${cy}" r="28" class="${c.none} ${c.sInk2}" stroke-width="2" stroke-dasharray="5 5"/><circle cx="75" cy="${cy}" r="20" class="${c.soft}"/>`;
+    else s += `<circle cx="75" cy="${cy}" r="20" class="${c.soft}"/>`;
+  }
+  s += `<path d="M32 676H118" class="${c.sInk2} ${c.none}" stroke-width="4" stroke-linecap="round"/><circle cx="96" cy="676" r="9" class="${c.ink}"/>`;
+  ['Character sheet', 'Encounter', 'Monsters'].forEach((t, i) => {
+    const x = 164 + i * 156;
+    s += `<rect x="${x}" y="54" width="148" height="28" rx="7" class="${i ? c.none : c.soft} ${c.line}"/>` + T(x + 14, 73, t, i ? c.ink2 : c.ink, 'font-size="14"');
+  });
+  s += `<rect x="164" y="92" width="572" height="28" rx="14" class="${c.panel}"/>` + T(184, 111, 'dndbeyond.com/encounters', c.ink2, 'font-size="14"');
+  s += `<rect x="176" y="138" width="548" height="56" rx="6" class="${c.soft}"/>` + T(196, 173, 'Ambush on the Salt Road', c.ink, 'font-size="22"');
+  s += `<rect x="176" y="210" width="250" height="176" rx="6" class="${c.soft}"/><path d="M190 372L262 290L306 334L344 300L414 372Z" class="${c.panel}"/><circle cx="380" cy="248" r="16" class="${c.panel}"/>`;
+  [270, 248, 276, 206, 262, 236, 150].forEach((w, i) => (s += `<rect x="446" y="${216 + i * 24}" width="${w}" height="10" rx="5" class="${c.soft}"/>`));
+  s += `<path d="M176 414H724" class="${c.line} ${c.none}" stroke-width="2"/>`;
+  s += T(184, 438, 'NAME', c.ink2, 'font-size="12" letter-spacing="1.5"') + T(500, 438, 'AC', c.ink2, 'font-size="12"') + T(580, 438, 'HP', c.ink2, 'font-size="12"') + T(660, 438, 'CR', c.ink2, 'font-size="12"');
+  [
+    ['Bandit captain', '15', '65', '2'],
+    ['Bandit', '12', '11', '1/8'],
+    ['Bandit', '12', '11', '1/8'],
+    ['Mastiff', '12', '5', '1/8'],
+    ['Mastiff', '12', '5', '1/8'],
+    ['Scout', '13', '16', '1/2'],
+  ].forEach((r, i) => {
+    const y = 472 + i * 40;
+    s += T(184, y, r[0], c.ink, 'font-size="16"') + T(500, y, r[1], c.ink2, 'font-size="16"') + T(580, y, r[2], c.ink2, 'font-size="16"') + T(660, y, r[3], c.ink2, 'font-size="16"');
+    s += `<path d="M176 ${y + 15}H724" class="${c.line} ${c.none}"/>`;
+  });
+  const nx = 778;
+  s += T(nx, 94, 'Session 12', c.ink, 'font-size="24"') + T(nx, 120, '2026-10-02', c.ink2, 'font-size="14"');
+  (
+    [
+      ['h', '## Arrival', 162],
+      ['t', 'The caravan reaches Saltmere at dusk.', 192],
+      ['t', 'Odo, the innkeeper, saw the ferry go.', 218],
+      ['c', 'scene:Tavern', 254],
+      ['t', '- [ ] Ask about the lighthouse', 294],
+      ['t', '- [x] Hand out the map', 320],
+      ['h', '## Ambush', 362],
+      ['c', 'scene:Road ambush', 398],
+      ['h', '## Log', 446],
+      ['t', '- 20:14 Scene: Tavern', 476],
+      ['t', '- 21:02 Scene: Road ambush', 502],
+      ['t', '- 21:03 Combat started', 528],
+      ['t', '- 21:05 Round 2', 554],
+      ['t', '- 21:09 Bandit 2 drops to 0 HP', 580],
+    ] as const
+  ).forEach(([k, str, y]) => {
+    if (k === 'h') s += T(nx, y, str, c.ink, 'font-size="17" font-weight="500"');
+    else if (k === 't') s += T(nx, y, str, c.ink2, 'font-size="15"');
+    else s += `<rect x="${nx}" y="${y - 20}" width="${str.length * 9.2 + 44}" height="30" rx="6" class="${c.soft} ${c.sAcc}" stroke-width="1.5"/>` + T(nx + 12, y, '▶ ' + str, c.acc, 'font-size="15"');
+  });
+  return s + '</svg>';
+}
+
+function scene() {
+  let s = frame(600, 380, 'Sketch of the scene editor');
+  s += T(24, 42, 'Edit scene · Tavern', c.ink, 'font-size="20"') + `<path d="M1 62H599" class="${c.line} ${c.none}"/>`;
+  (
+    [
+      ['crowd-murmur', 'loop', 0.8],
+      ['hearth-fire', 'loop', 0.55],
+      ['lute-by-the-bar', 'loop', 0.35],
+      ['mug-clink', 'every 5–20 s', 0.6],
+      ['door-creak', 'every 30–90 s', 0.4],
+    ] as const
+  ).forEach(([n, m, g], i) => {
+    const y = 100 + i * 54;
+    const kx = 300 + 256 * g;
+    s += T(24, y, n, c.ink, 'font-size="15"') + T(24, y + 20, m, c.ink2, 'font-size="12"');
+    s += `<path d="M300 ${y + 2}H556" class="${c.sInk2} ${c.none}" stroke-width="3" stroke-linecap="round" opacity=".35"/>`;
+    s += `<path d="M300 ${y + 2}H${kx}" class="${c.sAcc} ${c.none}" stroke-width="3" stroke-linecap="round"/><circle cx="${kx}" cy="${y + 2}" r="8" class="${c.acc}"/>`;
+  });
+  return s + '</svg>';
+}
+
+function combat() {
+  let s = frame(600, 380, 'Sketch of the combat tracker');
+  s += T(24, 42, 'Round 3', c.ink, 'font-size="20"') + T(576, 42, 'Next turn ⌘⏎', c.ink2, 'font-size="13" text-anchor="end"');
+  s += `<path d="M1 62H599" class="${c.line} ${c.none}"/>`;
+  const head = 'font-size="11" letter-spacing="1.5"';
+  s += T(64, 90, 'NAME', c.ink2, head) + T(330, 90, 'HP', c.ink2, head) + T(440, 90, 'AC', c.ink2, head) + T(520, 90, 'INIT', c.ink2, head);
+  (
+    [
+      ['Lair actions', '—', '—', '20', false, false],
+      ['Brakka', '31/44', '16', '19', true, true],
+      ['Goblin 1', '4/7', '15', '14', false, false],
+      ['Goblin 2', '0/7', '15', '14', false, false],
+      ['Wren', '22/22', '13', '12', false, true],
+    ] as const
+  ).forEach(([n, hp, ac, ini, cur, pc], i) => {
+    const y = 132 + i * 48;
+    if (cur) s += `<rect x="2" y="${y - 28}" width="596" height="44" class="${c.soft}"/><rect x="2" y="${y - 28}" width="5" height="44" class="${c.acc}"/>`;
+    s += `<circle cx="38" cy="${y - 6}" r="8" class="${pc ? c.ink2 : c.soft}"/>`;
+    s += T(64, y, n, c.ink, 'font-size="16"') + T(330, y, hp, hp.startsWith('0/') ? c.mark : c.ink, 'font-size="16"') + T(440, y, ac, c.ink2, 'font-size="16"') + T(520, y, ini, c.ink2, 'font-size="16"');
+  });
+  return s + '</svg>';
+}
+
+function notes() {
+  let s = frame(600, 380, 'Sketch of a session note in reading mode');
+  s += T(24, 42, 'Session 12 · reading', c.ink, 'font-size="20"') + `<path d="M1 62H599" class="${c.line} ${c.none}"/>`;
+  s += T(24, 98, 'The caravan reaches Saltmere at dusk.', c.ink2, 'font-size="15"') + T(24, 122, 'Odo, the innkeeper, saw the ferry go.', c.ink2, 'font-size="15"');
+  let x = 24;
+  ['▶ Tavern', '▶ Road ambush', '■ Stop'].forEach((cue) => {
+    const w = cue.length * 9 + 28;
+    s += `<rect x="${x}" y="142" width="${w}" height="32" rx="16" class="${c.soft} ${c.sAcc}" stroke-width="1.5"/>` + T(x + 14, 163, cue, c.acc, 'font-size="14"');
+    x += w + 10;
+  });
+  s += T(24, 220, 'Log', c.ink, 'font-size="17" font-weight="500"');
+  [
+    ['20:14', 'Scene: Tavern'],
+    ['21:03', 'Combat started'],
+    ['21:05', 'Round 2'],
+    ['21:09', 'Bandit 2 drops to 0 HP'],
+  ].forEach(([t, e], i) => {
+    const y = 254 + i * 28;
+    s += T(24, y, t, c.acc, 'font-size="14"') + T(84, y, e, c.ink2, 'font-size="14"');
+  });
+  return s + '</svg>';
+}
+
+const svg = { app, scene, combat, notes }[kind]();
+---
+
+<Fragment set:html={svg} />

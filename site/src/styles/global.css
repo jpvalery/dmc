@@ -1,0 +1,72 @@
+@import 'tailwindcss';
+@import '@fontsource/new-rocker/400.css';
+@import '@fontsource/grenze/400.css';
+@import '@fontsource/grenze/700.css';
+@import '@fontsource/dm-mono/400.css';
+@import '@fontsource/dm-mono/500.css';
+
+/* Headliner: a screen-printed gig poster in three inks (bone, brass, blood) on plum black.
+   Dark only, by design. */
+@theme {
+  --color-ground: #151017;
+  --color-ground-2: #1e1721;
+  --color-ground-3: #2a2030;
+  --color-bone: #efe4cc;
+  --color-brass: #e2a93b;
+  --color-blood: #c8352c;
+  --color-muted: #ab9d8c;
+  --color-line: rgb(239 228 204 / 0.16);
+
+  --font-display: 'New Rocker', 'Iowan Old Style', Georgia, serif;
+  --font-body: 'Grenze', Georgia, serif;
+  --font-mono: 'DM Mono', ui-monospace, Menlo, monospace;
+}
+
+@layer base {
+  html {
+    color-scheme: dark;
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+  }
+  body {
+    @apply bg-ground text-bone font-body text-[1.2rem] leading-normal antialiased;
+  }
+  ::selection {
+    @apply bg-brass text-ground;
+  }
+  :focus-visible {
+    @apply outline-2 outline-offset-3 outline-brass;
+  }
+  code,
+  kbd {
+    @apply font-mono text-[0.82em];
+  }
+  /* Links inside running text; navigation and buttons style themselves. */
+  :where(p, dd, td, li, figcaption) a {
+    @apply underline decoration-brass/70 underline-offset-3 transition-colors hover:text-bone;
+  }
+}
+
+/* One page column, gutter included, so every section lines up. */
+@utility wrap {
+  max-width: 1160px;
+  margin-inline: auto;
+  padding-inline: clamp(16px, 4vw, 40px);
+}
+
+/* Halftone dots behind the hero lettering, fading out from the middle. */
+@utility halftone {
+  background-image: radial-gradient(var(--color-brass) 1.3px, transparent 1.7px);
+  background-size: 10px 10px;
+  mask-image: radial-gradient(circle at 32% 48%, #000 0, transparent 62%);
+}
+
+/* The second ink printed slightly off register. */
+@utility misprint {
+  text-shadow: 0.04em 0.028em 0 var(--color-blood);
+}

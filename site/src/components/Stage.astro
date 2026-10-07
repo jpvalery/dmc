@@ -1,0 +1,27 @@
+---
+import Section from './Section.astro';
+import { panes } from '../data/content';
+---
+
+<Section eyebrow="The stage" title="One window, three panes">
+  <p slot="intro" class="max-w-[60ch]">Twelve tabs, a playlist and a sticky note. Or one window.</p>
+
+  <!-- The panes' default widths, to scale. -->
+  <div class="mt-9 mb-7 grid grid-cols-[1fr_4fr_3fr] border-2 border-bone font-mono text-[0.74rem] tracking-[0.08em]" aria-hidden="true">
+    <span class="bg-brass px-2 py-[0.7em] text-center text-ground">1/8</span>
+    <span class="border-l-2 border-bone px-2 py-[0.7em] text-center">4/8</span>
+    <span class="border-l-2 border-bone px-2 py-[0.7em] text-center">3/8</span>
+  </div>
+
+  <div class="grid gap-7 md:grid-cols-3">
+    {
+      panes.map((pane) => (
+        <div>
+          <p class="font-mono text-[0.72rem] uppercase tracking-[0.18em] text-brass">{pane.pos}</p>
+          <h3 class="mt-1 mb-1.5 font-display text-[1.9rem] leading-[1.05]">{pane.name}</h3>
+          <p set:html={pane.text} />
+        </div>
+      ))
+    }
+  </div>
+</Section>
